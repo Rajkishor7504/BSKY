@@ -1,0 +1,401 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using HPSBYS.Data.Model;
+using Dapper;
+using Dapper.Contrib;
+using NLog;
+
+namespace HPSBYS.Data.Services
+{
+    public class HospitalDetailsDataServices : BaseDataService 
+    {
+        public HospitalDetails GetHospitalInformation(string HospitalCode)
+        {
+            using (SqlConnecton)
+            {
+                return SqlConnecton.Query<HospitalDetails>("Exec USP_T_GetHospitalINFO @P_HospitalCode='" + HospitalCode + "'").FirstOrDefault();
+            }
+        }
+
+        public IList<URNInformation> GetURNINFormation(int Schemecode, string URN)
+        {
+            List<URNInformation> URNInformation = new List<URNInformation>();
+            using (SqlConnecton)
+            {
+                URNInformation = SqlConnecton.Query<URNInformation>("Exec USP_T_GetURN_INFO @P_Schemecode=" + Schemecode + ",@P_URN='" + URN + "'").ToList();
+
+            }
+            return URNInformation;
+        }
+
+        //public IList<Scheme> GetScheme(string Schemecode)
+        //{
+        //    List<Scheme> SchemeInformation = new List<Scheme>();
+        //    ILogger log = LogManager.GetCurrentClassLogger();
+        //    try
+        //    {
+        //        using (SqlConnecton)
+        //        {
+        //            SchemeInformation = SqlConnecton.Query<Scheme>("Exec USP_T_Scheme_INFO @P_Schemecode='" + Schemecode + "'").ToList();
+        //        }
+
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        SchemeInformation = null;
+        //        log.Error(ex);
+        //    }
+
+        //    return SchemeInformation;
+        //}
+
+        //public IList<PACKAGECATEGORY> GetPACKAGECATEGORY(string Action)
+        //{
+        //    List<PACKAGECATEGORY> GetPACKAGECATEGORYInfo = new List<PACKAGECATEGORY>();
+        //    ILogger log = LogManager.GetCurrentClassLogger();
+        //    try
+        //    {
+        //        using (SqlConnecton)
+        //        {
+        //            GetPACKAGECATEGORYInfo = SqlConnecton.Query<PACKAGECATEGORY>("Exec USP_MOB_GetProcedures @P_Action='" + Action + "'").ToList();
+        //        }
+
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        GetPACKAGECATEGORYInfo = null;
+        //        log.Error(ex);
+        //    }
+
+        //    return GetPACKAGECATEGORYInfo;
+        //}
+
+
+
+        //public IList<PackageInformation> GetPackageDetail(string Action, string PACKAGECATEGORY)
+        //{
+        //    List<PackageInformation> GetPackageInfo = new List<PackageInformation>();
+        //    ILogger log = LogManager.GetCurrentClassLogger();
+        //    try
+        //    {
+        //        using (SqlConnecton)
+        //        {
+        //            GetPackageInfo = SqlConnecton.Query<PackageInformation>("Exec USP_MOB_GetPackages @P_Action='" + Action + "', @P_PackageCategoryCode='" + PACKAGECATEGORY + "'").ToList();
+        //        }
+
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        GetPackageInfo = null;
+        //        log.Error(ex);
+        //    }
+
+        //    return GetPackageInfo;
+        //}
+
+
+
+
+
+
+        //public IList<Registration> GetRegistrationInformation(string Action,string HospitalCode)
+        //{
+        //    List<Registration> RegistrationInfo = new List<Registration>();
+        //    ILogger log = LogManager.GetCurrentClassLogger();
+        //    try
+        //    {
+        //        using (SqlConnecton)
+        //        {
+        //             RegistrationInfo = SqlConnecton.Query<Registration>("Exec USP_T_GetRegistration_INFO @P_Action='" + Action + "',@P_Hospitalcode='" + HospitalCode + "'").ToList();
+
+        //        }
+
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        RegistrationInfo = null;
+        //        log.Error(ex);
+        //    }
+
+        //    return RegistrationInfo;
+        //}
+
+
+
+        public IList<PatientRegistrationInformation> GetRegistrationInformation(string Action, string HospitalCode, string URN, string BlockingINVOICENO, string TransactionID)
+        {
+            List<PatientRegistrationInformation> RegistrationInfo = new List<PatientRegistrationInformation>();
+            ILogger log = LogManager.GetCurrentClassLogger();
+            try
+            {
+                using (SqlConnecton)
+                {
+                    RegistrationInfo = SqlConnecton.Query<PatientRegistrationInformation>("Exec USP_T_GetRegistration_INFO @P_Action='" + Action + "',@P_Hospitalcode='" + HospitalCode + "',@P_URN='" + URN + "',@P_BLOCKINGINVOICENO='" + BlockingINVOICENO + "',@P_TransactionID='" + TransactionID + "'").ToList();
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                RegistrationInfo = null;
+                log.Error(ex);
+            }
+
+            return RegistrationInfo;
+        }
+        public IList<Registration> GetRegistrationInformationByInvoiceNo(string Action, string HospitalCode, string URN, string BlockingINVOICENO, string TransactionID)
+        {
+            List<Registration> RegistrationInfo = new List<Registration>();
+            ILogger log = LogManager.GetCurrentClassLogger();
+            try
+            {
+                using (SqlConnecton)
+                {
+                    RegistrationInfo = SqlConnecton.Query<Registration>("Exec USP_T_GetRegistration_INFO @P_Action='" + Action + "',@P_Hospitalcode='" + HospitalCode + "',@P_URN='" + URN + "',@P_BLOCKINGINVOICENO='" + BlockingINVOICENO + "',@P_TransactionID='" + TransactionID + "'").ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                RegistrationInfo = null;
+                log.Error(ex);
+            }
+
+            return RegistrationInfo;
+        }
+        public IList<UnblockingInfo> GetUnblockingInformation(string HospitalCode, string URN)
+        {
+            List<UnblockingInfo> UnblockingInfo = new List<UnblockingInfo>();
+            ILogger log = LogManager.GetCurrentClassLogger();
+            try
+            {
+                using (SqlConnecton)
+                {
+                    UnblockingInfo = SqlConnecton.Query<UnblockingInfo>("Exec USP_T_Admission_INFO @P_Hospitalcode='" + HospitalCode + "',@URN='" + URN + "'").ToList();
+
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                UnblockingInfo = null;
+                log.Error(ex);
+            }
+
+            return UnblockingInfo;
+        }
+
+        public IList<DischargeSummary> GetDischargeInformation(string Action, string HospitalCode, string URN)
+        {
+            List<DischargeSummary> DischargeSummaryInfo = new List<DischargeSummary>();
+            ILogger log = LogManager.GetCurrentClassLogger();
+            try
+            {
+                using (SqlConnecton)
+                {
+                    DischargeSummaryInfo = SqlConnecton.Query<DischargeSummary>("Exec USP_T_GetDischarge_INFO  @P_Action='" + Action + "', @P_Hospitalcode='" + HospitalCode + "', @P_URN='" + URN + "'").ToList();
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                DischargeSummaryInfo = null;
+                log.Error(ex);
+            }
+
+            return DischargeSummaryInfo;
+        }
+
+        public IList<DischargeInformation> GetDischargeDetail(string Action, string HospitalCode, string URN, string BlockingInvoiceNo)
+        {
+            List<DischargeInformation> DischargeSummaryInfo = new List<DischargeInformation>();
+            ILogger log = LogManager.GetCurrentClassLogger();
+            try
+            {
+                using (SqlConnecton)
+                {
+                    DischargeSummaryInfo = SqlConnecton.Query<DischargeInformation>("Exec USP_T_GetDischarge_INFO  @P_Action='" + Action + "', @P_Hospitalcode='" + HospitalCode + "', @P_URN='" + URN + "', @P_BLOCKINGINVOICENO='" + BlockingInvoiceNo + "'").ToList();
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                DischargeSummaryInfo = null;
+                log.Error(ex);
+            }
+
+            return DischargeSummaryInfo;
+        }
+        //Package Extension
+
+        public IList<PackageExtension> GetPackageExtensionDetail(string Scheme, string HospitalCode, string URN)
+        {
+            List<PackageExtension> PackageExtensionDetail = new List<PackageExtension>();
+            ILogger log = LogManager.GetCurrentClassLogger();
+            try
+            {
+                using (SqlConnecton)
+                {
+                    PackageExtensionDetail = SqlConnecton.Query<PackageExtension>("Exec USP_T_GetPackageExtenInfo  @P_Scheme='" + Scheme + "', @P_HospitalCode='" + HospitalCode + "', @P_URN='" + URN + "'").ToList();
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                PackageExtensionDetail = null;
+                log.Error(ex);
+            }
+
+            return PackageExtensionDetail;
+        }
+        public IList<PatientRegistrationInformation> GetWardBlockPackageInformation(string Action, string HospitalCode, string URN, string BlockingINVOICENO, string TransactionID)
+        {
+            List<PatientRegistrationInformation> RegistrationInfo = new List<PatientRegistrationInformation>();
+            ILogger log = LogManager.GetCurrentClassLogger();
+            try
+            {
+                using (SqlConnecton)
+                {
+                    RegistrationInfo = SqlConnecton.Query<PatientRegistrationInformation>("Exec USP_T_GetWardBlockPackage_INFO @P_Action='" + Action + "',@P_Hospitalcode='" + HospitalCode + "',@P_URN='" + URN + "',@P_BLOCKINGINVOICENO='" + BlockingINVOICENO + "',@P_TransactionID='" + TransactionID + "'").ToList();
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                RegistrationInfo = null;
+                log.Error(ex);
+            }
+
+            return RegistrationInfo;
+        }
+        public IList<PatientRegistrationInformation> GetPackageChangeInformation(string Action, string HospitalCode, string URN, string BlockingINVOICENO, string TransactionID)
+        {
+            List<PatientRegistrationInformation> RegistrationInfo = new List<PatientRegistrationInformation>();
+            ILogger log = LogManager.GetCurrentClassLogger();
+            try
+            {
+                using (SqlConnecton)
+                {
+                    RegistrationInfo = SqlConnecton.Query<PatientRegistrationInformation>("Exec USP_T_GetPackageChange_INFO @P_Action='" + Action + "',@P_Hospitalcode='" + HospitalCode + "',@P_URN='" + URN + "',@P_BLOCKINGINVOICENO='" + BlockingINVOICENO + "',@P_TransactionID='" + TransactionID + "'").ToList();
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                RegistrationInfo = null;
+                log.Error(ex);
+            }
+
+            return RegistrationInfo;
+        }
+        public IList<WardInfo> GetPreviousWardDetailsByTranId(string Action, string TransactionID,string DischargeDate)
+        {
+            List<WardInfo> RegistrationInfo = new List<WardInfo>();
+            ILogger log = LogManager.GetCurrentClassLogger();
+            try
+            {
+                using (SqlConnecton)
+                {
+                    RegistrationInfo = SqlConnecton.Query<WardInfo>("Exec USP_T_GetWardBlockPackage_INFO @P_Action='" + Action + "',@P_TransactionID='" + TransactionID + "',@P_DischargeDate='"+DischargeDate+"'").ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                RegistrationInfo = null;
+                log.Error(ex);
+            }
+
+            return RegistrationInfo;
+        }
+        public IList<AddOnInfo> GetPreviousAddOnPackageDetailsByInvoiceNo(string Action, string InvoiceNo)
+        {
+            List<AddOnInfo> RegistrationInfo = new List<AddOnInfo>();
+            ILogger log = LogManager.GetCurrentClassLogger();
+            try
+            {
+                using (SqlConnecton)
+                {
+                    RegistrationInfo = SqlConnecton.Query<AddOnInfo>("Exec USP_T_GetAddOnBlockPackage_INFO @P_Action='" + Action + "',@P_BLOCKINGINVOICENO='" + InvoiceNo+ "'").ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                RegistrationInfo = null;
+                log.Error(ex);
+            }
+
+            return RegistrationInfo;
+        }
+        public IList<PatientRegistrationInformation> GetWardPreAuthInformation(string Action, string HospitalCode, string URN)
+        {
+            List<PatientRegistrationInformation> RegistrationInfo = new List<PatientRegistrationInformation>();
+            ILogger log = LogManager.GetCurrentClassLogger();
+            try
+            {
+                using (SqlConnecton)
+                {
+                    RegistrationInfo = SqlConnecton.Query<PatientRegistrationInformation>("Exec [USP_T_GetWardBlockPackage_INFO] @P_Action='" + Action + "',@P_Hospitalcode='" + HospitalCode + "',@P_URN='" + URN + "'").ToList();
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                RegistrationInfo = null;
+                log.Error(ex);
+            }
+
+            return RegistrationInfo;
+        }
+        public IList<PatientRegistrationInformation> GetPackageChangePreAuthInformation(string Action, string HospitalCode, string URN)
+        {
+            List<PatientRegistrationInformation> RegistrationInfo = new List<PatientRegistrationInformation>();
+            ILogger log = LogManager.GetCurrentClassLogger();
+            try
+            {
+                using (SqlConnecton)
+                {
+                    RegistrationInfo = SqlConnecton.Query<PatientRegistrationInformation>("Exec [USP_T_GetPackageChangePreAuth_INFO] @P_Action='" + Action + "',@P_Hospitalcode='" + HospitalCode + "',@P_URN='" + URN + "'").ToList();
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                RegistrationInfo = null;
+                log.Error(ex);
+            }
+
+            return RegistrationInfo;
+        }
+        public IList<PatientRegistrationInformation> GetAddOnPreAuthInformation(string Action, string HospitalCode, string URN)
+        {
+            List<PatientRegistrationInformation> RegistrationInfo = new List<PatientRegistrationInformation>();
+            ILogger log = LogManager.GetCurrentClassLogger();
+            try
+            {
+                using (SqlConnecton)
+                {
+                    RegistrationInfo = SqlConnecton.Query<PatientRegistrationInformation>("Exec [USP_T_GetAddOnBlockPackage_INFO] @P_Action='" + Action + "',@P_Hospitalcode='" + HospitalCode + "',@P_URN='" + URN + "'").ToList();
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                RegistrationInfo = null;
+                log.Error(ex);
+            }
+
+            return RegistrationInfo;
+        }
+    }
+}

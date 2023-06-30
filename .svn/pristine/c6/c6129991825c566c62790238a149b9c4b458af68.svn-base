@@ -1,0 +1,38 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using HPSBYS.Data.Model;
+using Dapper;
+using Dapper.Contrib;
+using NLog;
+
+namespace HPSBYS.Data.Services
+{
+   public class URNInformationDataService : BaseDataService
+    {
+        public IList<URNInformation> GetURNINFormation(int Schemecode, string URN)
+        {
+            List<URNInformation> URNInformation = new List<URNInformation>();
+            ILogger log = LogManager.GetCurrentClassLogger();
+            try
+            {
+                using (SqlConnecton)
+                {
+                    URNInformation = SqlConnecton.Query<URNInformation>("Exec USP_T_GetURN_INFO @P_Schemecode=" + Schemecode + ",@P_URN='" + URN + "'").ToList();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                URNInformation = null;
+                log.Error(ex);
+            }
+            
+            return URNInformation;
+        }
+    }
+}
+
+ 

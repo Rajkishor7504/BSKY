@@ -1,0 +1,44 @@
+2018-11-27 09:40:18.8204 DEBUG WebAPI Registered
+2018-11-27 10:48:57.1901 DEBUG WebAPI Registered
+2018-11-27 11:04:47.8970 DEBUG WebAPI Registered
+2018-11-27 11:14:13.2050 DEBUG WebAPI Registered
+2018-11-27 11:28:45.8407 DEBUG WebAPI Registered
+2018-11-27 12:35:22.2754 DEBUG WebAPI Registered
+2018-11-27 12:45:32.1707 DEBUG WebAPI Registered
+2018-11-27 15:04:04.9699 DEBUG WebAPI Registered
+2018-11-27 15:21:28.5487 DEBUG WebAPI Registered
+2018-11-27 15:22:33.8933 ERROR System.Data.SqlClient.SqlException (0x80131904): Execution Timeout Expired.  The timeout period elapsed prior to completion of the operation or the server is not responding. ---> System.ComponentModel.Win32Exception (0x80004005): The wait operation timed out
+   at System.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+   at System.Data.SqlClient.SqlInternalConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+   at System.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, Boolean callerHasConnectionLock, Boolean asyncClose)
+   at System.Data.SqlClient.TdsParser.TryRun(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj, Boolean& dataReady)
+   at System.Data.SqlClient.SqlDataReader.TryConsumeMetaData()
+   at System.Data.SqlClient.SqlDataReader.get_MetaData()
+   at System.Data.SqlClient.SqlCommand.FinishExecuteReader(SqlDataReader ds, RunBehavior runBehavior, String resetOptionsString, Boolean isInternal, Boolean forDescribeParameterEncryption, Boolean shouldCacheForAlwaysEncrypted)
+   at System.Data.SqlClient.SqlCommand.RunExecuteReaderTds(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, Boolean async, Int32 timeout, Task& task, Boolean asyncWrite, Boolean inRetry, SqlDataReader ds, Boolean describeParameterEncryptionRequest)
+   at System.Data.SqlClient.SqlCommand.RunExecuteReader(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, String method, TaskCompletionSource`1 completion, Int32 timeout, Task& task, Boolean& usedCache, Boolean asyncWrite, Boolean inRetry)
+   at System.Data.SqlClient.SqlCommand.RunExecuteReader(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, String method)
+   at System.Data.SqlClient.SqlCommand.ExecuteReader(CommandBehavior behavior, String method)
+   at System.Data.SqlClient.SqlCommand.ExecuteDbDataReader(CommandBehavior behavior)
+   at System.Data.Common.DbCommand.System.Data.IDbCommand.ExecuteReader(CommandBehavior behavior)
+   at Dapper.SqlMapper.ExecuteReaderWithFlagsFallback(IDbCommand cmd, Boolean wasClosed, CommandBehavior behavior)
+   at Dapper.SqlMapper.<QueryImpl>d__138`1.MoveNext()
+   at System.Collections.Generic.List`1..ctor(IEnumerable`1 collection)
+   at System.Linq.Enumerable.ToList[TSource](IEnumerable`1 source)
+   at Dapper.SqlMapper.Query[T](IDbConnection cnn, String sql, Object param, IDbTransaction transaction, Boolean buffered, Nullable`1 commandTimeout, Nullable`1 commandType)
+   at HPSBYS.Data.Services.URNInformationDataService.GetURNINFormation(Int32 Schemecode, String URN) in D:\Ram\HPSBYS_1.2.0.0\HPSBYS.Data\Services\URNInformationDataService.cs:line 23
+ClientConnectionId:d6cfd7d3-c68d-4c3b-8d97-d94db050dc26
+Error Number:-2,State:0,Class:11
+2018-11-27 15:33:43.5416 DEBUG WebAPI Registered
+2018-11-27 15:47:47.6202 DEBUG WebAPI Registered
+2018-11-27 15:50:11.8315 DEBUG WebAPI Registered
+2018-11-27 16:01:47.0143 DEBUG WebAPI Registered
+2018-11-27 16:10:47.9096 DEBUG WebAPI Registered
+2018-11-27 16:25:27.8274 DEBUG WebAPI Registered
+2018-11-27 16:33:12.6356 DEBUG WebAPI Registered
+2018-11-27 16:36:37.4944 DEBUG WebAPI Registered
+2018-11-27 16:47:57.1303 DEBUG WebAPI Registered
+2018-11-27 16:57:12.9655 DEBUG WebAPI Registered
+2018-11-27 16:59:44.2709 DEBUG WebAPI Registered
+2018-11-27 17:36:48.1416 DEBUG WebAPI Registered
+2018-11-27 18:16:10.7125 DEBUG WebAPI Registered

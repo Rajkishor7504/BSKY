@@ -1,0 +1,209 @@
+﻿
+using HPSBYS.Data.Model;
+using HPSBYS.Data.Services;
+using HPSBYS.Web.Models;
+using NLog;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+
+namespace HPSBYS.Web.Controllers
+{
+    [SessionTimeOutFilter]
+    [Authorize]
+    public class DischargeController : Controller
+    {
+        ILogger log = LogManager.GetCurrentClassLogger();
+        string result = string.Empty;
+        // GET: Discharge
+        [HttpGet]
+        public ViewResult AddDischarge()
+        {
+            return View();
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public JsonResult AddDischarge(FormCollection PaitentInfo)
+        {
+            string fname = string.Empty;
+            string fileExtention = string.Empty;
+            if (Request.Files.Count > 0)
+            {
+                try
+                {
+                    string TreatComCertificate = string.Empty;
+                    HttpFileCollectionBase files = Request.Files;
+                    for (int i = 0; i < files.Count; i++)
+                    {
+                        HttpPostedFileBase file = files[i];
+                        fname = file.FileName;
+                        fileExtention = System.IO.Path.GetExtension(file.FileName);
+                        int Year = DateTime.Now.Year;
+                        string Month = DateTime.Now.ToString("MMMM");
+                        string HopitalCode = Session["HospitalCode"].ToString();
+                        string dirUrl = "~/UploadDocument/" + HopitalCode + "/" + Year + "/" + Month + "/DischargeDocument";
+                        string dirPath = Server.MapPath(dirUrl);
+                        if (!Directory.Exists(dirPath))
+                        {
+                            Directory.CreateDirectory(dirPath);
+                        }
+                        var newGuid = Guid.NewGuid();
+                        string subGuid = newGuid.ToString().Substring(0, 15);
+                        string ActFileName = "DIS_" + PaitentInfo["URN"] + "_" + GetTimestamp(DateTime.Now)+fileExtention;
+                       // string ActFileName = subGuid + "_" + fname;
+                        TreatComCertificate = ActFileName;
+                        fname = Path.Combine(Server.MapPath(dirUrl), ActFileName);
+                        file.SaveAs(fname);
+                    }
+                    PatientInfo patientInfo = new PatientInfo
+                    {
+                        ACTIONCODE = PaitentInfo["ACTIONCODE"],
+                        BlockingInvoiceNo = PaitentInfo["BlockingInvoiceNo"],
+                        DischargeDesc = PaitentInfo["DischargeDesc"],
+                        DischargeUserDate = PaitentInfo["DischargeUserDate"],
+                        DATEOFDISCHARGE = PaitentInfo["DATEOFDISCHARGE"],
+                        Mortality = PaitentInfo["Mortality"],
+                        MortalitySummary = PaitentInfo["MortalitySummary"],
+                        ProcedureCode = PaitentInfo["ProcedureCode"],
+                        ProcedureName = PaitentInfo["ProcedureName"],
+                        PackageCode = PaitentInfo["PackageCode"],
+                        PackageName = PaitentInfo["PackageName"],
+                        PackageCost = PaitentInfo["PackageCost"],
+                        NoofDays = PaitentInfo["NoofDays"],
+                        AmoutBlocked = PaitentInfo["AmoutBlocked"],
+                        NoofDaysActual = PaitentInfo["NoofDaysActual"],
+                        PackageMode = PaitentInfo["PackageMode"],
+                        IsMedSergical = PaitentInfo["IsMedSergical"],
+                        URN = PaitentInfo["URN"],
+                        TreatmentCompletionCer = TreatComCertificate,
+                        Category = PaitentInfo["category"],
+                        CategoryCode = PaitentInfo["categoryCode"]
+                    };
+                    using (PatientDataServices dataServices = new PatientDataServices())
+                    {
+                        result = dataServices.addPatientDischarge(patientInfo);
+                    }
+                    if (result == "1")
+                    {
+                        return Json("sucess");
+                    }
+                    else
+                    {
+                        return Json("failed");
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    log.Error(ex);
+                    return Json("failed");
+                }
+
+            }
+            else
+            {
+                return Json("failed");
+            }
+        }
+        [HttpGet]
+        public ViewResult ViewDischarge()
+        {
+            return View();
+        }
+        public ViewResult TreatmentCompletionCertificate()
+        {
+            return View();
+        }
+        [HttpGet]
+        public ViewResult AddDownWard()
+        {
+            return View();
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public JsonResult AddDownWardReferal(FormCollection PaitentInfo)
+        {
+            try
+            {
+                DownwardReferalInfo patientInfo = new DownwardReferalInfo
+                {
+                    Action="A",
+                    URN = PaitentInfo["URN"],
+                    BlockingInvoiceNo = PaitentInfo["BlockingInvoiceNo"],
+                    IsReferalRequired = PaitentInfo["IsReferalRequired"],
+                    BlockCode = PaitentInfo["BlockCode"],
+                    DistrictCode = PaitentInfo["DistrictCode"],
+                    PHCCode = PaitentInfo["PHCCode"],
+                    SubCenterCode = PaitentInfo["SubCenterCode"]
+                };
+                using (PatientDataServices dataServices = new PatientDataServices())
+                {
+                    result = dataServices.addDownwardReferal(patientInfo);
+                }
+                if (result == "1")
+                {
+                    return Json("success");
+                }
+                else if (result == "2")
+                {
+                    return Json("exist");
+                }
+                else
+                {
+                    return Json("failed");
+                }
+
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex);
+                return Json("failed");
+            }
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public JsonResult UpdateDownWardReferal(FormCollection PaitentInfo)
+        {
+            try
+            {
+                DownwardReferalInfo patientInfo = new DownwardReferalInfo
+                {
+                    Action = "B",
+                    URN = PaitentInfo["URN"],
+                    BlockingInvoiceNo = PaitentInfo["BlockingInvoiceNo"],
+                    IsReferalRequired = PaitentInfo["IsReferalRequired"],
+                    BlockCode = PaitentInfo["BlockCode"],
+                    DistrictCode = PaitentInfo["DistrictCode"],
+                    PHCCode = PaitentInfo["PHCCode"],
+                    SubCenterCode = PaitentInfo["SubCenterCode"]
+                };
+                using (PatientDataServices dataServices = new PatientDataServices())
+                {
+                    result = dataServices.addDownwardReferal(patientInfo);
+                }
+                if (result == "1")
+                {
+                    return Json("update");
+                }                
+                else
+                {
+                    return Json("failed");
+                }
+
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex);
+                return Json("failed");
+            }
+        }
+        [NonAction]
+        private static string GetTimestamp(DateTime value)
+        {
+            return value.ToString("yyyyMMddHHmmssffff");
+        }
+    }
+}

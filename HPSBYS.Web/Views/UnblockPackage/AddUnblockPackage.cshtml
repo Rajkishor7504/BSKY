@@ -1,0 +1,1769 @@
+﻿@{
+    /**/
+    ViewBag.Title = "AddUnblockPackage";
+    Layout = "~/Views/Shared/_CommonLayout.cshtml";
+}
+@functions{
+    public string TokenHeaderValue()
+    {
+        string cookieToken, formToken;
+        AntiForgery.GetTokens(null, out cookieToken, out formToken);
+        return cookieToken + ":" + formToken;
+    }
+}
+<style>
+    .active11 {
+        background: gold !important;
+    }
+    tr.row_selected td {
+        background-color: #EFF9F6 !important;
+    }
+    .divdisable {
+        pointer-events: none;
+    }
+</style>
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 pb-3">
+            <div class="card">
+                <div class="card-body">
+                    <div class="form-box-bg mb-4">
+
+                        <div id="PatientDetailsSegment">
+                            <div class="row mb-1 heading-pkg border-bottom pl-3">
+                                <h5>Patient Information :</h5>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                                    <div class="mb-4">
+                                        <label class="pkg-label font-weight-normal">NFSA /SFSS Card No  :</label>
+                                        <div id="NSFSSCardNoPI" class="pkghead-txt"></div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                                    <div class="mb-4">
+                                        <label class="pkg-label font-weight-normal">Current Available Balance :</label>
+                                        <div id="CurrentAvailBalPI" class="pkghead-txt"></div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                                    <div class="mb-4">
+                                        <label class="pkg-label font-weight-normal">Policy Period : </label>
+                                        <div id="PolicyPeriodPI" class="pkghead-txt"></div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                                    <div class="mb-4">
+                                        <label class="pkg-label font-weight-normal">Invoice No: </label>
+                                        <div id="InvoiceNoPI" class="pkghead-txt"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                                    <div class="mb-4">
+                                        <label class="pkg-label font-weight-normal">Case No: </label>
+                                        <div id="caseno" class="pkghead-txt"></div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                                    <div class="mb-4">
+                                        <label class="pkg-label font-weight-normal">Current Policy: </label>
+                                        <div id="CurrentPolicyPI" class="pkghead-txt"></div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                                    <div class="mb-4">
+                                        <label class="pkg-label font-weight-normal">Hospital Name : </label>
+                                        <div id="HospitalNamePI" class="pkghead-txt"></div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                                    <div class="mb-4">
+                                        <label class="pkg-label font-weight-normal">Override Code : </label>
+                                        <div id="OverrideCodePI" class="pkghead-txt"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                                    <div class="mb-4">
+                                        <label class="pkg-label font-weight-normal"> Patient Name: </label>
+                                        <div id="PatientNamePI" class="pkghead-txt"></div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                                    <div class="mb-4">
+                                        <label class="pkg-label font-weight-normal">Patient Phone No: </label>
+                                        <div id="PatientPhoneNoPI" class="pkghead-txt"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mb-1 heading-pkg border-bottom pl-3">
+                                <h5> Admission Details  </h5>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                                    <div class="mb-4">
+                                        <label class="pkg-label font-weight-normal">  Actual Date of Admission: </label>
+                                        <div id="DateOfAdmissionPI" class="pkghead-txt"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div id="BlockPackageDetailsSegment" class="form-box-bg mb-4">
+                        <div class="row pl-3 mb-1 heading-pkg border-bottom">
+                            <h5> Blocked Package </h5>
+                        </div>
+                        <div class="table-responsive mt-4">
+                            @*<table id="grdBlockPackage1" data-toggle="table" class="table table-striped">
+                            </table>*@
+
+                            <!-- Blocked Package -->
+
+                            <table id="grdBlockPackage1" class="table table-striped border preauth-tbl" cellspacing="0" width="100%">
+                                <thead>
+                                    <tr>
+                                        <th style="width:5% !important;">Sl No</th>
+                                        <th style="width:15% !important;"> <div class="prehed-bold"> Member Name</div> </th>
+                                        <th style="width:15% !important;">Package Details   <div class="prehed-small"> Code | Name </div> </th>
+                                        <th style="width:30% !important;">Procedure Details   <div class="prehed-small"> Code | Description </div> </th>
+                                        <th style="width:10% !important;"> Block Date </th>
+                                        <th style="width:12% !important;">Amount Blocked</th>
+                                        <th style="width:15% !important; text-align:center;"> Action </th>
+                                    </tr>
+                                </thead>
+                               @* <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>  <div class="pre-bold"> Bibhu Jena </div> </td>
+                                        <td> <div class="text-success font-weight-bold"> BM004A </div>  <div class="pre-bold"> Burns Management </div> </td>
+                                        <td> <div class="badge badge-success p-2 mb-2"> BM </div> <div class="prehed-small"> Electrical contact burns: Low voltage - without part of limb / limb loss; Includes % TBSA skin grafted, flap cover, follow-up dressings etc. as deemed necessary; Surgical procedures are required for deep burns that are not amenable to heal with dressings alone. </div>  </td>
+                                        <td> 16-May-23 </td>
+                                        <td> <div class="pre-bold"> &#8377; 1,25,000 </div> </td>
+                                        <td><button type="button" class="btn btn-outline-success btn-sm my-2 my-sm-0" title="Un-block">Un-Block</button> </td>
+
+
+                                    </tr>
+
+
+                                    <tr>
+                                        <td>2</td>
+                                        <td>  <div class="pre-bold"> SRI SRI RAJENDRA BALIAR SINGH </div> </td>
+                                        <td> <div class="text-success font-weight-bold"> MC007A </div> <div class="pre-bold"> Cardiology </div> </td>
+                                        <td>  <div class="badge badge-success p-2 mb-2"> MC </div> <div class="prehed-small"> Electrical contact burns: Low voltage - without part of limb / limb loss; Includes % TBSA skin grafted, flap cover, follow-up dressings etc. as deemed necessary; Surgical procedures are required for deep burns that are not amenable to heal with dressings alone. </div> </td>
+                                        <td> 16-May-23 </td>
+                                        <td> <div class="pre-bold"> &#8377; 1,25,000 </div> </td>
+                                        <td><button type="button" class="btn btn-outline-success btn-sm my-2 my-sm-0" title="Un-block">Un-Block</button> </td>
+
+
+                                    </tr>
+
+
+
+
+
+
+                                </tbody>*@
+                            </table>
+
+
+
+                            <!--Blocked Package -->
+
+                        </div>
+                    </div>
+                    <div id="MemberDetailsSegment" class="form-box-bg mb-4 customRadio customCheckbox">
+                        <div class="row pl-3 mb-4 heading-pkg border-bottom">
+                            <h5> Verified Details </h5>
+                        </div>
+                        <div id="verificationBlock">
+                            <div class="table-responsive">
+                                <table id="grdFamilyDetails" data-toggle="table" class="table table-striped">
+                                </table>
+                            </div>
+                        </div>
+                        <div class="form-row  mb-4 heading-pkg px-0" id="OverVerifieddetails">
+
+                            <div class="col-2">
+                                <input type="text" id="txtOverrideCode" readonly maxlength="7" class="form-control" />
+                            </div>
+                            <div class="col-2">
+                                <input class="btn btn-outline-success my-2 my-sm-0" type="button" onclick="OverrideRequest()" value="Generate Override Code" id="btnoverridegeneration" />
+                            </div>
+                            @*<div class="col-2">
+                                    <input class="btn btn-outline-success my-2 my-sm-0" type="button"  value="Verify Override Code" id="btnoverridegeneration" />
+                                </div>*@
+                        </div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 px-0">
+                            <div class="col-form-label">Remark <b><span style="color:red">*</span></b></div>
+                            <textarea id="Remark" class="form-control" rows="4" oninput="this.value = this.value.toUpperCase()"></textarea>
+                            <input type="hidden" id="MemberId" />
+                            <input type="hidden" id="Hospitalcode" />
+                            <input type="hidden" id="TransactionID" />
+                            <input type="hidden" id="VerifiedMemberId" />
+                            <input type="hidden" id="VerifiedMemberName" />
+                            <input type="hidden" id="AuthenticatioMode" />
+                        </div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-left mb-4 mt-4 px-0">
+                            <input class="btn btn-success my-2 my-sm-0" type="button" value="Submit" id="BtnUnblockPackage" onclick="UnblockPackageSava(this);">
+                            <input class="btn btn-primary my-2 my-sm-0" type="reset" value="Clear" id="UnblockReset">
+                            <input class="btn btn-danger my-2 my-sm-0" type="button" value="Close" id="UnblockClose">
+                        </div>
+                        <!-- Button trigger modal -->
+                        <!--OTP Modal -->
+                        <div class="modal fade" id="OTPModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static">
+                            <div class="modal-dialog modal-sm otpmodal" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel"> OTP Verification </h5>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="row">
+                                            <div class="col-lg-12" align="center">
+                                                <div class="mb-4">
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <div class="col-form-label  mb-1"> OTP <b><span style="color:red">*</span></b></div>
+                                                            <input type="text" class="form-control mb-2 inputOnlyNumber" id="txtopt" autocomplete="off" placeholder="Enter OTP" maxlength="6">
+                                                            <input type="hidden" mb-3" id="Uid" />
+                                                            <input type="hidden" mb-3" id="txn" />
+                                                            <input type="hidden" mb-3" id="OTPVerifyMemberID" />
+                                                            <input type="hidden" mb-3" id="OTPurn" />
+                                                            <input type="hidden" mb-3" id="SelectedPatientId" />
+                                                            <label class="mb-2 text-left">Time Remaining <span id="timer-countdown">05:00 </span></label>
+
+                                                            <div>
+                                                                <input type="button" class="btn btn-outline-success" value="Verify" onclick="VerifyOTP();">
+                                                                <input type="button" class="btn btn-outline-danger" value="Cancel" data-dismiss="modal" aria-label="Close">
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--IRIS Modal -->
+                        <div class="modal fade" id="IrisModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-lg" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel">Authenticate</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">×</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="row justify-content-center  customRadio">
+                                            <div class="col-md-3">
+                                                <div class="chkbox-bg">
+                                                    <input type="radio" name="textEditor" id="rdProduction" checked="checked" value="P">
+                                                    <label for="rdProduction"> Prodouction </label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="chkbox-bg">
+                                                    <input type="radio" name="textEditor" id="rdStaging" value="S" disabled>
+                                                    <label for="rdStaging"> Staging Server </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="col-lg-12">
+                                                <div class="mb-3">
+                                                    <div class="form-row mb-2">
+                                                        <div class="col-md-3">
+                                                            <input type="hidden" id="getrdresponse" />
+                                                            <div class="col-form-label">RD Service Status <b><span style="color:red">*</span></b></div>
+                                                            <input type="text" class="form-control" id="rdStatus" readonly>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <div class="col-form-label">Device Info Path <b><span style="color:red">*</span></b></div>
+                                                            <input type="text" class="form-control" id="rdinfo" readonly>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <div class="col-form-label"> Capture Path <b><span style="color:red">*</span></b></div>
+                                                            <input type="text" class="form-control" readonly>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <div class="col-form-label">RD Service Info <b><span style="color:red">*</span></b></div>
+                                                            <input type="text" class="form-control" readonly>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row  mb-3 heading-pkg border-bottom">
+                                            <h5> Capture Pid Data </h5>
+                                        </div>
+                                        <div class="form-row mb-3">
+                                            <div class="col-md-3">
+                                                <div class="col-form-label">Error Code <b><span style="color:red">*</span></b></div>
+                                                <input type="text" class="form-control" id="errCode" readonly>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="col-form-label">Quality Service <b><span style="color:red">*</span></b></div>
+                                                <input type="text" class="form-control" readonly>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="col-form-label"> Error Info <b><span style="color:red">*</span></b></div>
+                                                <input type="text" class="form-control" id="errInfo" readonly>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="col-form-label"> dpid <b><span style="color:red">*</span></b></div>
+                                                <input type="text" class="form-control" id="dpid" readonly>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="col-form-label"> Red/Id <b><span style="color:red">*</span></b></div>
+                                                <input type="text" class="form-control" readonly>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="col-form-label"> Red/info <b><span style="color:red">*</span></b></div>
+                                                <input type="text" class="form-control" readonly>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="col-form-label"> do <b><span style="color:red">*</span></b></div>
+                                                <input type="text" class="form-control" readonly>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="col-form-label"> mi <b><span style="color:red">*</span></b></div>
+                                                <input type="text" class="form-control" id="mi" readonly>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <div class="col-form-label"> mc <b><span style="color:red">*</span></b></div>
+                                                <input type="text" class="form-control" id="mc" readonly>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <div class="row  mb-3 heading-pkg border-bottom">
+                                                <h5> Auth Request </h5>
+                                            </div>
+                                            <div class="form-row mb-2">
+                                                <div class="col-md-3">
+                                                    <div class="col-form-label">Aadhaar UID <b><span style="color:red">*</span></b></div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="AadharUidMask" class="form-control" readonly>
+                                                    <input type="hidden" id="AadharUid" class="form-control" readonly>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="col-form-label"> Response Result <b><span style="color:red">*</span></b></div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <input type="text" class="form-control" readonly>
+                                                </div>
+                                            </div>
+                                            <div class="form-row mb-2">
+                                                <div class="col-md-3">
+                                                    <div class="col-form-label"> Error code <b><span style="color:red">*</span></b></div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <input type="number" class="form-control" readonly>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="col-form-label"> Error Info <b><span style="color:red">*</span></b></div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <input type="text" class="form-control" readonly>
+                                                </div>
+                                            </div>
+                                            <input type="hidden" id="rdInfo" />
+                                            <input type="hidden" id="rdData" />
+                                            <input type="hidden" id="vMemberId">
+                                            <input type="hidden" id="Urn">
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 px-0" align="left">
+                                                <input type="button" class="btn btn-outline-success mb-2" value="Captured" id="btnCapture" onclick="Capture();">
+                                                <input type="button" class="btn btn-outline-success mb-2" value="Authentication" id="btnAuthentication">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="clearfix"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- OverRide Request Modal -->
+<div id="MyPopupBlock" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <form id="OverrideRequestForm">
+                <div class="modal-header">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <h4 class="modal-title"> Override Request </h4>
+                        </div>
+                    </div>
+                    <button type="button" class="close" data-dismiss="modal"> &times; </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-2">
+                            <label class="pkg-label font-weight-normal">Member Id :</label>
+                            <div class="pkghead-txt" id="lblPatientMemberId"></div>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <label class="pkg-label font-weight-normal"> Name :</label>
+                            <div class="pkghead-txt" id="lblPatientName"></div>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <label class="pkg-label font-weight-normal"> Gender :</label>
+                            <div class="pkghead-txt" id="lblPatientGender"></div>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <label class="pkg-label font-weight-normal"> Age :</label>
+                            <div class="pkghead-txt" id="lblPatientAge"></div>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <label class="pkg-label font-weight-normal"> Aadhar No. :</label>
+                            <div class="pkghead-txt" id="lblPatientAadharNo"></div>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <label class="pkg-label font-weight-normal"> URN :</label>
+                            <div class="pkghead-txt" id="lblPatientUrnNo"></div>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <label class="pkg-label font-weight-normal">Purpose of Override Code :</label>
+                            <label>
+                                <input type="checkbox" class="packagedetails" id="chkboxblock" value="0302" />
+                                Unblock Package
+                            </label>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="pkg-label font-weight-normal"> Upload File@*<b><span style="color:red">*</span></b>*@ </label>
+                            <div class="pkghead-txt">
+                                <input type="file" class="form-control pr-5" id="uploadfile">
+                                <span id="RemoveOverrideDoc" onclick="RemoveOverrideDoc(this)" class="btn btn-outline-danger btn-sm btn-crus"> <i class="fa fa-times"></i></span>
+                            </div>
+                            <div>
+                                <small><span style="color:red">File to be uploaded in  pdf , jpeg , jpg and size should not exceed 5 MB </span></small>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <label class="pkg-label font-weight-normal"> Description<b><span style="color:red">*</span></b></label>
+                            <div class="pkghead-txt">
+                                <textarea id="txtDescription12" oninput="this.value = this.value.toUpperCase()" class="form-control" placeholder="Description" style="width:100%"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button type="button" id="btnSubmit" class="btn btn-sm btn-success" onclick="submitOverrideRequestForm()"> Submit </button>
+                            <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal"> Close </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- OverRide Request Modal END -->
+
+<!-- Body content Ends here -->
+<script src="~/js/commonvalidation.js"></script>
+
+<script type="text/javascript">
+
+    var RemoveUnblockobj = [];
+
+    $(document).ready(function () {
+        loadNavigation('AddUnblockPackage', 'Mlunblockpackage', 'pl', 'Unblock Package', 'Add Unblock Package', '');
+        $("#btnCapture").hide();
+        $('#RemoveOverrideDoc').hide();
+        //-- Kisan Data Show in Unblock edit header part --
+        if (localStorage.getItem('UnlockPackageInfo') != null) {
+            var PackageInfo = JSON.parse(localStorage.getItem('UnlockPackageInfo'));
+
+            if (PackageInfo[0].urn != "") {
+                var BalanceParams = {
+                    Action: 'A',
+                    URN: PackageInfo[0].urn,
+                    FamilyId: PackageInfo[0].familyID
+                };
+
+                $.ajax({
+                    url: ServiceURL + "/api/Common/GetAvailBalance",
+                    type: "GET",
+                    data: BalanceParams,
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    beforeSend: function () {
+                        $("#loader").show();
+                    },
+                    success: function (result) {
+                        console.log("GetAvailBalance-", result);
+                        if (result != null) {
+                            $('#CurrentAvailBalPI').html(result.availableBalance);
+                            $('#TraBlkAmnt').html(result.amountBlocked);
+                            $('#PolicyPeriodPI').html(result.policyStartDate + ' To ' + result.policyEnddate)
+                        }
+                        else {
+                            $('#CurrentAvailBalPI').html('NA');
+                            $('#TraBlkAmnt').html('NA');
+                        }
+                    },
+                    complete: function () {
+                        $("#loader").hide();
+                    },
+                    error: function (error) {
+                        console.log(error.responseText);
+                    }
+                });
+            }
+
+            getHospitalInfo();
+
+            // Display Block Package Details
+            var UnblockMemberinformationParams = {
+                action: 'B',
+                urn: PackageInfo[0].urn,
+                memberId: PackageInfo[0].memberID,
+                hospitalcode: PackageInfo[0].hospitalCode,
+                transactionID: PackageInfo[0].transactionID
+            }
+            $.ajax({
+                url: ServiceURL + "/api/Common/GetUnblockinginformationByMember",
+                type: "GET",
+                data: UnblockMemberinformationParams,
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                beforeSend: function () {
+                    $("#loader").show();
+                },
+                success: function (response) {
+                    console.log(response);
+                    if (response != null) {
+                        $('#NSFSSCardNoPI').html(response[0].urn);
+                        $('#PatientNamePI').html(response[0].memberName);
+                        $('#CurrentPolicyPI').html(response[0].schemeName);
+                        $('#InvoiceNoPI').html(response[0].blockingInvoiceNo);
+                        $("#OverrideCodePI").html('NA');
+                        $("#PatientPhoneNoPI").html(response[0].patientContactNumber);
+                        $("#DateOfAdmissionPI").html(response[0].dateofadmission);
+                        $("#MemberId").val(response[0].memberID);
+                        $("#TransactionID").val(response[0].transactionID);
+                        //For Over Ride Request Data Bind
+                        $("#lblPatientMemberId").html(response[0].memberID);
+                        $("#lblPatientName").html(response[0].memberName);
+                        $("#lblPatientGender").html(response[0].patientgender);
+                        $("#lblPatientAge").html(response[0].age);
+                        $("#lblPatientAadharNo").html(response[0].uidnumber);
+                        $("#lblPatientUrnNo").html(response[0].urn);
+                        $("#caseno").html(response[0].caseno);
+                                 //END
+                    }
+
+                    $("#grdBlockPackage1").DataTable({
+                        autoWidth: false,
+                        processing: true,
+                        bLengthChange: true,
+                        lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                        bFilter: true,
+                        bSort: true,
+                        bPaginate: false,
+                        searching: false,
+                        bInfo: false,
+                        data: response,
+                        columns: [
+                            { data: 'id', type: "text", title: "Sl#", align: "center", render: function (data, type, row, meta) { return meta.row + meta.settings._iDisplayStart + 1; } },
+                            { data: "memberName", type: "text", title: "Member Name", align: "left", },
+                           
+                            {
+                                data: null,
+                             /*   title: "Package Details" ,'<div class="prehed- small"> Code | Name </div>',*/
+                                align: "left",
+                                render: function (data, type, row) {
+                                    var packageColumn = '<b class="text-success font-weight-bold">' + row.procedureCode + '</b>'; 
+                                    packageColumn += '<div class="pre-bold">' + row.packageName + '</div>';
+                                    return packageColumn;
+                                }
+                            },
+                            {
+                                data: null,
+                              /*  title: "Package Code & Package",*/
+                                align: "left",
+                                render: function (data, type, row) {
+                                    var packageColumn = '<div class="badge badge-success p-2 mb-2">' + row.packageheadercode + '</div>';
+                                    packageColumn += '<div class="prehed-small">' + row.procedureName + '</div>';
+                                    return packageColumn;
+                                }
+                            },
+                            /*{ data: "packageheadercode", type: "text", title: "Package Code", align: "left" },*/
+                            //{ data: "packageName", type: "text", title: "Package", align: "left" },
+                           /* { data: "procedureCode", type: "text", title: "Procedure Code", align: "left"},*/
+                            /* { data: "procedureName", type: "text", title: "Procedure", align: "left"},*/
+                            { data: "dateofadmission", type: "text", title: "Blocked Date", align: "left" },
+                            /*{ data: "amountBlocked", type: "number", title: " Amount blocked", align: "right"},*/
+                            {
+                                data: null,
+                                /*  title: "Package Code & Package",*/
+                                align: "right",
+                                render: function (data, type, row) {
+                                    var packageColumn = '<div class="pre-bold text-right">' + row.amountBlocked + '</div>';
+                                    return packageColumn;
+                                }
+                            },
+                        ],
+                        columnDefs: [
+                        {
+                            targets: 6,
+                                data: null,
+                                align:"center",
+                            title: "Action",
+                                defaultContent: "<div class='text-center'><button type='button' onclick='SelectUnblockPackage(this)' class='text-center btn btn-outline-success focusedBtn btn-sm my-2 my-sm-0'>Un-Block</button></div>"
+                            }]
+                    });
+                },
+                complete: function () {
+                    $("#loader").hide();
+                },
+                failure: function (response) {
+                    alert(response.d);
+                },
+                error: function (response) {
+                    alert(response.d);
+                }
+            });
+
+            //Override Code
+            OverrideDetails(PackageInfo[0].memberID, PackageInfo[0].urn);
+            //End Override Code
+
+            // Display Family Details
+            var params = {
+                URN: PackageInfo[0].urn
+            };
+            $.ajax({
+                url: ServiceURL + "/api/URN/GetFamilyMemeberList",
+                type: "GET",
+                data: params,
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                beforeSend: function () {
+                    $("#loader").show();
+                },
+                success: function (response) {
+                    console.log("FamilyDetails : -", response);
+                    $("#grdFamilyDetails").DataTable({
+                        processing: true,
+                        bLengthChange: true,
+                        lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                        bFilter: true,
+                        bSort: true,
+                        bPaginate: false,
+                        searching: false,
+                        bInfo: false,
+                        data: response,
+                        columns: [
+                            { data: 'id', type: "text", title: "Sl#", align: "center", render: function (data, type, row, meta) { return meta.row + meta.settings._iDisplayStart + 1; } },
+                            { data: "memberID", type: "text", title: "Member Id", align: "center" },
+                            { data: "memberName", type: "text", title: "Name", align: "center" },
+                            { data: "memberGender", type: "text", title: "Gender", align: "center" },
+                            { data: "memberAge", type: "text", title: "Age", align: "center" },
+                            {
+                                data: "maskAadharnumber", type: "text", title: " Aadhaar Card No ", align: "center", render: function (data, type, row, meta) {
+                                    //if (type === 'display') {
+                                    //    var BaseUrl = response.memberDistrictCode + '/' + response.memberBlockCode + '/' + response.memberPanchayatCode + '/RationCard/' + response.adharcard;
+                                    //    data = '<a target="_blank" href="../Download.ashx?msg=""' + encodeURIComponent(BaseUrl) + '">' + data + '</a>';
+                                    //}
+                                    return data;
+                                }
+                            },
+                            {
+                                data: "rationCardNumber", type: "text", title: " Ration Card No ", align: "center", render: function (data, type, row, meta) {
+                                    //if (type === 'display') {
+                                    //    var BaseUrl = response.memberDistrictCode + '/' + response.memberBlockCode + '/' + response.memberPanchayatCode + '/RationCard/' + response.adharcard;
+                                    //    data = '<a target="_blank" href="../Download.ashx?msg=""' + encodeURIComponent(BaseUrl) + '">' + data + '</a>';
+                                    //}
+                                    return data;
+                                }
+                            },
+                        ],
+                        columnDefs: [
+                            {
+                                targets: 7,
+                                data: null,
+                                title: "IRIS",
+                                orderable: false,
+                                defaultContent: "<button type='button'id='btnIris' onclick='IrisVerification(this)' class='btn btn-outline-success focusedBtn btn-sm my-2 my-sm-0'> IRIS</button>"
+                            },
+                            {
+                                targets: 8,
+                                data: null,
+                                title: "POS",
+                                orderable: false,
+                                defaultContent: "<button type='button'id='btnPOS' onclick='POSVerification(this)' class='btn btn-outline-primary focusedBtn btn-sm my-2 my-sm-0'> POS </button>"
+                            },
+                            {
+                                targets: 9,
+                                data: null,
+                                title: "OTP",
+                                orderable: false,
+                                defaultContent: "<button type='button'id='btnOTP' onclick='OTPVerification(this)' class='btn btn-outline-warning focusedBtn btn-sm my-2 my-sm-0'> OTP </button>"
+                            }]
+                    });
+                },
+                complete: function () {
+                    $("#loader").hide();
+                },
+                failure: function (response) {
+                    alert(response.d);
+                },
+                error: function (response) {
+                    alert(response.d);
+                }
+            });
+        };
+    });
+
+    function OverrideDetails(memberid, urn) {
+            //Override
+            var overideparams = {
+                Action: 'B',
+                URN: urn,
+                HospitalCode: '@Session["HospitalCode"]',
+                Memberid: memberid
+            };
+            $.ajax({
+                url: ServiceURL + "/api/Common/GetOverrideRefrral",
+                type: "GET",
+                data: overideparams,
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                beforeSend: function () {
+                    $("#loader").show();
+                },
+                success: function (resultBal) {
+                    console.log(resultBal);
+                    if (resultBal.unblockfpoverride != null) {
+                        $('#btnoverridegeneration').attr('disabled', 'disabled');
+                        $('#txtOverrideCode').val(resultBal.unblockfpoverride);
+                        $('#verificationBlock').addClass('divdisable');
+                        $('#txtOverrideCode').attr('disabled', 'disabled');
+                        $('#VerifiedMemberId').val(memberid);
+                        $('#VerifiedMemberName').val($('#PatientNamePI').text());
+                        $('#AuthenticatioMode').val("FPOVERRIDE");
+                    }
+                    if (resultBal.unblockfpoverride == null) {
+                        $('#txtOverrideCode').removeAttr('disabled', 'disabled');
+                        $('#verificationBlock').removeClass('divdisable');
+                    }
+                },
+                complete: function () {
+                    $("#loader").hide();
+                },
+                error: function (error) {
+                    console.log(error.responseText);
+                }
+            });
+            //End Override
+    }
+
+    //OverRide Request
+    function OverrideRequest() {
+        $(".packagedetails").prop('checked', true);
+        $('.packagedetails').prop('disabled', true);
+        $('#MyPopupBlock').modal('show');
+
+    }
+
+    function submitOverrideRequestForm() {
+        var MotalityDocUpload = $("#uploadfile").get(0);
+        var Motalityfiles = MotalityDocUpload.files;
+        var fileExtension = ['pdf', 'jpeg', 'jpg'];
+        var filename = $('#uploadfile').val();
+        var extension = filename.replace(/^.*\./, '');
+        if (filename.length != 0) {
+            var File = $("#uploadfile")[0].files[0].size;
+        }
+        //if ($('#uploadfile').val() === "") {
+        //    return sweetAlert('Alert', 'Please Upload File !!')
+
+        //}
+        if ($.inArray(extension.toLowerCase(), fileExtension) == -1 && filename.length != 0) {
+            swal({
+                text: "Please upload a valid file of type pdf, docx, jpeg, jpg !!",
+                confirmButtonColor: "#36A865",
+                type: "error",
+                confirmButtonText: "OK",
+                closeOnConfirm: false
+            }).then(function () {
+                $("#uploadfile").focus();
+            });
+            return false;
+        }
+        else if (File > 5242880) {
+            swal({
+                text: "File size cannot be greater than 5MB !!",
+                confirmButtonColor: "#36A865",
+                type: "error",
+                confirmButtonText: "OK",
+                closeOnConfirm: false
+            }).then(function () {
+                $("#uploadfile").focus();
+            });
+            return false;
+        }
+        else if ($('#txtDescription12').val() === "") {
+            swal({
+                text: "Please Enter Description !!",
+                confirmButtonColor: "#36A865",
+                type: "error",
+                confirmButtonText: "OK",
+                closeOnConfirm: false
+            }).then(function () {
+                $("#txtDescription12").focus();
+            });
+            return false;
+        }
+        else {
+            var OverrideRequestData = new FormData();
+            OverrideRequestData.append("MemberId", $('#lblPatientMemberId').text());
+            OverrideRequestData.append("URN", $('#lblPatientUrnNo').text());
+            OverrideRequestData.append("NoofDays", "");
+            if (Motalityfiles.length > 0) { OverrideRequestData.append("UploadDoc", Motalityfiles[0]); }
+             if (Motalityfiles.length > 0) { OverrideRequestData.append("UploadDoc1", Motalityfiles[0].name); }
+
+
+            OverrideRequestData.append("Description", $('#txtDescription12').val());
+            OverrideRequestData.append("GENERATEDTHROUGH", $('#chkboxblock').val());
+             OverrideRequestData.append("HospitalCode", '@Session["HospitalCode"]');
+            OverrideRequestData.append("HospitalCategoryId", @Session["HospitalCategoryId"]);
+            OverrideRequestData.append("ActionCode", "A");
+            $.ajax({
+                url: '@Url.Action("GenerateOverrideRequest", "BlockPackage")',
+                type: "POST",
+                data: OverrideRequestData,
+                processData: false,
+                contentType: false,
+                beforeSend: function () {
+                    $("#loader").show();
+                },
+                success: function (data) {
+
+                    if (data[0].output == 2 && data[0].statecode == 21) {
+                        swal({
+                            title: "Override Request generated successfully!!",
+                            text: "Click ok to redirect override view page.",
+                            icon: "success",
+                            type: "success",
+                            confirmButtonColor:"#36A865",
+                            confirmButtonText: "Ok"
+                        })
+                            .then((result) => {
+                                if (result.value) {
+                                    window.location = '@Url.Content("~/BlockPackage/OverrideView")';
+                                } else if (result.dismiss === 'cancel') {
+                                    swal(
+                                        'Cancelled',
+                                        'Your stay here :)',
+                                        'error'
+                                    )
+                                }
+                            });;
+
+                    }
+                    else if (data[0].output == 2 && data[0].statecode != 21) {
+                        $("#txtOverrideCode").val(data[0].unblockoverridecode);
+                        $('#MyPopupBlock').modal('hide');
+                        $("#PackageDetails").show();
+                    }
+
+                    else if (data[0].output == 3) {
+                        swal({
+                            text: "Override request has already generated, new request not allowed. !!",
+                            confirmButtonColor: "#36A865",
+                            type: "error",
+                            confirmButtonText: "OK",
+                            closeOnConfirm: false
+                        });
+                    }
+                    else {
+                    }
+                },
+                complete: function () {
+                    $("#loader").hide();
+                },
+                error: function (error) {
+                    console.log(error.statusText);
+                }
+            });
+        }
+    }
+
+    function getHospitalInfo() {
+        var params = {
+            HospitalCode: '@Session["HospitalCode"]'
+        };
+        $.ajax({
+            url: ServiceURL + "/api/Hospital/GetHospitalInformation",
+            type: "GET",
+            data: params,
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $("#loader").show();
+            },
+            success: function (data) {
+                console.log("GetHospitalInformation", data);
+                $("#HospitalNamePI").html(data.hospitalname);
+            },
+            complete: function () {
+                $("#loader").hide();
+            },
+            error: function (error) {
+                console.log(error.statusText);
+            }
+        });
+    }
+
+    function UnblockPackageSava() {
+        //debugger;
+        if (RemoveUnblockobj.length > 0) {
+            if ($('#Remark').val() != "") {
+                if ($('#VerifiedMemberId').val() != "") {
+                    swal({
+                        title: "Are you sure?",
+                        text: " To unblock the package!",
+                        type: "warning",
+                        showCancelButton: true,
+                        cancelButtonColor: '#d33',
+                        confirmButtonColor: "#36A865",
+                        confirmButtonText: 'Yes'
+                    }).then(function (isConfirm) {
+                        if (isConfirm.value) {
+                            var UnblockPkgParams = JSON.stringify({
+                                Action: 'A',
+                                URN: $('#NSFSSCardNoPI').text(),
+                                MemberId: $('#MemberId').val(),
+                                HospitalCode: '@Session["HospitalCode"]',
+                                TransactionID: $('#TransactionID').val(),
+                                RemoveUnblockDetails: RemoveUnblockobj,
+                                OverrideCode: $('#txtOverrideCode').val(),
+                                Remark: $('#Remark').val(),
+                                VerificationData: 'Sucess',
+                                VerificationMode: $('#AuthenticatioMode').val(),
+                                VerifiedMemberId: $('#VerifiedMemberId').val(),
+                                VerifiedMemberName: $('#VerifiedMemberName').val(),
+                            });
+                            $.ajax({
+                                url: ServiceURL + "/api/UnblockPackage/CreatePatientUnblockPackage",
+                                type: "POST",
+                                data: UnblockPkgParams,
+                                dataType: "json",
+                                contentType: "application/json; charset=utf-8",
+                                headers: {
+                                    'RequestVerificationToken': '@TokenHeaderValue()'
+                                },
+                                beforeSend: function () {
+                                    $('#BtnUnblockPackage').prop('disabled', true);
+                                    $("#loader").show();
+                                },
+                                success: function (data) {
+                                    console.log("Unblock", data);
+                                    var DischargeSlip = [];
+                                    if (data.length > 0) {
+                                        swal({
+                                            title: "Unblock Package", text: "Package Unblocked Successfully", type: "success", confirmButtonColor: "#36A865",
+                                        }).then(function () {
+                                            DischargeSlip.push(JSON.stringify({
+                                                URN: data[0].urn,
+                                                MemberId: data[0].MemberId,
+                                                HospitalCode: '@Session["HospitalCode"]',
+                                                Invoiceno: data[0].unblockinginvoicenumber
+                                            }));
+                                            localStorage.setItem('InsertedUnbloackData', DischargeSlip);
+                                            console.log("Dischage Click:", DischargeSlip);
+                                            windowUnblockPackageSlipPopUp();
+                                        });
+                                    }
+                                    else {
+                                        swal({
+                                            title: "Unblock Package", text: "Save Un Successfull", type: "error", confirmButtonColor: "#36A865",
+                                            confirmButtonText: "OK",
+                                            closeOnConfirm: false
+                                        });
+                                    }
+                                },
+                                complete: function () {
+                                    $("#loader").hide();
+                                    $('#BtnUnblockPackage').prop('disabled', false);
+                                },
+                                error: function (error) {
+                                    $('#divLoader').hide();
+                                    console.log(error.statusText);
+                                }
+                            });
+                        };
+                    });
+                }
+                else {
+                    swal({
+                        text: "Please verify the family member",
+                        confirmButtonColor: "#36A865",
+                        type: "error",
+                        confirmButtonText: "OK",
+                        closeOnConfirm: false
+                    }).then(function () {
+                        $("#verificationBlock").focus();
+                    });
+                }
+            }
+            else {
+                swal({
+                    text: "Please enter remarks!!",
+                    confirmButtonColor: "#36A865",
+                    type: "error",
+                    confirmButtonText: "OK",
+                    closeOnConfirm: false
+                }).then(function () {
+                    $("#Remark").focus();
+                });
+            }
+        }
+        else {
+            swal({
+                text: "Please choose block package!!",
+                confirmButtonColor: "#36A865",
+                type: "error",
+                confirmButtonText: "OK",
+                closeOnConfirm: false
+            }).then(function () {
+                $("#BlockPackageDetailsSegment").focus();
+            });
+        }
+    }
+
+    function SelectUnblockPackage(ele) {
+        //$(ele).closest('tr').addClass('row_selected')
+
+        $("#grdBlockPackage1 tbody tr").on('click', function (event) {
+            $("#grdBlockPackage1 tbody tr").removeClass('row_selected');
+            $(this).addClass('row_selected');
+        });
+
+        RemoveUnblockobj = [];
+
+        var dataRow = $('#grdBlockPackage1').DataTable().row($(ele).closest('tr')).data();
+        var unblockData = {
+            URN: dataRow.urn,
+            PackageHeaderId: dataRow.packageheaderid,
+            PackageSubcategoryId: dataRow.packagesubcategoryid,
+            ProcedureId: dataRow.procedureid,
+            AmountTobeUnBlocked: dataRow.amountBlocked,
+            PackageDetailId: dataRow.txnpackagedetailid,
+            TransactionCode: dataRow.transactioncode
+        };
+
+        RemoveUnblockobj.push(unblockData);
+        console.log("RemoveUnblockobj", RemoveUnblockobj);
+    }
+
+    function sweetAlert(stitle, sdata, sparam) {
+        swal({
+            title: stitle,
+            html: "<div class='row'> <div class='mb-1 col-md-12 text-center'>" + sdata + "</div> </div>",
+            confirmButtonColor: "#36A865",
+            confirmButtonText: "OK"
+        }).then(function (isConfirm) {
+            if (sparam != null) {
+                if (sparam == 'pageReload') {
+                    window.location.reload();
+                }
+                else {
+                    setUserSession(sparam);
+                }
+            }
+        });
+    }
+
+    // Iris Device Ready or not Code
+    function discoverRDService() // Search for the valid RDService from port 11100 to 11120
+    {
+        var primaryUrl = "";
+        if (window.location.protocol != "https:") {
+            primaryUrl = "http://localhost"
+        }
+        else {
+            primaryUrl = "https://localhost"
+        }
+        document.getElementById("getrdresponse").innerHTML = primaryUrl;
+        var tempcount = 0;
+        url = "";
+        for (var i = 11100; i <= 11120; i++) {
+            var verb = "RDSERVICE";
+            var err = "";
+            var res;
+            $.support.cors = true;
+            var httpStaus = false;
+            var jsonstr = "";
+            var data = new Object();
+            var obj = new Object();
+            var xmlstr = '';
+            var RDurl = primaryUrl + ":" + i.toString();
+
+            $.ajax({
+                type: "RDSERVICE",
+                async: false,
+                crossDomain: true,
+                url: RDurl,
+                contentType: "text/xml; charset=utf-8",
+                processData: false,
+                cache: false,
+                async: false,
+                crossDomain: true,
+                beforeSend: function () {
+                    $("#loader").show();
+                },
+                success: function (data) {
+                    try {
+                        xmlstr = data.xml ? data.xml : (new XMLSerializer()).serializeToString(data);
+                        data = xmlstr;
+                        var xmlDoc = $.parseXML(data);
+                        console.log("decvice xmldoc-", xmlDoc);
+                        var $xml = $(xmlDoc);
+                        var Name = $xml.find('RDService').attr('status');
+                        var info = $xml.find('RDService').attr('info');
+                        $('#rdStatus').val(Name);
+                        $('#rdinfo').val(info);
+
+                        if ("Biomatiques Iris (Model: EPI-1000)" == info) {
+                            url = RDurl;
+                            i = 11130;;
+                        }
+
+                        if (Name == "READY") {
+                            $("#btnCapture").show();
+                            DeviceInfo();
+                        }
+
+                        httpStaus = true;
+                        res = { httpStaus: httpStaus, data: data };
+                        tempcount++;
+
+                    }
+                    catch (e) {
+                        //alert(e.Message);
+                    }
+                },
+                complete: function () {
+                    $("#loader").hide();
+                },
+                error: function (jqXHR, ajaxOptions, thrownError) {
+                    //    res = { httpStaus: httpStaus, err: getHttpError(jqXHR) };
+                }
+            });
+        }
+        return res;
+    }
+
+    // Iris Device information
+    function DeviceInfo() {
+        $('#getrdresponse').html('');
+        var urlinfo = url + "/BISPL/info";
+        document.getElementById("getrdresponse").innerHTML = urlinfo;
+        var verb = "DEVICEINFO";
+        var err = "";
+        var res;
+        $.support.cors = true;
+        var httpStaus = false;
+        var jsonstr = "";
+        var data = new Object();
+        var obj = new Object();
+        var xmlstr = '';
+        var RDurl = urlinfo;
+
+        $.ajax({
+            type: "DEVICEINFO",
+            async: false,
+            crossDomain: true,
+            url: RDurl,
+            contentType: "text/xml; charset=utf-8",
+            processData: false,
+            cache: false,
+            async: false,
+            crossDomain: true,
+            beforeSend: function () {
+                $("#loader").show();
+            },
+            success: function (data) {
+                try {
+                    xmlstr = data.xml ? data.xml : (new XMLSerializer()).serializeToString(data);
+                    data = xmlstr;
+                    var xmlDoc = $.parseXML(data);
+                    console.log("xmldoc-", xmlDoc);
+                    var $xml = $(xmlDoc);
+                    var dpid = $xml.find('DeviceInfo').attr('dpId');
+                    var mi = $xml.find('DeviceInfo').attr('mi');
+                    var mc = $xml.find('DeviceInfo').attr('mc');
+                    $('#mi').val(mi);
+                    $('#mc').val(mc);
+                    $('#dpid').val(dpid);
+                    $('#rdInfo').val(data);
+                    document.getElementById("getrdresponse").innerHTML = data;
+                    httpStaus = true;
+                    res = { httpStaus: httpStaus, data: data };
+                    tempcount++;
+
+                }
+                catch (e) {
+                    //Alert(e.Message);
+                }
+            },
+            complete: function () {
+                $("#loader").hide();
+            },
+            error: function (jqXHR, ajaxOptions, thrownError) {
+                //    res = { httpStaus: httpStaus, err: getHttpError(jqXHR) };
+            }
+        });
+
+    }
+
+    // Iris Device Capture information
+    function Capture() {
+        /* alert("Click");*/
+        $('#getrdresponse').html('');
+
+        var val = '';
+        if (document.getElementById('rdProduction').checked) {
+            val = document.getElementById('rdProduction').value
+        }
+        else if (document.getElementById('rdStaging').checked) {
+            val = document.getElementById('rdStaging').value
+        }
+        //else{
+        // alert("Please Select Option");
+        //}
+        var urlcapture = url + "/BISPL/capture";
+
+        var PIDOPTS = '<PidOptions ver=\"1.0\">' + '<Opts fCount=\"0\" fType=\"\" iCount=\"1\" iType=\"0\" pCount=\"\" pType=\"\" format=\"0\" pidVer=\"2.0\" timeout=\"15000\" otp=\"\" wadh=\"\" posh=\"\" env=\"' + val + '\"/>' + '</PidOptions>';
+
+        var verb = "CAPTURE";
+        var err = "";
+        var res;
+        $.support.cors = true;
+        var httpStaus = false;
+        var jsonstr = "";
+        var data = new Object();
+        var obj = new Object();
+        var xmlstr = '';
+        var RDurl = urlcapture;
+
+        $.ajax({
+            type: "CAPTURE",
+            async: false,
+            crossDomain: true,
+            url: RDurl,
+            contentType: "text/xml; charset=utf-8",
+            data: PIDOPTS,
+            processData: false,
+            cache: false,
+            async: false,
+            crossDomain: true,
+            beforeSend: function () {
+                $("#loader").show();
+            },
+            success: function (data) {
+                try {
+                    xmlstr = data.xml ? data.xml : (new XMLSerializer()).serializeToString(data);
+                    data = xmlstr;
+                    var xmlDoc = $.parseXML(data);
+                    console.log("xmlCaptureDoc-", xmlDoc);
+                    var $xml = $(xmlDoc);
+                    var dpid = $xml.find('DeviceInfo').attr('dpId');
+                    var mi = $xml.find('DeviceInfo').attr('mi');
+                    var mc = $xml.find('DeviceInfo').attr('mc');
+                    var errorcode = $xml.find('Resp').attr('errCode');
+                    var errInfo = $xml.find('Resp').attr('errInfo');
+                    $('#mi').val(mi);
+                    $('#mc').val(mc);
+                    $('#dpid').val(dpid);
+                    $('#errCode').val(errorcode);
+                    $('#errInfo').val(errInfo);
+                    $('#rdData').val(data);
+                    if (errInfo == $('#errCode').text()) {
+                        $("#btnAuthentication").show();
+                    }
+                    document.getElementById("getrdresponse").innerHTML = data;
+                    httpStaus = true;
+                    res = { httpStaus: httpStaus, data: data };
+                    tempcount++;
+
+                }
+                catch (e) {
+                    //Alert(e.Message);
+                }
+            },
+            complete: function () {
+                $("#loader").hide();
+            },
+            error: function (jqXHR, ajaxOptions, thrownError) {
+                //    res = { httpStaus: httpStaus, err: getHttpError(jqXHR) };
+            }
+        });
+
+    }
+
+    // Iris Authentication
+    function IrisVerification(ele) {
+        var dataRow = $('#grdFamilyDetails').DataTable().row($(ele).closest('tr')).data();
+        $('#IrisModal').modal('show');
+        $("#AadharUidMask").val(dataRow.maskAadharnumber);
+        $("#AadharUid").val(dataRow.aadharnumber);
+        $("#vMemberId").val(dataRow.memberID);
+        $("#Urn").val(dataRow.urn);
+        $("#btnAuthentication").hide();
+        $('#rdInfo').val("");
+        $('#rdData').val("");
+        $('#VerifiedMemberId').val("");
+        $('#VerifiedMemberName').val("");
+        $('#AuthenticatioMode').val("");
+        discoverRDService();
+        //DeviceInfo();
+        currrentElement = ele;
+    }
+
+    // Iris Authentication
+    $('#btnAuthentication').click(function (event) {
+        var model = JSON.stringify({
+            uid: $("#AadharUid").val(),
+            memberId: $("#vMemberId").val(),
+            urn: $("#Urn").val(),
+            rdInfo: $('#rdInfo').val(),
+            rdData: $('#rdData').val(),
+            verificationThrough: "0302",
+            patientid: $('#MemberId').val(),
+            hospitalcode: '@Session["HospitalCode"]'
+        });
+
+        $.ajax({
+            url: ServiceURL + "/api/Common/IRISVerification",
+            type: "POST",
+            data: model,
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $("#loader").show();
+            },
+            success: function (result) {
+                if (result.status == "SUCCESS") {
+                    swal({
+                        //title: "Alert",
+                        text: "Authentication Successfully",
+                        type: "success",
+                        confirmButtonColor: "#36A865",
+                        confirmButtonText: "OK"
+                    }).then(function () {
+                        $('#IrisModal').modal('hide');
+                        displayIRISSelectedRow(currrentElement, "SUCCESS");
+                    });
+                }
+                else if (result.status == "ERROR") {
+                    swal({
+                        //title: "Alert",
+                        text: result.errMsg,
+                        type: "error",
+                        confirmButtonColor: "#36A865",
+                        confirmButtonText: "OK"
+                    }).then(function () {
+                        $('#IrisModal').modal('hide');
+                        displayIRISSelectedRow(currrentElement, "ERROR");
+                    });
+                }
+                else {
+
+                }
+            },
+            complete: function () {
+                $("#loader").hide();
+            },
+            error: function (error) {
+                $('#divLoader').hide();
+                console.log(error.statusText);
+            }
+        });
+    });
+
+    // IRIS Selected Verifiy Row
+    function displayIRISSelectedRow(ele, result) {
+        if (result == "ERROR") {
+            var currentRow = $(ele).closest("tr");
+            currentRow.find("td:eq(7)").find('#btnIris').text("Not Verified");
+        }
+        if (result == "SUCCESS") {
+            var currentRow = $(ele).closest("tr");
+            currentRow.find("td:eq(7)").find('#btnIris').text("Verified");
+            $(ele).closest('tr').addClass('row_selected')
+            $('#verificationBlock').addClass('divdisable')
+            $('#VerifiedMemberId').val(currentRow.find("td:eq(1)").text());
+            $('#VerifiedMemberName').val(currentRow.find("td:eq(2)").text());
+            $('#OverVerifieddetails').addClass('divdisable');
+            $('#AuthenticatioMode').val("IRIS");
+        }
+
+    }
+
+    // Pos Verification Part
+    function POSVerification(ele) {
+        var dataRow = $('#grdFamilyDetails').DataTable().row($(ele).closest('tr')).data();
+        $('#VerifiedMemberId').val("");
+        $('#VerifiedMemberName').val("");
+        $('#AuthenticatioMode').val("");
+        POSVerifyOrNot(ele, dataRow.aadharnumber, dataRow.memberID, "0302", '@Session["HospitalCode"]');
+    }
+
+    // Pos Verification Part
+    function POSVerification(ele) {
+        var dataRow = $('#grdFamilyDetails').DataTable().row($(ele).closest('tr')).data();
+        var SelectedPaitentid = $('#MemberId').val();
+        $('#VerifiedMemberId').val("");
+        $('#VerifiedMemberName').val("");
+        $('#AuthenticatioMode').val("");
+        POSVerifyOrNot(ele, dataRow.urn, dataRow.aadharnumber, dataRow.memberID, SelectedPaitentid, "0301",'@Session["HospitalCode"]');
+    }
+
+    // Pos Verification Part
+    function POSVerifyOrNot(ele, urn, uid, memberid, SelectedPaitentid, varificationThrough,hospitalcode) {
+        $.ajax({
+            url: ServiceURL + "/api/Common/CheckPosVerifyOrNot",
+            type: "get",
+            dataType: "json",
+            data: { urn: urn, uid: uid, memberID: memberid, selectedPatient: SelectedPaitentid, verificationThrough: varificationThrough, hospitalcode:'@Session["HospitalCode"]' },
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $("#loader").show();
+            },
+            success: function (data) {
+                var currentRow = $(ele).closest("tr");
+                if (data.length > 0) {
+                    if (data[0].verifystatus == "Y") {
+                        var urnno = currentRow.find("td:eq(8)").find('#btnPOS').text("Verified");
+                        $(ele).closest('tr').addClass('row_selected')
+                        $('#verificationBlock').addClass('divdisable')
+                        $('#PackageDetails').show();
+                        $('#TreatmentType').addClass('divdisable');
+                        $('#VerifiedMemberId').val(currentRow.find("td:eq(1)").text());
+                        $('#VerifiedMemberName').val(currentRow.find("td:eq(2)").text());
+                        $('#OverVerifieddetails').addClass('divdisable');
+                        $('#AuthenticatioMode').val("POS");
+                    }
+                    else {
+                        currentRow.find("td:eq(8)").find('#btnPOS').text("Not Verified");
+                    }
+                }
+                else {
+                    currentRow.find("td:eq(8)").find('#btnPOS').text("Not Verified");
+                }
+            },
+            complete: function () {
+                $("#loader").hide();
+            },
+            error: function (error) {
+                console.log(error.statusText);
+            }
+        });
+    }
+
+    // Send Otp
+    function OTPVerification(ele) {
+        var dataRow = $('#grdFamilyDetails').DataTable().row($(ele).closest('tr')).data();
+        $('#txtopt').val('');
+        SendOTP(dataRow.aadharnumber);
+        currrentElement = ele;
+        var SelectedPaitentid = $('#MemberId').val();
+        $("#Uid").val(dataRow.aadharnumber);
+        $('#VerifiedMemberId').val("");
+        $('#VerifiedMemberName').val("");
+        $('#AuthenticatioMode').val("");
+        $("#OTPVerifyMemberID").val(dataRow.memberID);
+        $("#OTPurn").val(dataRow.urn);
+        $("#SelectedPatientId").val(SelectedPaitentid);
+    }
+
+    // Send Otp Part
+    function SendOTP(aadharnumber) {
+        if (aadharnumber != "") {
+            //:: Kisan encrypt Format Start
+            var aadharnumberEncrypt = aadharnumber;
+            var key = CryptoJS.enc.Utf8.parse('8080808080808080');
+            var iv = CryptoJS.enc.Utf8.parse('8080808080808080');
+            var encryptedlogin = CryptoJS.AES.encrypt(CryptoJS.enc.Utf8.parse(aadharnumberEncrypt), key,
+                { keySize: 128 / 8, iv: iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 });
+            aadharnumberEncrypt = encryptedlogin;
+            console.log(aadharnumberEncrypt);
+            //:: Kisan encrypt Format End
+            $.ajax({
+                url: ServiceURL + "/api/Common/SendOTP?AadhaarNo=" + aadharnumberEncrypt,
+                type: "POST",
+                processData: false,
+                contentType: false,
+                beforeSend: function () {
+                    $("#loader").show();
+                },
+                success: function (result) {
+                    console.log("otp", result);
+                    if (result.status == "SUCCESS") {
+                        swal({
+                            //title: "Alert",
+                            text: "OTP Generated & Sent to registred Mobile no. & E-mail ID!!",
+                            type: "success",
+                            confirmButtonColor: "#36A865",
+                            confirmButtonText: "OK"
+                        }).then(function () {
+                            $('#OTPModal').modal('show');
+                            OTPTIMER();
+                        });
+                        $('#Uid').val(aadharnumber);
+                        $('#txn').val(result.txn);
+                    }
+                    else if (result.status == "ERROR") {
+                        swal({
+                            //title: "Alert",
+                            text: "Invalid aadhaar number or aadhaar server not responding.!!",
+                            type: "error",
+                            confirmButtonColor: "#36A865",
+                            confirmButtonText: "OK",
+                            closeOnConfirm: false
+                        });
+                    }
+                    else {
+                    }
+                },
+                complete: function () {
+                    $("#loader").hide();
+                },
+                error: function (error) {
+                    $('#divLoader').hide();
+                    console.log(error.statusText);
+                }
+            });
+        }
+    };
+
+    // Verification OTP Part
+    function VerifyOTP() {
+        var otpValue = $('#txtopt').val();
+        var Uid = $("#Uid").val();
+        var txn = $("#txn").val();
+        var OTPVerifyMemberID = $("#OTPVerifyMemberID").val();
+        var OTPurn = $("#OTPurn").val();
+        var SelectedPatientId = $('#MemberId').val();
+        if (otpValue != "") {
+                var model = JSON.stringify({
+                uid: Uid,
+                txn: txn,
+                otpValue: otpValue,
+                verificationThrough: "0302",
+                memberid: OTPVerifyMemberID,
+                urn: OTPurn,
+                patientid: SelectedPatientId,
+                hospitalcode:'@Session["HospitalCode"]'
+            });
+
+            $.ajax({
+                url: ServiceURL + "/api/Common/OTPVerification",
+                type: "POST",
+                data: model,
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                beforeSend: function () {
+                    $("#loader").show();
+                },
+                success: function (result) {
+                    if (result == "SUCCESS") {
+                        swal({
+                            //title: "Alert",
+                            text: "OTP verified successfully!!",
+                            type: "success",
+                            confirmButtonColor: "#36A865",
+                            confirmButtonText: "OK"
+                        }).then(function () {
+                            $('#OTPModal').modal('hide');
+                            displayOTPSelectedRow(currrentElement, result);
+                        });
+                    }
+                    else if (result == "ERROR") {
+                        swal({
+                            //title: "Alert",
+                            text: "OTP Not verified !!",
+                            type: "error",
+                            confirmButtonColor: "#36A865",
+                            confirmButtonText: "OK"
+                        }).then(function () {
+                            $('#txtopt').val("");
+                            $('#OTPModal').modal('show');
+                            displayOTPSelectedRow(currrentElement, result);
+                        });;
+                    }
+                    else {
+                    }
+                },
+                complete: function () {
+                    $("#loader").hide();
+                },
+                error: function (error) {
+                    $('#divLoader').hide();
+                    console.log(error.statusText);
+                }
+            });
+        }
+        else {
+            swal({
+                text: "Please enter OTP",
+                confirmButtonColor: "#36A865",
+                type: "error",
+                confirmButtonText: "OK",
+                closeOnConfirm: false
+            }).then(function () {
+                $("#txtopt").focus();
+            });
+        }
+    };
+
+    // OTP Selected Verifiy Row
+    function displayOTPSelectedRow(ele, result) {
+        if (result == "ERROR") {
+            var currentRow = $(ele).closest("tr");
+            currentRow.find("td:eq(9)").find('#btnOTP').text("Not Verified");
+        }
+        if (result == "SUCCESS") {
+            var currentRow = $(ele).closest("tr");
+            currentRow.find("td:eq(9)").find('#btnOTP').text("Verified");
+            $(ele).closest('tr').addClass('row_selected');
+            $('#verificationBlock').addClass('divdisable');
+            $('#TreatmentType').addClass('divdisable');
+            $('#PackageDetails').show();
+            $('#VerifiedMemberId').val(currentRow.find("td:eq(1)").text());
+            $('#VerifiedMemberName').val(currentRow.find("td:eq(2)").text());
+            $('#OverVerifieddetails').addClass('divdisable');
+            $('#AuthenticatioMode').val("OTP");
+        }
+    }
+
+     // Reset
+    $('#UnblockReset').click(function (event) {
+         window.location.href =  window.location.href;
+        //$('#txtDischargedate').val("");
+        //$('#MotalityDoc').val("");
+        //$('#txtMortality').val("SELECT");
+        //$('#txtdesc').val("");
+    });
+
+    // Cancel
+    $('#UnblockClose').click(function (event) {
+        window.location.href = "@Url.Action("ViewUnblockPackage", "UnblockPackage")";
+    });
+
+    function OTPTIMER() {
+        let timerOn = true;
+        function timer(remaining) {
+            var m = Math.floor(remaining / 60);
+            var s = remaining % 60;
+            m = m < 10 ? '0' + m : m;
+            s = s < 10 ? '0' + s : s;
+            document.getElementById('timer-countdown').innerHTML = m + ':' + s;
+            remaining -= 1;
+
+            if (remaining >= 0 && timerOn) {
+                setTimeout(function () {
+                    timer(remaining);
+                }, 1000);
+                return;
+            }
+
+            if (!timerOn) {
+                // Do validate stuff here
+                return;
+            }
+            // Do timeout stuff here
+            $('#OTPModal').modal('hide');
+            //alert('Timeout for otp');
+        }
+        timer(600);
+    }
+
+    function windowUnblockPackageSlipPopUp() {
+        var url = '@Url.Action("UnBlockSlip", "UnblockPackage")';
+        var width = 1200;
+        var height = 700;
+        var left = (screen.width - width) / 2;
+        var top = (screen.height - height) / 2;
+        var params = 'width=' + width + ', height=' + height;
+        params += ', top=' + top + ', left=' + left;
+        params += ', directories=no';
+        params += ', location=no';
+        params += ', menubar=no';
+        params += ', resizable=no';
+        params += ', scrollbars=yes';
+        params += ', status=no';
+        params += ', toolbar=no';
+        newwin = window.open(url, 'windowname5', params);
+         window.location.href = "@Url.Action("ViewUnblockPackageDetails", "UnblockPackage")";
+        if (window.focus) { newwin.focus() }
+        return false;
+    }
+
+    $("#uploadfile").on("change", function (e) {
+        var fileExtension = ['pdf', 'jpeg', 'jpg'];
+        var filename = $('#uploadfile').val();
+        var extension = filename.replace(/^.*\./, '');
+        var fileSize = $("#uploadfile")[0].files[0].size;
+        if ($.inArray(extension.toLowerCase(), fileExtension) == -1 && filename.length != 0) {
+            swal({
+                text: "Please upload a valid file of type pdf, jpeg, jpg !!",
+                confirmButtonColor: "#36A865",
+                type: "error",
+                confirmButtonText: "OK",
+                closeOnConfirm: false
+            }).then(function () {
+                $("#uploadfile").focus();
+                $("#uploadfile").val("");
+            });
+            return false;
+        }
+        if (fileSize > 5000141) {
+            swal({
+                text: "File size cannot be greater than 5MB !!",
+                confirmButtonColor: "#36A865",
+                type: "error",
+                confirmButtonText: "OK",
+                closeOnConfirm: false
+            }).then(function () {
+                $("#uploadfile").focus();
+                $("#uploadfile").val("");
+            });
+            return false;
+        }
+        else {
+            $("#RemoveOverrideDoc").show();
+        }
+    });
+
+    function RemoveOverrideDoc(ele) {
+        $("#uploadfile").val("");
+        $('#RemoveOverrideDoc').hide();
+    }
+</script>
+
+
+
+

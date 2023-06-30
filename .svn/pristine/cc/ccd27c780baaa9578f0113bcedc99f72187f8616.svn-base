@@ -1,0 +1,121 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace HPSBYS.Data.Model
+{
+    public class PolicyDetails
+    {
+        public string PolicyDistrictCode { get; set; }
+        public string Policynumber { get; set; }
+        public string PolicyStartDate { get; set; }
+        public string PolicyEnddate { get; set; }
+
+    }
+
+
+    public class Scheme
+    {
+        public int SchemeCode { get; set; }
+        public string SchemeName { get; set; }
+
+
+    }
+
+    public class PACKAGECATEGORY
+    {
+        public string PACKAGECATEGORYCODE { get; set; }
+        public string PROCEDURES { get; set; }
+        public string CriticalCarePackage { get; set; }
+        public string SpecialtyType { get; set; }
+        //public int Id { get; set; }
+    }
+
+    public class SUBPACKAGECATEGORY
+    {
+        public string SubCat_Code { get; set; }
+        public string SubCat_Name { get; set; }
+        //public int Id { get; set; }
+    }
+
+
+    public class PackageInformation
+    {
+        public string PackageId { get; set; }
+        public string PackageName { get; set; }
+        public string PackageDescription { get; set; }
+        public string Amount { get; set; }
+        public string package_days { get; set; }
+        public int ID { get; set; }
+        public string PackageCategoryCode { get; set; }
+        public string PreAuthStatus { get; set; }
+        public string ClinicalDoc { get; set; }
+        public string Claimdoc { get; set; }
+        public string MedSergical { get; set; }
+        public string PackageMode { get; set; }
+        public string CappedAmount { get; set; }
+        public int WardType { get; set; }
+    }
+
+
+
+    public class UnblockingReason
+    {
+        public int UnblockReasonId { get; set; }
+        public string UnblockingReasons { get; set; }
+    }
+
+    public class Login
+    {
+        public int STATUS { get; set; }
+        public string Hospitalstate { get; set; }
+        public string HospitalDistName { get; set; }
+        public string Hospitaldistrictcode { get; set; }
+        public string USERID { get; set; }
+        public string USERNAME { get; set; }
+        public string HospitalName { get; set; }
+        public string HospitalCode { get; set; }
+        public string Password { get; set; }
+        public string ConfirmPassword { get; set; }
+        public string NewPassword { get; set; }
+        public int RegBackMonth { get; set; }
+        public string LastUpdateDate { get; set; }
+
+
+    }
+    public class WardDetail
+    {
+        public int Childid { get; set; }
+        public string Ward { get; set; }
+        public string Amount { get; set; }
+        public int WardLevel { get; set; }
+        public int wardtype { get; set; }
+    }
+    public class BalanceInfo
+    {
+        public string AvailableBalance { get; set; }
+        public string AmountBlocked { get; set; }
+    }
+    public class Dist
+    {
+        public string DistrictCode { get; set; }
+        public string DistrictName { get; set; }
+    }
+    public class Block
+    {
+        public int BlockCode { get; set; }
+        public string BlockName { get; set; }
+    }
+    public class PHC
+    {
+        public int PHCCode { get; set; }
+        public string PHCName { get; set; }
+    }
+    public class SubCentre
+    {
+        public int SubCentreCode { get; set; }
+        public string SubCentreName { get; set; }
+    }
+}

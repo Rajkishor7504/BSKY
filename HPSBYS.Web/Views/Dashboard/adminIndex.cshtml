@@ -1,0 +1,614 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_DashboardLayout1.cshtml";
+}
+
+<script src="../js/jquery.vticker.min.js"></script>
+<script src="../js/highcharts.js"></script>
+<script src="../js/exporting.js"></script>
+<script src="../js/export-data.js"></script>
+<script src="../js/accessibility.js"></script>
+
+<!-- Dashboard Body content part starts -->
+<section class="dashboard_bg">
+    @*oncontextmenu="return false;"*@
+    <div class="container">
+        <!-- sticky icon start -->
+        <div class="sticky-icon">
+
+            <div class="sticky-inner">
+                <i class="fa fa-phone"> </i>
+                <div>
+                    <div class="nums font-28">  104 </div>
+                    <p>  BSKY Helpline No </p>
+                </div>
+            </div>
+            <div class="sticky-inner">
+                <i class="fa fa-file-pdf-o">  </i>
+                <div>
+                    <div class="nums"> Download User Mannual</div>
+                    <div>
+                        <a href="~/UserManual/UserMannual.pdf" class=" bg-stbtn btn-sm" target="_blank" title="Downlaod PDF">
+                            Download
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="sticky-inner">
+                <i class="fi-rr-download">  </i>
+                <div>
+                    <div class="nums"> Download Packages</div>
+                    <div>
+                        <a href="~/UserManual/PackageDetails.xlsx" class=" bg-stbtn btn-sm" target="_blank" title="Downlaod Excel">
+                            Download
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- sticky icon end -->
+
+        <h1 class="text-center hospital-name"> Welcome To! <span class="color-lt"> @Session["HospitalName"] </span> </h1>
+        <div class="text-center text-white font_20">
+            <p>
+                State Government bear the full cost of all healthcare services delivered to all patients  <br>in all State Government health care facilitie starting from Sub Centre level to District Head Quarters and Government Medical College Hospital level  <br>and State Government bear the cost of healthcare services provided in the empaneled private hospitals for BSKY card holder families in the State.<br> for an annual health coverage of Rs. 5 lakh per family and additional Rs. 5 lakh for the women members of the family.
+            </p>
+        </div>
+        <div class="form-row dashboard-menu justify-content-center">
+            <div class="col-lg-2 col-md-4 col-sm-4 col-xs-6  wow fadeInUp animated anm-remov" data-wow-delay="0.3s">
+                <a href="@Url.Action("ViewBlockPackage", "BlockPackage")" class="col2">
+                    <div class="dash_sec card" id="zoom_1">
+                        <div class="card-icon">  <img src="../imgs/svg/block-package.svg"></div>
+                        <h5>Block Package</h5>
+                        <p>Blocking of package against patient URN.</p>
+                        <div class="dash_ic"> <i class="fi-rr-chevron-right"></i></div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-xs-6  wow fadeInRight animated anm-remov" data-wow-delay="0.3s">
+                <a class="col2">
+                    @*href="@Url.Action("ViewPackageChange", "BlockPackage")"*@
+                    <div class="dash_sec card" id="zoom_2">
+                        <div class="card-icon"> <img src="../imgs/svg/package-change.svg"></div>
+                        <h5>Package Change</h5>
+                        <p>Change the package through URN.</p>
+                        <div class="dash_ic"> <i class="fi-rr-chevron-right"></i></div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-xs-6 wow fadeInLeft animated anm-remov" data-wow-delay="0.3s">
+                <a class="col2">
+                    @*href="@Url.Action("ViewBlockRoomTypeChange", "BlockPackage")"*@
+                    <div class="dash_sec card" id="zoom_3">
+                        <div class="card-icon"><img src="../imgs/svg/change-ward-type.svg"></div>
+                        <h5>Change Ward Type</h5>
+                        <p>Change the ward through URN.</p>
+                        <div class="dash_ic"> <i class="fi-rr-chevron-right"></i></div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-xs-6 wow fadeInDown animated anm-remov" data-wow-delay="0.3s">
+                <a href="@Url.Action("ViewUnblockPackage", "UnblockPackage")" class="col3">
+                    <div class="dash_sec card" id="zoom_4">
+                        <div class="card-icon"> <img src="../imgs/svg/unblock-package.svg"></div>
+                        <h5>Unblock Package</h5>
+                        <p>Unblocking of package against patient URN.</p>
+                        <div class="dash_ic"> <i class="fi-rr-chevron-right"></i></div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-xs-6 wow fadeInRight animated anm-remov" data-wow-delay="0.3s">
+                <a href="@Url.Action("AddDischarge", "Discharge")" class="col4">
+                    <div class="dash_sec card" id="zoom_5">
+                        <div class="card-icon"> <img src="../imgs/svg/discharge.svg"></div>
+                        <h5>Discharge</h5>
+                        <p>Discharge patient through URN.</p>
+                        <div class="dash_ic"> <i class="fi-rr-chevron-right"></i></div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container">
+    @*marquee section*@
+
+    <div class="notice" id="NoticeDiv">
+        <div class="order-title">
+            <span class="icon-office-order pe-1"></span>
+            <span> Notice</span>
+        </div>
+        <marquee class="mrq-notice" behavior="scroll" direction="left" onmouseover="this.stop();" onmouseout="this.start();">
+            <div class="px-2 m-0 nt-list">
+                <div id="diplayNotic" class="dt-cirle">
+                    <a href="#!" class="mr-4">
+                        @Session["HospitalName"] MOU will  be expired on dated:
+                        <span class="text-danger"> @Session["mou_enddate"] </span>.
+                    </a>
+                </div>
+                <div id="diplayExpiredNotic" class="dt-cirle">
+                    <a href="#!" class="mr-4">
+                        @Session["HospitalName"] MOU has been expired you can not block packages.
+                    </a>
+                </div>
+                <div id="diplayEmpanelmentNotic" class="dt-cirle">
+                    <a href="#!" class="mr-4">
+                        @Session["HospitalName"] Empanelment has been expired you can not block packages.
+                    </a>
+                </div>
+            </div>
+        </marquee>
+    </div>
+
+    @*marquee section*@
+
+    <div class="dashboard-sts">
+        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-xs-12 mb-2">
+            <div class="d-block d-xl-flex d-lg-flex d-md-flex d-sm-flex pb-1 justify-content-end form-row">
+                @*<div class="pr-3 text-secondary d-flex align-items-center">Show Data</div>*@
+                <div class="col-xl-2 col-md-2 pb-1 pb-xl-0 pb-lg-0 pb-md-2 pb-sm-2">
+                    <label class="pkg-label mb-1">From Date : </label>
+                    <input type="text" class="form-control datepicker" id="chartFromdt">
+                </div>
+                <div class="col-xl-2 col-md-2 pb-1 pb-xl-0 pb-lg-0 pb-md-2 pb-sm-2">
+                    <label class="pkg-label mb-1">To Date : </label>
+                    <input type="text" class="form-control datepicker" id="chartTodt">
+                </div>
+                <div class="col-xl-2 col-md-2 pb-1 pb-xl-0 pb-lg-0 pb-md-2 pb-sm-2">
+                    <label class="pkg-label mb-1">State : </label>
+                    <select id="ddState" class="form-control form-group bindStates" onchange="bindDistricts(this, ddDistrict, ddHospital);">
+                        <option value="0">-Select-</option>
+                    </select>
+                </div>
+                <div class="col-xl-2 col-md-2 pb-1 pb-xl-0 pb-lg-0 pb-md-2 pb-sm-2">
+                    <label class="pkg-label mb-1">District : </label>
+                    <select id="ddDistrict" class="form-control form-group" onchange="bindHospitals(ddState, this, ddHospital);">
+                        <option value="0">-Select-</option>
+                    </select>
+                </div>
+                <div class="col-xl-2 col-md-2 pb-1 pb-xl-0 pb-lg-0 pb-md-2 pb-sm-2">
+                    <label class="pkg-label mb-1">Hospital : </label>
+                    <select id="ddHospital" class="form-control form-group">
+                        <option value="0">-Select-</option>
+                    </select>
+                </div>
+                <div class="col-lg-2 d-flex justify-content-start align-items-center mt-3">
+                    <input id="btnSearch" type="button" onclick="searchDashboardStats();" class="btn btn-sm btn-outline-success" value="Search">
+                </div>
+            </div>
+        </div>
+
+        <!-- pie chart-auth Details -->
+        <div class="form-row">
+            <div class="col-xl-8 col-lg-7 col-md-12 col-sm-12 col-xs-12 ">
+                <div class="card d-flex h-100">
+                    <div class="border mb-4 h-100">
+                        <div class="new-dash pb-4">
+                            <h3> Patient Details </h3>
+                        </div>
+                        <div class="card-body">
+                            <figure class="highcharts-figure">
+                                <div id="coloumn-bar" class="highchart_sec"></div>
+                            </figure>
+                            <div class="d-flex align-items-center justify-content-center">
+                                <div class="row chart-toll">
+                                    <div class="flex-fill">
+                                        <div class="preauthdash-bl d-flex flex-row align-items-center">
+                                            <div class="color-t bg-default"></div>
+                                            <div class="flex-grow-1 bd-highlight ml-2">  Total Patient Blocked </div>
+                                        </div>
+                                        <div id="divPatBlocked" class="d_bigprice"></div>
+                                    </div>
+                                    <div class="flex-fill">
+                                        <div class="preauthdash-bl d-flex flex-row align-items-center">
+                                            <div class="color-t bg-success"></div>
+                                            <div class="flex-grow-1 bd-highlight ml-2">  Ongoint Treatment </div>
+                                        </div>
+                                        <div id="divPatOngoing" class="d_bigprice text-successnew">  80,365 </div>
+                                    </div>
+                                    <div class="flex-fill">
+                                        <div class="preauthdash-bl d-flex flex-row align-items-center">
+                                            <div class="color-t bg-warning"></div>
+                                            <div class="flex-grow-1 bd-highlight ml-2">  Discharge </div>
+                                        </div>
+                                        <div id="divPatDischarge" class="d_bigprice text-warningnew"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-4 col-lg-5 col-md-12 col-sm-12 col-xs-12">
+                <div class="card d-flex h-100">
+                    <div class="border mb-4 h-100">
+                        <div class="new-dash pb-4">
+                            <h3> Procedure Details </h3>
+                        </div>
+                        <div class="card-body">
+                            <figure class="highcharts-figure d-flex justify-content-center">
+                                <div id="pie"></div>
+                            </figure>
+                            <div class="row chart-toll">
+                                <div class="flex-fill">
+                                    <div class="preauthdash-bl d-flex flex-row align-items-center">
+                                        <div class="color-t bg-primary"></div>
+                                        <div class="flex-grow-1 bd-highlight ml-2">  Blocked </div>
+                                    </div>
+                                    <div id="divProcBlocked" class="d_bigprice"></div>
+                                </div>
+                                <div class="flex-fill">
+                                    <div class="preauthdash-bl d-flex flex-row align-items-center">
+                                        <div class="color-t bg-success"></div>
+                                        <div class="flex-grow-1 bd-highlight ml-2">  Unblocked </div>
+                                    </div>
+                                    <div id="divProcUnblocked" class="d_bigprice text-successnew"></div>
+                                </div>
+                                <div class="flex-fill">
+                                    <div class="preauthdash-bl d-flex flex-row align-items-center">
+                                        <div class="color-t bg-warning"></div>
+                                        <div class="flex-grow-1 bd-highlight ml-2">  Discharge </div>
+                                    </div>
+                                    <div id="divProcDischarge" class="d_bigprice text-warningnew"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- pie chart Details -->
+        <!-- Pre-auth Details -->
+        <div class="form-row">
+            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+                <div class="card d-flex h-100">
+                    <div class="border mb-4 h-100">
+                        <div class="row">
+                            <div class="col-xl-12 col-lg-12">
+                                <div class="new-dash pb-4">
+                                    <h3> Pre-Auth Details</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row dast_width">
+                                <div class="col-xl-8 col-lg-8 col-md-12 col-sm-12 col-xs-12 border-right">
+                                    <div class="row mb-4">
+                                        <div class="col-xl-8 col-lg-8 col-md-8 col-sm-6 col-xs-12">
+                                            <label id="lblPreAuthResponse" class="card-complhead"></label>
+                                            <div class="text-secondary d_pricesmall"> Response received by Nodal Doctors </div>
+                                        </div>
+                                        <div class="col-xl-4 col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                            <label id="lblPreAuthApprovedAmt" class="card-complhead text-successnew"></label>
+                                            <div class="text-secondary d_pricesmall"> Approved Amount </div>
+                                        </div>
+                                    </div>
+                                    <div class="border-bottom mb-2"></div>
+                                    <div class="row d-flex align-items-center flex-fill">
+                                        <div class="col-xl-8 col-lg-8 col-md-12 col-sm-12 col-xs-12">
+                                            <div class="row">
+                                                <div class="col-xl-4 col-lg-4 col-md-4 col-sm-4 col-xs-6 border-right">
+                                                    <div id="divPreAuthRejectCase" class="d_bigprice"></div>
+                                                    <div class="text-secondary d_pricesmall"> Rejected Cases </div>
+                                                </div>
+                                                <div class="col-xl-4 col-lg-4 col-md-4 col-sm-4 col-xs-6 text-center">
+                                                    <div id="divPreAuthApproved" class="d_bigprice"></div>
+                                                    <div class="text-secondary d_pricesmall"> Approved </div>
+                                                </div>
+                                                <div class="col-xl-4 col-lg-4 col-md-4 col-sm-4 col-xs-12 text-center">
+                                                    <div id="divPreAuthAutoApproved" class="d_bigprice"></div>
+                                                    <div class="text-secondary d_pricesmall"> Auto Approved </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12">
+                                            <div class="mb-2">
+                                                <div class="preauthdash-bl"> <span class="mr-2">Blocked</span> <span id="spnPreAuthBlocked"></span></div>
+                                                <div class="progress progress-preauth rounded-0 bg-white">
+                                                    <div id="divPreAuthBlockedProgress" class="progress-bar bg-success rounded-0" role="progressbar" style="width: 85%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                                                </div>
+                                            </div>
+                                            <div class="mb-2">
+                                                <div class="preauthdash-bl"> <span class="mr-2">Pending</span> <span id="spnPreAuthPending"></span></div>
+                                                <div class="progress progress-preauth rounded-0 bg-white">
+                                                    <div id="divPreAuthPendingProgress" class="progress-bar bg-warning rounded-0" role="progressbar" style="width: 40%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                                                </div>
+                                            </div>
+                                            <div class="mb-2">
+                                                <div class="preauthdash-bl"> <span class="mr-2">Expired&nbsp;</span> <span id="spnPreAuthExpired"></span> </div>
+                                                <div class="progress progress-preauth rounded-0 bg-white">
+                                                    <div id="divPreAuthExpiredProgress" class="progress-bar bg-danger rounded-0" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12 ">
+                                    <div class="row mb-4">
+                                        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                            <label id="lblPreAuthResponseAwaited" class="card-complhead"></label>
+                                            <div class="text-secondary d_pricesmall"> Response Awaited </div>
+                                        </div>
+                                        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                            <label id="lblPreAuthPendingAmount" class="card-complhead"> <span class="text-warningnew"></span> </label>
+                                            <div class="text-secondary d_pricesmall"> Pending Amount </div>
+                                        </div>
+                                    </div>
+                                    <div class="border-bottom mb-2"></div>
+                                    <div class="row">
+                                        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                            <div class="row">
+                                                <div class="mb-4 col-xl-12 col-lg-12 col-md-6 col-sm-6 col-xs-6">
+                                                    <div id="divPreAuthFreshCase" class="d_bigprice"></div>
+                                                    <div class="text-secondary d_pricesmall"> Fresh Cases </div>
+                                                </div>
+                                                <div class="mb-2 col-xl-12 col-lg-12 col-md-6 col-sm-6 col-xs-6">
+                                                    <div id="divPreAuthRevertCase" class="d_bigprice"></div>
+                                                    <div class="text-secondary d_pricesmall"> Reverted Cases </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                            <div class="highcharts-figure">
+                                                <div id="donut-circle"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Pre-auth Details -->
+        <!-- 104 Outbound Call -->
+        @*<div class="form-row">
+                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+                    <div class="card d-flex h-100">
+                        <div class="border mb-4 h-100">
+                            <div class="row">
+                                <div class="col-xl-12 col-lg-12">
+                                    <div class="new-dash pb-4">
+                                        <h3> 104 Outbound Call  </h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 col-xs-12 border-right">
+                                        <div class="outbound-gap">
+                                            <label id="lblObcTotCallConn" class="card-complhead"></label>
+                                            <div class="text-secondary d_pricesmall"> Total Call Connected </div>
+                                        </div>
+                                        <div class="grid-outbound">
+                                            <div class="row">
+                                                <div class="d-flex justify-content-start flex-fill">
+                                                    <div class="flex-fill pl-3">
+                                                        <div class="bd-highlight mb-2">
+                                                            <div id="divObcYes" class="d_bigprice text-successnew"></div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="flex-fill text-right pr-3">
+                                                        <div class="ml-auto bd-highlight mb-2">
+                                                            <div id="divObcNo" class="d_bigprice text-dangernew"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="progress">
+                                                <div id="divObcYesProgress" class="progress-bar rounded-0 bg-success" role="progressbar" style="width: 25%" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100"></div>
+                                                <div id="divObcNoProgress" class="progress-bar rounded-0 bg-danger" role="progressbar" style="width: 75%" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"></div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="d-flex justify-content-start flex-fill">
+                                                    <div class="flex-fill pl-3">
+                                                        <div class="small-dashfnt"> <span class="text-successnew">Yes </span>| <span id="spnObcYesPerc"></span></div>
+                                                    </div>
+                                                    <div class="flex-fill text-right pr-3">
+                                                        <div class="small-dashfnt"> <span class="text-dangernew">No </span>| <span id="spnObcNoPerc"></span></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 col-xs-12 border-right">
+                                        <div class="outbound-gap">
+                                            <div class="row">
+                                                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                    <label id="lblObcPositiveRes" class="card-complhead text-successnew"> 71.46%</label>
+                                                    <div class="text-secondary d_pricesmall"> Positive Response </div>
+                                                </div>
+                                                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                    <label id="lblObcNegetiveRes" class="card-complhead text-successnew"> 52.36%</label>
+                                                    <div class="text-secondary d_pricesmall"> Negetive Response </div>
+                                                </div>
+                                            </div>
+                                            <div class="row mt-3">
+                                                <div class="col-xl-5 col-lg-5 col-md-5 col-sm-6 col-xs-12 d-flex justify-content-center">
+                                                    <div class="highcharts-figure">
+                                                        <div id="pie2"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-xl-7 col-lg-7 col-md-7 col-sm-6 col-xs-12 mt-3">
+                                                    <div class="preauthdash-bl d-flex flex-row align-items-center mb-2">
+                                                        <div class="color-t bg-warning"></div>
+                                                        <div class="flex-grow-1 bd-highlight ml-2 w-50">  Support </div>
+                                                        <div id="divObcSupport" class="bd-highlight flex-fill text-left w-50"></div>
+                                                    </div>
+                                                    <div class="preauthdash-bl d-flex flex-row align-items-center mb-2">
+                                                        <div class="color-t bg-primary"></div>
+                                                        <div class="flex-grow-1 bd-highlight ml-2 w-50">  Behaviour </div>
+                                                        <div id="divObcBehaviour" class="bd-highlight flex-fill text-left w-50"></div>
+                                                    </div>
+                                                    <div class="preauthdash-bl d-flex flex-row align-items-center mb-2">
+                                                        <div class="color-t bg-success"></div>
+                                                        <div class="flex-grow-1 bd-highlight ml-2 w-50">  Bribe </div>
+                                                        <div id="divObcBribe" class="bd-highlight flex-fill text-left w-50"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12">
+                                        <div class="outbound-gap">
+                                            <label id="lblObcTotCallNotCon" class="card-complhead"></label>
+                                            <div class="text-secondary d_pricesmall"> Total Call Not Connected </div>
+                                        </div>
+                                        <div class="grid-outbound">
+                                            <div class="row">
+                                                <div class="d-flex justify-content-start flex-fill">
+                                                    <div class="flex-fill pl-3">
+                                                        <div class="bd-highlight mb-2">
+                                                            <div id="divObcFreshCase" class="d_bigprice text-warningnew"></div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="flex-fill text-right pr-3">
+                                                        <div class="ml-auto bd-highlight mb-2">
+                                                            <div id="divObcNotConnected" class="d_bigprice text-dangernew"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="progress">
+                                                <div id="divObcFreshCaseProgress" class="progress-bar rounded-0 bg-warning" role="progressbar" style="width: 60%" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
+                                                <div id="divObcNotConnectedProgress" class="progress-bar rounded-0 bg-danger" role="progressbar" style="width: 100%" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"></div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="d-flex justify-content-start flex-fill">
+                                                    <div class="flex-fill pl-3">
+                                                        <div class="small-dashfnt"> <span class="text-warningnew"> Fresh Case </span>| <span id="spnObcFreshCasePerc"></span></div>
+                                                    </div>
+                                                    <div class="flex-fill text-right pr-3">
+                                                        <div class="small-dashfnt "> <span class="text-dangernew"> Not Connected </span>| <span id="spnObcNotConnectedPerc"></span></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>*@
+        <!-- 104 Outbound Call -->
+        <!-- Referral Authentication -->
+        @*<div class="form-row referal-gap">
+                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+                    <div class="card d-flex h-100">
+                        <div class="border mb-4 h-100">
+                            <div class="row">
+                                <div class="col-xl-6 col-lg-6 col-md-5 col-sm-12 col-xs-12">
+                                    <div class="new-dash pb-4">
+                                        <h3> Referral Authentication </h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="row dast_width">
+                                    <div class="col-xl-12 col-lg-12 col-md-6 col-sm-12 col-xs-12">
+                                        <div class="row bottom-gap">
+                                            <div class="col-xl-8 col-lg-8 col-md-6 col-sm-6 col-xs-12">
+                                                <label id="lblRefAuthActionByDc" class="card-complhead"></label>
+                                                <div class="text-secondary d_pricesmall"> Action Taken By DC </div>
+                                            </div>
+                                            <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 col-xs-12">
+                                                <div id="divRefAuthPerc" class="progress-success"></div>
+                                                <div class="progress">
+                                                    <div id="divRefAuthProgress" class="progress-bar bg-success" role="progressbar" aria-label="Success example" style="width: 55.27%" aria-valuenow="55" aria-valuemin="0" aria-valuemax="100"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-xl-4 col-lg-4 col-md-6 col-sm-4 col-xs-12">
+                                                <div id="divRefAuthAuthenticate" class="d_bigprice"></div>
+                                                <div class="d_pricesmall"> Authenticate </div>
+                                            </div>
+                                            <div class="col-xl-4 col-lg-4 col-md-6 col-sm-4 col-xs-12">
+                                                <div id="divRefAuthNotAuthenticate" class="d_bigprice"></div>
+                                                <div class="d_pricesmall"> Not Authenticate </div>
+                                            </div>
+                                            <div class="col-xl-4 col-lg-4 col-md-12 col-sm-4 col-xs-12">
+                                                <div id="divRefAuthAutoAuthenticate" class="d_bigprice"></div>
+                                                <div class="d_pricesmall"> Auto Authenticate </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>*@
+        <!-- Referral Authentication -->
+        <!-- authentication mode -->
+        <div class="form-row">
+            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-xs-12 ">
+                <div class="card d-flex h-100">
+                    <div class="border mb-4 h-100">
+                        <div class="new-dash pb-4">
+                            <h3> Authentication Mode </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-row dast_width">
+                                <div class="col-xl-3 col-lg-3 col-md-3 col-sm-3 col-xs-6">
+                                    <div id="divAuthModePos" class="d_bigprice"></div>
+                                    <div class="d_pricesmall mt-1"> POS </div>
+                                </div>
+                                <div class="col-xl-3 col-lg-3 col-md-3 col-sm-3 col-xs-6">
+                                    <div id="divAuthModeIris" class="d_bigprice"></div>
+                                    <div class="d_pricesmall mt-1"> IRIS </div>
+                                </div>
+                                <div class="col-xl-3 col-lg-3 col-md-3 col-sm-3 col-xs-6">
+                                    <div id="divAuthModeOtp" class="d_bigprice"></div>
+                                    <div class="d_pricesmall mt-1"> OTP </div>
+                                </div>
+                                <div class="col-xl-3 col-lg-3 col-md-3 col-sm-3 col-xs-6">
+                                    <div id="divAuthModeOverride" class="d_bigprice"></div>
+                                    <div class="d_pricesmall mt-1"> Override </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-xs-12 ">
+                <div class="card d-flex h-100">
+                    <div class="border mb-4 h-100">
+                        <div class="new-dash pb-4">
+                            <h3> Override Code Details </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-row dast_width">
+                                <div class="col-xl-3 col-lg-3 col-md-3 col-sm-3 col-xs-6">
+                                    <div class="border-right">
+                                        <div id="divOvdTotalRequest" class="d_bigprice text-dark"></div>
+                                        <div class="d_pricesmall mt-1"> Total Request </div>
+                                    </div>
+                                </div>
+                                <div class="col-xl-3 col-lg-3 col-md-3 col-sm-3 col-xs-6">
+                                    <div id="divOvdTotalApprove" class="d_bigprice text-successnew"></div>
+                                    <div class="d_pricesmall mt-1"> Approved </div>
+                                </div>
+                                <div class="col-xl-3 col-lg-3 col-md-3 col-sm-3 col-xs-6 ">
+                                    <div id="divOvdTotalReject" class="d_bigprice text-dangernew"></div>
+                                    <div class="d_pricesmall mt-1"> Rejected </div>
+                                </div>
+                                <div class="col-xl-3 col-lg-3 col-md-3 col-sm-3 col-xs-6 ">
+                                    <div id="divOvdTotalPending" class="d_bigprice text-warningnew"></div>
+                                    <div class="d_pricesmall mt-1"> Pending </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- authentication mode -->
+    </div>
+</div>
+
+@Scripts.Render("~/bundles/AdminUtility")
+@Scripts.Render("~/bundles/adminDashboard")

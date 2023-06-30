@@ -1,0 +1,123 @@
+﻿
+@{
+    ViewBag.Title = "adminKnowYourStatus";
+    Layout = "~/Views/Shared/_CommonLayout.cshtml";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="clearfix"></div>
+                    <!-- Family Verification info -->
+                    <div class="form-box-bg mb-4">
+                        <ul class="nav nav-tabs custom-tab mb-4">
+                            <li class="nav-item">
+                                <a class="nav-link active" href="@Url.Action("KnowYourStatus","IPReports")">View</a>
+                            </li>
+                        </ul>
+                        <div class="col-md-12 p-0">
+                            <div class="form-row">
+                                <div class="col-lg-12 col-md-12 col-sm-8 col-xs-12 form-row form-designsc">
+                                    <label for="packageHeader" class="col-lg-2 col-md-4 col-sm-4 col-xs-12 col-form-label">NFSA/SFSS NO<b><span style="color:red">*</span></b></label>
+                                    <div class="col-lg-2 col-md-4 col-sm-4 col-xs-12 mb-2 px-0">
+                                        <input id="txtUrnNo" type="text" class="form-control" autofocus placeholder="Enter here" maxlength="17" onkeypress="return inputLimiter(event,'Numbers')" />
+                                        @*<input id="hdnUrnNo" type="hidden" />*@
+                                    </div>
+                                    <div class="col-lg-1 col-md-3 col-sm-4 col-xs-12 mb-2 px-0">
+                                        <input class="btn btn-outline-success" type="button" value="Search" id="btnSearchUrn">
+                                    </div>
+                                    <label id="lblddPatientName" class="col-form-label">Member Name <b><span style="color:red">*</span></b> </label>
+                                    <div id="divddPatientName" class="col-lg-3 col-md-4 col-sm-4 col-xs-12 mb-2 px-0">
+                                        <span class="text-danger"></span>
+                                        <select id="ddPatientName" class="form-control form-group dropdownRequired">
+                                            <option value="0">-Select-</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="tableid" class="table-responsive mt-2">
+                            @*<table id="example2" class="table table-striped jsgrid-table" style="width:100%">*@
+                            <table class="table table-striped border">
+                                <thead>
+                                    <tr>
+                                        <th>Sl#</th>
+                                        <th>URN</th>
+                                        <th>
+                                            <div class="prehed-bold"> Member Details </div>
+                                            <div class="prehed-small"> ID | Name </div>
+                                        </th>
+                                        <th>Gender</th>
+                                        <th>Age</th>
+                                        <th>Aadhar No</th>
+                                        <th>Patient Phone No</th>
+                                        @*<th>Admission Status</th>*@
+                                        <th> Action </th>
+                                    </tr>
+                                </thead>
+                                <tbody id="example2">
+                            </table>
+                        </div>
+                        <!-- modal start -->
+                        <!--<div class="modal fade wow fadeInUp animated" id="popModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-xl modal-dialog-scrollable" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <div class="row heading-pkg">
+                                            <h5 class="mb-0">@Session["HospitalName"]</h5>
+                                        </div>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="row">
+                                            <div class="col-6 heading-pkg">
+                                                <h5 id="popModalTitle" class="pkg-label mb-1"></h5>
+                                            </div>
+                                            <div class="col-6">
+                                                <button id="btnExcel" type="button" class="btn btn-outline-success btn-sm float-right" data-toggle="tooltip" title="Export To Excel">
+                                                    <i class="fa fa-file-excel-o"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <p></p>
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <table id="grdReportDetails" class="table table-striped" style="width:100%;">
+                                                    <thead>
+                                                        <tr>
+                                                            <th scope="col">SL No</th>
+                                                            <th scope="col">Member Name</th>
+                                                            <th scope="col">Admission</th>
+                                                            <th scope="col">Blocking</th>
+                                                            <th scope="col">Unblocking</th>
+                                                            <th scope="col">Discharge</th>
+                                                            <th scope="col">Pre-Auth</th>
+                                                        </tr>
+                                                    </thead>
+                                                </table>
+                                                <table id="exlReportDetails"></table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>-->
+                        <!-- modal end -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.mynamespace = {};
+    document.mynamespace.hospitalcode = '@HttpContext.Current.Session["HospitalCode"]';
+</script>
+
+@Scripts.Render("~/bundles/adminknowyourstatusreport")

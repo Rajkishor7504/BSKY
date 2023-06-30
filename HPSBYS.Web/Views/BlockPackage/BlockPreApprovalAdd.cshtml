@@ -1,0 +1,759 @@
+﻿
+@{
+    ViewBag.Title = "BlockPreApprovalAdd";
+    Layout = "~/Views/Shared/_CommonLayout.cshtml";
+}
+
+<div class="container">
+    <div class="row">
+        <input type="hidden" value="abc" />
+        <div class="col-12 pb-3">
+            <div class="card">
+                <div class="card-body">
+                    <div class="clearfix"></div>
+                    <div class="form-box-bg mb-4">
+                        <ul class="nav nav-tabs custom-tab mb-3">
+                            <li class="nav-item">
+                                <a class="nav-link active" href="@Url.Action("BlockPreApprovalAdd","BlockPackage")">Query</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="@Url.Action("BlockPreApproval","BlockPackage")">View</a>
+                            </li>
+                        </ul>
+
+                        <div class="form-row mb-4">
+                            <div class="col-lg-2">
+                                <div class="mb-4">
+                                    <label for="packageHeader" class="mb-1">From Date<b><span style="color:red">*</span></b></label>
+                                    <input type="text" class="form-control" id="frmdatepicker">
+                                </div>
+                            </div>
+                            <div class="col-lg-2">
+                                <div class="mb-4">
+                                    <label for="packageHeader" class="mb-1">To Date<b><span style="color:red">*</span></b></label>
+                                    <input type="text" class="form-control" id="todatepicker">
+                                </div>
+                            </div>
+                            <div class="col-lg-2">
+                                <div class="mb-4">
+                                    <label for="packageHeader" class="mb-1">Status</label>
+                                    <select id="ddlquerystatus" class="form-control form-group">
+                                        <option value="A">ALL</option>
+                                        <option value="N">Query</option>
+                                        <option value="Y">Query-Complied</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-2 d-flex justify-content-start align-items-center">
+                                <input class="btn btn-outline-success my-2 my-sm-0" type="button" value="Search" id="btndateSearch">
+                            </div>
+                        </div>
+
+                        <div class="table-responsive mt-2">
+                            <table id="grdPreApprvPackage" class="table table-striped border preauth-tbl" cellspacing="0" width="100%">
+                                <thead>
+                                    <tr>
+                                        <th>Sl No</th>
+                                        <th>URN</th>
+                                        <th> <div class="prehed-bold"> Name </div> <div class="prehed-small"> Contact No</div> </th>
+                                        <th>Case No</th>
+                                        <th> Registration Date </th>
+                                        <th> Package Name </th>
+                                        <th> Package Code </th>
+                                        <th>Package Amount   </th>
+                                        <th> Remarks <div class="prehed-small"> Status </div> </th>
+                                        <th> Action </th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="MyPopup" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <h4 class="modal-title"> View Details </h4>
+                        </div>
+                    </div>
+                    <button type="button" class="close" data-dismiss="modal">
+                        &times;
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="SNARemarksfirstDiv">
+                        <div class="row col-md-12 px-0">
+                            <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12" align="left">
+                                <label class="mb-2 mt-2"> SNA Description First </label>
+                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12" align="right" id="downloadPdfFirstDiv">
+                                <input type="hidden" id="pathName1" />
+                                <input type="hidden" id="filename1" />
+                                <button type="button" class="btn btn-outline-success mb-2" data-title="Download" @*href='/BlockPackage/DownloadFile'*@ onclick="downloadfile1();" id="downloadPdfFirst" download="Document.pdf">Download File  &nbsp;<i class="fa fa-file-pdf-o"></i></button>
+                            </div>
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" align="left">
+                                <textarea rows="4" cols="30" maxlength="200" class="form-control form-group" id="txtSnaRemarksFirst" name="txtSnaRemarksFirst" disabled></textarea>
+                            </div>
+                            <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12" align="left">
+                                <label class="mb-2 mt-2"> SNA Remarks First </label>
+                            </div>
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" align="left">
+                                <textarea rows="2" cols="30" maxlength="200" class="form-control form-group" id="txtSnaRemarks" name="txtSnaRemarks" disabled></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="SNARemarksSecondDiv">
+                        <div class="row col-md-12 px-0">
+                            <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12" align="left">
+                                <label class="mb-2 mt-2"> SNA Description Second </label>
+                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12" align="right" id="downloadPdfSecondDiv">
+                                <input type="hidden" id="pathName2" />
+                                <input type="hidden" id="filename2" />
+                                <input type="hidden" id="yearname" />
+                                <input type="hidden" id="urn" />
+                                <input type="hidden" id="memberid" />
+                                <button type="button" class="btn btn-outline-success mb-2" data-title="Download" onclick="downloadfile2();" id="downloadPdfSecond" download="Document.pdf">Download File  &nbsp;<i class="fa fa-file-pdf-o"></i></button>
+                            </div>
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" align="left">
+                                <textarea rows="4" cols="30" maxlength="200" class="form-control form-group" id="txtSnaRemarksSecond" name="txtSnaRemarksSecond" disabled></textarea>
+                            </div>
+                            <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12" align="left">
+                                <label class="mb-2 mt-2"> SNA Remarks Second </label>
+                            </div>
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" align="left">
+                                <textarea rows="2" cols="30" maxlength="200" class="form-control form-group" id="txtSnaRemarks2" name="txtSnaRemarks2" disabled></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <input type="hidden" id="hdnquerycount" value="@ViewBag.data" />
+                        <div class="col-md-12">
+                            <label class="mb-2 mt-2"> Upload Documents </label>
+                            <div class="row">
+                                <div class="col-lg-6 col-md-6 col-sm-12" id="FileUploadFirstDiv">
+                                    <input type="file" class="col-sm-12 form-control pr-5" id="txtdocument1">
+                                    <span id="Removetxtdocument1" onclick="Removetxtdocument1(this)" class="btn btn-outline-danger btn-sm btn-crus"> <i class="fa fa-times"></i></span>
+                                    <div>
+                                        <small class="text-danger">File to be uploaded must be pdf,jpeg, jpg and size should not exceed 5MB </small>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-12" id="FileUploadSecondDiv">
+                                    <input type="file" class="col-sm-12 form-control pr-5" id="txtdocument2">
+                                    <span id="Removetxtdocument2" onclick="Removetxtdocument2(this)" class="btn btn-outline-danger btn-sm btn-crus"> <i class="fa fa-times"></i></span>
+                                    <div>
+                                        <small class="text-danger">File to be uploaded must be pdf,jpeg, jpg and size should not exceed 5MB </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @*<div class="col-md-6">
+                                <label class="pkg-label font-weight-normal">Package Details</label>
+                                <div class="pkghead-txt"> Details </div>
+                            </div>*@
+                    </div>
+
+                    <div class="row" id="replyFirstDiv">
+                        <div class="col-md-12">
+                            <label class="mb-2 mt-2">
+                                Reply<b><span style="color:red">*</span></b>
+                            </label>
+                            <textarea rows="4" cols="30" maxlength="200" class="form-control" id="txtReply" name="txtReply"></textarea>
+                            <div class="chrtr_lmt red-text">
+                                <small>
+                                    <b>
+                                        Maximum&nbsp;
+                                        <input size="2" style="color:green" value="500" id="txtCharslimit1" name="txtCharslimit1" readonly="readonly" class="remaining border-0 font-weight-bold" tabindex="-1">&nbsp;Characters
+                                    </b>
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" id="replySecondDiv">
+                        <div class="col-md-12">
+                            <label class="mb-2 mt-2">
+                                Reply<b><span style="color:red">*</span></b>
+                            </label>
+                            <input type="hidden" id="querycountid" />
+                            <textarea rows="4" cols="30" maxlength="200" class="form-control" id="txtReplySecond" name="txtReplySecond"></textarea>
+                            <div class="chrtr_lmt red-text">
+                                <small>
+                                    <b>
+                                        Maximum&nbsp;
+                                        <input size="2" style="color:green" value="500" id="txtCharslimit2" name="txtCharslimit2" readonly="readonly" class="remaining border-0 font-weight-bold" tabindex="-1">&nbsp;Characters
+                                    </b>
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button type="button" id="btnSubmit" class="btn btn-sm btn-success">
+                                Submit
+                            </button>
+                            <button type="button" id="btnCancel" class="btn btn-sm btn-danger" data-dismiss="modal">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        loadNavigation('BlockPreApprovalAdd', 'MtPreauth', 'pl', 'Block Package', 'Block Pre Approval', '');
+        //For TextArea(strat)
+        //var txtCharCountLength = $('#txtDesc').val().length;
+        //var remainingChar = 500 - txtCharCountLength;
+        //$("#txtCharslimit").val(remainingChar);
+        //For TextArea(End)
+        $('#path').html('Block Pre-Approval Add');
+        $("#frmdatepicker").datepicker({
+            numberOfMonths: 1,
+            changeMonth: true,
+            dateFormat: "dd-M-y",
+            changeYear: true
+        });
+        $('#Removetxtdocument1').hide();
+        $('#Removetxtdocument2').hide();
+        $("#todatepicker").datepicker({
+            numberOfMonths: 1,
+            changeMonth: true,
+            dateFormat: "dd-M-y",
+            changeYear: true
+
+        });
+        $('#txtReply').keyup(function () {
+            var txtCharCountLength = $(this).val().length;
+            if (txtCharCountLength <= 500) {
+                var remainingChar = 500 - txtCharCountLength;
+                $("#txtCharslimit1").val(remainingChar);
+            }
+        });
+        $('#txtReplySecond').keyup(function () {
+            var txtCharCountLength = $(this).val().length;
+            if (txtCharCountLength <= 500) {
+                var remainingChar = 500 - txtCharCountLength;
+                $("#txtCharslimit2").val(remainingChar);
+            }
+        });
+        //$('#txtdocument1').change(function () {
+        //    var File = $(this)[0].files[0].size / 1024 / 1024;
+        //    File = File.toFixed(1);
+        //    if (File > 1) {
+        //        return swal({
+
+        //            title: "File size cannot be greater than 1MB",
+        //            type: 'error',
+        //            confirmButton: 'true',
+        //            confirmButtonColor: '#36A865',
+        //            confirmButtonText: 'Ok',
+        //            allowOutsideClick: false
+
+
+        //        })
+        //    }
+        //});
+        //$('#txtdocument2').change(function () {
+        //    var File = $(this)[0].files[0].size / 1024 / 1024;
+        //    File = File.toFixed(1);
+        //    if (File > 1) {
+        //        return swal({
+
+        //            title: "File size cannot be greater than 1MB",
+        //            type: 'error',
+        //            confirmButton: 'true',
+        //            confirmButtonColor: '#36A865',
+        //            confirmButtonText: 'Ok',
+        //            allowOutsideClick: false
+
+
+        //        })
+        //    }
+        //});
+
+        var d = new Date();
+        var currentDate = d.getDate();
+        var currMonth = d.getMonth();
+        var currYear = d.getFullYear();
+        var startDate = new Date(currYear, currMonth, 1);
+        var endDate = new Date(currYear, currMonth, currentDate);
+
+        $("#frmdatepicker").val(moment(startDate).format("DD-MMM-YY"));
+        $("#todatepicker").val(moment(endDate).format("DD-MMM-YY"));
+        var fromdate = $("#frmdatepicker").val();
+        var todate = $("#todatepicker").val();
+        bindPreApprovalList(fromdate, todate);
+       /* bindPreApprovalList();*/
+
+        $("#btndateSearch").click(function () {
+            var fromDt = $("#frmdatepicker").val();
+            var toDt = $("#todatepicker").val();
+            var from = "";
+            var to = "";
+            if (fromDt != "")
+                from = new Date($("#frmdatepicker").val());
+            if (toDt != "")
+                to = new Date($("#todatepicker").val());
+            if (from == "" && to == "") {
+                return swal({
+                    title: "Please select From Date and To Date",
+                    type: 'error',
+                    confirmButton: 'true',
+                    confirmButtonColor: '#36A865',
+                    confirmButtonText: 'Ok',
+                    allowOutsideClick: false
+                })
+                    .then(() => {
+                        $('#frmdatepicker').focus();
+                    });
+            }
+            else if (from == "" && to != "") {
+                return swal({
+                    title: "Please select From Date",
+                    type: 'error',
+                    confirmButton: 'true',
+                    confirmButtonColor: '#36A865',
+                    confirmButtonText: 'Ok',
+                    allowOutsideClick: false
+                    })
+                    .then(() => {
+                        $('#frmdatepicker').focus();
+                    });
+            }
+            else if (from > to) {
+                return swal({
+                    title: "From Date should not be greater than To Date",
+                    type: 'error',
+                    confirmButton: 'true',
+                    confirmButtonColor: '#36A865',
+                    confirmButtonText: 'Ok',
+                    allowOutsideClick: false
+                    })
+                    .then(() => {
+                        $('#frmdatepicker').focus();
+                    });
+            }
+            else {
+                var fromdate = $("#frmdatepicker").val();
+                var todate = $("#todatepicker").val();
+                bindPreApprovalList(fromdate, todate);
+            }
+        });
+
+        $("#btnSubmit").click(function () {
+            var MotalityDocUpload = $("#txtdocument1").get(0);
+            var PhotoUpload = $("#txtdocument2").get(0);
+            var Motalityfiles = MotalityDocUpload.files;
+            var Photofiles = PhotoUpload.files;
+            var fileExtension = ['pdf', 'jpeg', 'jpg'];
+            var filename = $('#txtdocument1').val();
+            var filename1 = $('#txtdocument2').val();
+            var extension = filename.replace(/^.*\./, '');
+            var photoextension = filename1.replace(/^.*\./, '');
+            if (filename.length != 0) {
+                var File = $("#txtdocument1")[0].files[0].size;
+            }
+            if (filename1.length != 0) {
+                var PhotoFile = $("#txtdocument2")[0].files[0].size;
+            }
+            if ($.inArray(extension.toLowerCase(), fileExtension) == -1 && filename.length != 0) {
+                swal({
+                    text: "Please upload a valid file of type pdf, jpeg, jpg !!",
+                    confirmButtonColor: "#36A865",
+                    type: "error",
+                    confirmButtonText: "OK",
+                    closeOnConfirm: false
+                });
+               // return sweetAlert('Alert', "Please upload a valid file of type pdf, jpeg, jpg !!")
+            }
+            else if (File > 5242880) {
+                swal({
+                    text: "File size cannot be greater than 5MB !!",
+                    confirmButtonColor: "#36A865",
+                    type: "error",
+                    confirmButtonText: "OK",
+                    closeOnConfirm: false
+                }).then((result) => {
+
+                    $('#txtdocument1').focus();
+                });
+               // return sweetAlert('Alert', "File size cannot be greater than 5MB !!")
+            }
+            //if ($.inArray(extension.toLowerCase(), photoextension) == -1 && filename1.length != 0) {
+            //    return sweetAlert('Alert', "Please upload a valid file of type pdf, jpeg, jpg !!")
+            //}
+            else if (PhotoFile > 5242880) {
+                swal({
+                    text: "File size cannot be greater than 5MB !!",
+                    confirmButtonColor: "#36A865",
+                    type: "error",
+                    confirmButtonText: "OK",
+                    closeOnConfirm: false
+                }).then((result) => {
+
+                    $('#txtdocument2').focus();
+                });
+               /// return sweetAlert('Alert', "File size cannot be greater than 5MB !!")
+            }
+            else if ($('#querycountid').val() == "1" && $("#txtReply").val() == "") {
+                swal({
+                    text: "Please Enter Reply !!",
+                    confirmButtonColor: "#36A865",
+                    type: "error",
+                    confirmButtonText: "OK",
+                    closeOnConfirm: false
+                }).then((result) => {
+
+                    $('#txtReply').focus();
+                });
+                //return sweetAlert('Alert', "Please Enter Reply !!")
+            }
+            else if ($('#querycountid').val() == "2" && $("#txtReplySecond").val() == "") {
+                swal({
+                    text: "Please Enter Reply !!",
+                    confirmButtonColor: "#36A865",
+                    type: "error",
+                    confirmButtonText: "OK",
+                    closeOnConfirm: false
+                }).then((result) => {
+
+                    $('#txtReplySecond').focus();
+                });
+                //return sweetAlert('Alert', "Please Enter Reply !!")
+            }
+            else /*if (window.confirm('Are you sure to submit the data？'))*/ {
+                swal({
+                    title: "Are you sure?",
+                    text: " to submit the data!",
+                    type: "warning",
+                    showCancelButton: true,
+                    cancelButtonColor: '#d33',
+                    confirmButtonColor: "#36A865",
+                    confirmButtonText: 'Yes'
+                }).then(function (isConfirm) {
+                    if (isConfirm.value) {
+                        $('#btnSubmit').prop('disabled', true);
+                        var formdata = new FormData();
+                        if (Motalityfiles.length > 0) { formdata.append("document2", Motalityfiles[0]); }
+                        if (Photofiles.length > 0) { formdata.append("document3", Photofiles[0]); }
+                        formdata.append("uploadyear", $('#yearname').val());
+                        formdata.append("urn", $('#urn').val());
+                        formdata.append("memberid", $('#memberid').val());
+                        formdata.append("replySecond", $("#txtReply").val());
+                        formdata.append("replyThird", $("#txtReplySecond").val());
+
+                        $.ajax({
+                            url: '@Url.Content("~/")' + "BlockPackage/AddDocumentPopUp",
+                            type: "POST",
+                            data: formdata,
+                            processData: false,
+                            contentType: false,
+                            beforeSend: function () {
+                                $("#loader").show();
+                            },
+                            success: function (result) {
+                                if (result == "sucess") {
+                                    return swal({
+                                        title: "Data Submitted Successfully",
+                                        type: 'success',
+                                        confirmButton: 'true',
+                                        confirmButtonColor: '#36A865',
+                                        confirmButtonText: 'Ok',
+                                        allowOutsideClick: false
+                                    }).then(function () {
+                                        window.location = '@Url.Content("~/")' + "BlockPackage/BlockPreApprovalAdd";
+                                        $('#MyPopup').modal('hide');
+                                    });
+                                }
+                            },
+                            complete: function () {
+                                $("#loader").hide();
+                            },
+                            error: function (error) {
+                                console.log(error.responseText);
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    });
+
+    var SchemeParams = {
+        urnno: '',
+        action:'A',
+    };
+
+    function downloadfile1() {
+        var filepath = $('#pathName1').val();
+        var filename = $('#filename1').val();
+        window.location.href = "@Url.Action("Downloadfile", "Discharge")?pathName=" + filepath +"&filename=" + filename;
+    }
+
+    $("#txtdocument1").on("change", function (e) {
+        var fileExtension = ['pdf', 'jpeg', 'jpg'];
+        var filename = $('#txtdocument1').val();
+        var extension = filename.replace(/^.*\./, '');
+        var fileSize = $("#txtdocument1")[0].files[0].size;
+        if ($.inArray(extension.toLowerCase(), fileExtension) == -1 && filename.length != 0) {
+            swal({
+                text: "Please upload a valid file of type pdf, jpeg, jpg !!",
+                confirmButtonColor: "#36A865",
+                type: "error",
+                confirmButtonText: "OK",
+                closeOnConfirm: false
+            }).then(function () {
+                $("#txtdocument1").focus();
+                $("#txtdocument1").val("");
+            });
+            return false;
+        }
+        if (fileSize > 5000141) {
+            swal({
+                text: "File size cannot be greater than 5MB !!",
+                confirmButtonColor: "#36A865",
+                type: "error",
+                confirmButtonText: "OK",
+                closeOnConfirm: false
+            }).then(function () {
+                $("#txtdocument1").focus();
+                $("#txtdocument1").val("");
+            });
+            return false;
+        }
+        else {
+            $("#Removetxtdocument1").show();
+        }
+    });
+
+    $("#txtdocument2").on("change", function (e) {
+        var fileExtension = ['pdf', 'jpeg', 'jpg'];
+        var filename = $('#txtdocument2').val();
+        var extension = filename.replace(/^.*\./, '');
+        var fileSize = $("#txtdocument2")[0].files[0].size;
+        if ($.inArray(extension.toLowerCase(), fileExtension) == -1 && filename.length != 0) {
+            swal({
+                text: "Please upload a valid file of type pdf, jpeg, jpg !!",
+                confirmButtonColor: "#36A865",
+                type: "error",
+                confirmButtonText: "OK",
+                closeOnConfirm: false
+            }).then(function () {
+                $("#txtdocument2").focus();
+                $("#txtdocument2").val("");
+            });
+            return false;
+        }
+        if (fileSize > 5000141) {
+            swal({
+                text: "File size cannot be greater than 5MB !!",
+                confirmButtonColor: "#36A865",
+                type: "error",
+                confirmButtonText: "OK",
+                closeOnConfirm: false
+            }).then(function () {
+                $("#txtdocument2").focus();
+                $("#txtdocument2").val("");
+            });
+            return false;
+        }
+        else {
+            $("#Removetxtdocument2").show();
+        }
+    });
+
+    function Removetxtdocument1(ele) {
+        $("#txtdocument1").val("");
+        $('#Removetxtdocument1').hide();
+    }
+
+    function Removetxtdocument2(ele) {
+        $("#txtdocument2").val("");
+        $('#Removetxtdocument2').hide();
+    }
+
+    function downloadfile2() {
+        var filepath = $('#pathName2').val();
+        var filename = $('#filename2').val();
+        window.location.href = "@Url.Action("Downloadfile", "Discharge")?pathName=" + filepath +"&filename=" + filename;
+    }
+
+    function CancelPackage(obj) {
+        var idValue = $(obj).data('id');
+         $.ajax({
+             url: '@Url.Content("~/")' + "BlockPackage/ShowSnaRemark",
+            type: "GET",
+            /* data: SchemeParams,*/
+            data: { packagedetailid: idValue },
+            dataType: "json",
+             contentType: "application/json; charset=utf-8",
+             beforeSend: function () {
+                 $("#loader").show();
+             },
+             success: function (data) {
+                 var result = data.data;
+                 $('#querycountid').val(result[0].querycount);
+                 if (result[0].querycount == "1") {
+                     $("#FileUploadSecondDiv").hide();
+                     $("#replySecondDiv").hide();
+                     $('#pathName1').val(result[0].filepath);
+                     $('#filename1').val(result[0].preauthdoc1);
+                     $('#yearname').val(result[0].uploadyear);
+                     $('#txtSnaRemarks').val(result[0].QueryRemark1); // remarks // Updated by Akshat 26-May-23
+                     $('#urn').val(result[0].urn);
+                     $('#memberid').val(result[0].memberid);
+                     $("#MyPopup").modal("show");
+                     $("#txtSnaRemarksFirst").text(result[0].snaremarks);
+                     $("#SNARemarksSecondDiv").hide();
+
+                     if (result[0].snaremarks == null) {
+                         $("#downloadPdfFirstDiv").hide();
+                     }
+                     else {
+                         $("#downloadPdfFirstDiv").show();
+                     }
+                     if ('@Session["moustatus"]' == 'true' || '@Session["empanelmentstatus_flag"]' == '1' || '@Session["is_block_active"]' == '1') {
+                         $("#btnSubmit").attr('disabled', true);
+                     }
+                     else {
+                         $("#btnSubmit").attr('disabled', false);
+                     }
+                 }
+                 else if (result[0].querycount == "2") {
+                     if (result[0].preauthdoc1 != null) {
+                         $('#pathName1').val(result[0].filepath);
+                         $('#filename1').val(result[0].preauthdoc1);
+                         $("#downloadPdfFirst").show();
+                     }
+                     else {
+                         $("#downloadPdfFirst").hide();
+                     }
+
+                     $('#yearname').val(result[0].uploadyear);
+                     $('#urn').val(result[0].urn);
+                     $('#memberid').val(result[0].memberid);
+                     $("#FileUploadSecondDiv").show();
+                     $("#FileUploadFirstDiv").hide();
+                     $("#replySecondDiv").show();
+                     $("#replyFirstDiv").hide();
+                     $("#MyPopup").modal("show");
+                     $("#txtSnaRemarksFirst").text(result[0].snaremarks);
+                     $('#txtSnaRemarks').val(result[0].QueryRemark1); // remarks // Updated by Akshat 26-May-23
+                     $("#SNARemarksSecondDiv").show();
+                     $("#txtSnaRemarksSecond").text(result[0].snaremarkssecond);
+                     $('#txtSnaRemarks2').val(result[0].QueryRemark2); // Added by Akshat 26-May-23
+
+                     if (result[0].snaremarkssecond == null) {
+                         $("#downloadPdfSecondDiv").hide();
+                     }
+                     else {
+                         $("#downloadPdfSecondDiv").show();
+                     }
+                     if (result[0].preauthdoc2 != null) {
+                         $('#pathName2').val(result[0].filepath);
+                         $('#filename2').val(result[0].preauthdoc2);
+                         $("#downloadPdfSecondDiv").show();
+
+                     }
+                     else {
+                         $("#downloadPdfSecondDiv").hide();
+                     }
+                 }
+             },
+             complete: function () {
+                 $("#loader").hide();
+             },
+             error: function (error) {
+                 console.log(error.responseText);
+             }
+         });
+
+    }
+
+    function bindPreApprovalList(fromdate_, todate_) {
+        var fromdate = fromdate_;
+        var todate = todate_;
+        var HopitalCode = @Session["HospitalCode"].ToString();
+        var act = "Q";
+        $.ajax({
+            url: '@Url.Content("~/")' + "BlockPackage/BlockPreApprovalAdd",
+            type: "GET",
+            /* data: SchemeParams,*/
+            data: { fromdate: fromdate, todate: todate, hospitalcode: HopitalCode, actioncode: act, querystatus: $('#ddlquerystatus').val() },
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $("#loader").show();
+            },
+            success: function (data) {
+                var result = data.data;
+                var defaultmessage = "No Record(s) Found!";
+                // var thisHtml = "";
+                var oTable = $('#grdPreApprvPackage').DataTable({
+                    "language": {
+                        "emptyTable": defaultmessage
+                    },
+                    destroy: true,
+                    lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                    buttons: [{  //for excel
+                        extend: 'excel',
+                        title: 'Enumerator Registration Details',
+                        customize: function (xlsx) {
+                            var sheet = xlsx.xl.worksheets['sheet1.xml'];
+                            var style = xlsx.xl['styles.xml'];
+
+                            $('xf', style).find("alignment[horizontal='center']").attr("wrapText", "1");
+
+                            $('row', sheet).first().attr('ht', '20').attr('customHeight', "1").attr('s', '2');
+                        },
+                        className: 'buttons-excel btn-cs d-none',
+                        text: '<i class="icon-excel"></i> Excel'
+                    }, 'pdf'],
+                });
+                //oTable.buttons().container().appendTo('.indicatorslist');
+
+                oTable.row().clear().draw();
+                var result = data.data;
+                for (var i = 0; i < result.length; i++) {
+                    //debugger;
+                    var badgeClass = '';
+                    if (result[i].statustext == "QUERY") {
+                        badgeClass = 'badge-warning'; //
+                    } else if (result[i].statustext == "QUERY-COMPLIED") {
+                        badgeClass = 'badge-success';
+                    } else if (result[i].statustext == "PENDING (QUERY)") {
+                        badgeClass = 'badge-danger';
+                    }
+                    else {
+                        badgeClass = 'badge-primary';
+                    }
+                    oTable.row.add([(i + 1),
+                    '' + result[i].urnno + '<input type="hidden" class="wrapperDivHidden" value="' + result[i].patientname + '" /><input type="hidden" class="clsPakcode" value="' + result[i].packagedetailid + '" /><input type="hidden" class="clsProcName" value="' + result[i].procedurename + '" /><input type="hidden" class="clshopcode" value="' + result[i].hospitalcode + '" /><input type="hidden" class="clsmemid" value="' + result[i].memberid + '" />', ' <div class="pre-bold">' + result[i].patientname + '</div> <div class= "prehed-small" >' + result[i].contactno + '</div>', result[i].caseno, result[i].registrationdate, result[i].procedurename, result[i].procedurecode, '<div class="pre-bold"> &#8377;' + result[i].amount + ' </div>', '<div class="pre-bold"> ' + result[i].remarks + '</div> <div class="badge ' + badgeClass + ' badge-font mt-1">' + result[i].statustext + ' </div>',/* result[i].remarks == null ? "--" : result[i].remarks, result[i].status == "Q" ? result[i].statustext : "NA", result[i].needmoredocs == "N" ?*/'<button type="button" id="btnCancelPack" data-id="' + result[i].packagedetailid + '" value="View" onclick="CancelPackage(this)" class="btn btn-sm btn-outline-success /*btnSelect*/ focusedBtn btn-sm my-2 mr-2 my-sm-0"><i class="fa fa-eye"></i></button>'/* : ''*/
+                    ]).draw();
+                }
+            },
+            complete: function () {
+                $("#loader").hide();
+            },
+            error: function (error) {
+                console.log(error.responseText);
+            }
+        });
+    }
+</script>

@@ -1,0 +1,560 @@
+﻿
+@{
+    ViewBag.Title = "AddAddOnPreAuthCancellation";
+    Layout = "~/Views/Shared/_CommonLayout.cshtml";
+}
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.datepicker').datepicker({
+            format: 'dd M yyyy',
+            endDate: 'today',
+            autoclose: true
+        }); //code for datepicker
+        $(".datepicker").datepicker("setDate", (new Date().toDateString()));
+        $('.datepicker').datepicker('remove');
+        $('#CancelDt').attr('readonly', true);
+        var arrPackageInfo = [];
+        var Ucount = 1;
+        var Pcount = 1;
+        var params = {
+            HospitalCode: '@Session["HospitalCode"]'
+        };
+        $.ajax({
+            url: ServiceURL + "/api/Hospital/GetHospitalInformation",
+            type: "GET",
+            data: params,
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            success: function (data) {
+                $("#hdState").html(data.hospitalState);
+                $("#hdDistrict").html(data.hospitalDistrict);
+                $("#hdHospitalCode").html(data.hospitalCode);
+                $("#HdName").html(data.hospitalname);
+                // console.log(data);
+            },
+            error: function (error) {
+                console.log(error.statusText);
+            }
+        });
+       
+        $('#path').html('<a href="@Url.Action("AddOnPreAuthorizationDetails", "PreAuthorization")">AddOn Change Request</a> / Cancellation');
+        if (localStorage.getItem('CancellationInfo') != null) {
+            var PackageInfo = JSON.parse(localStorage.getItem('CancellationInfo'));
+            $('#urnNum').html(PackageInfo[0].urn);
+            $('#headOfFamily').html(PackageInfo[0].headMemberName);
+            $('#headOfFamilyID').html(PackageInfo[0].headMemberID);
+            $('#regDate').html(PackageInfo[0].registrationDate);
+            $('#benefName').html(PackageInfo[0].memberName);
+            $('#state').html(PackageInfo[0].memberStateName);
+            $('#stateCode').html(PackageInfo[0].memberStateCode);
+            $('#district').html(PackageInfo[0].memberDistrictName);
+            $('#districtCode').html(PackageInfo[0].memberDistrictCode);
+            $('#memberBlockCode').html(PackageInfo[0].memberBlockCode);
+            $('#panchayatCode').html(PackageInfo[0].panchayatCode);
+            $('#villageCode').html(PackageInfo[0].villageCode);
+            $('#invNo').html(PackageInfo[0].invoiceNo);
+            $('#divPageStatus').html(PackageInfo[0].PageBackStatus);
+            $('#WardLogId').html(PackageInfo[0].WardLogId);
+            if (PackageInfo[0].PageBackStatus == 'P') {
+                $('#tranID').html(PackageInfo[0].TransactionID);
+            }
+           
+        }
+        $('#Unspecified').click(function () {
+            if ($('#Unspecified').prop("checked", true)) {
+                $('#DivUnSpecified').css('visibility', 'visible');
+                $('#DivPre-approved').css('visibility', 'hidden');
+                $('#btnBlock').css('visibility', 'hidden');
+                $('#jsGrid').css('visibility', 'hidden');
+                Ucount = 1;
+            }
+        });
+        $('#preApproved').click(function () {
+            if ($('#preApproved').prop("checked", true)) {
+                $('#DivPre-approved').css('visibility', 'visible');
+                $('#DivUnSpecified').css('visibility', 'hidden');
+                $('#btnBlock').css('visibility', 'hidden');
+                $('#jsGrid').css('visibility', 'hidden');
+                Pcount = 1;
+                var PackCatagoryParams = {
+                    Action: 'P'
+                };
+                $.ajax({
+                    url: ServiceURL + "/api/Common/GetPackageCategory",
+                    type: "GET",
+                    data: PackCatagoryParams,
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    success: function (data) {
+                        // console.log(data);
+                        $('#PApackageHeader').empty().append('<option selected="selected" value="0">--select--</option>');
+                        $.each(data, function () {
+                            $('#PApackageHeader').append($("<option></option>").val(this['packagecategorycode']).text(this['procedures']));
+                        });
+                    },
+                    error: function (error) {
+                        console.log(error.statusText);
+                    }
+                });
+            }
+        });
+        $('#Medical').click(function () {
+            if ($('#Medical').prop("checked", true)) {
+                $('#btnBlock').css('visibility', 'hidden');
+                $('#jsGrid').css('visibility', 'hidden');
+            }
+        });
+
+        $('#btnBack').click(function () {
+                 window.location.href = '@Url.Action("AddOnPreAuthorizationDetails", "PreAuthorization")';
+        });
+        $('#btnSubmit').click(function () {
+            if (validateCancellation()) {
+                if (checkconfirm()) {
+                    var Cancelparams = JSON.stringify({
+                        Action: 'B',
+                        CancelReason: $('#CanReason').val(),
+                        CancelDate: $('#CancelDt').val(),
+                        WardLogId: $('#WardLogId').text()
+                    });
+                    $.ajax({
+                        url: ServiceURL + "/api/BlockPackage/addAddOnCancelPackage",
+                        type: "POST",
+                        data: Cancelparams,
+                        dataType: "json",
+                        contentType: "application/json; charset=utf-8",
+                        success: function (data) {
+                            // console.log(data);
+                            if (data == '1')
+                            {
+                                alert('PreAuth Cancelled Successfully!!!');
+                                window.location.href = '@Url.Action("AddOnPreAuthorizationDetails", "PreAuthorization")';
+                            }
+                            else if (data == '2') {
+                                alert('Cant be Cancelled.The Patient Treatment is Going On!!!');
+                            }
+                        },
+                        error: function (error) {
+                            console.log(error.statusText);
+                        }
+                    });
+                }
+            }
+        });
+        var ml = 200;
+        $('#CancelReason').text("(Maximum " + ml + " characters are allowed.)");
+        $('#CanReason').keydown(function () {
+            var text = $(this).val();
+            var textLength = text.length;
+            if (textLength > ml) {
+                $(this).val(text.substring(0, (ml)));
+                var charactersLeft = ml - textLength + 1;
+            }
+            else {
+                var charactersLeft = ml - textLength;
+            }
+            $('#CancelReason').text("(Maximum " + (charactersLeft) + " characters are allowed.)");
+        });
+
+        $('#btnBlock').click(function () {
+            if ($('#AuthStatus').text() == 'Y') {
+                var confirm = checkconfirmReq();
+            }
+            else {
+                var confirm = checkconfirm();
+            }
+            if (confirm == true) {
+                var gridPackageInfo = $("#jsGrid").jsGrid("option", "data");
+                if (gridPackageInfo.length > 0) {
+                    var BlockPkgParams = JSON.stringify({
+                        ACTIONCODE: 'R',
+                        BlockingInvoiceNo: gridPackageInfo[0].InvoiceNo,
+                        BlockingUserDate: gridPackageInfo[0].BlockingDate,
+                        DATEOFADMISSION: gridPackageInfo[0].BlockingDate,
+                        ProcedureCode: gridPackageInfo[0].ProcedureCode,
+                        ProcedureName: gridPackageInfo[0].Procedure,
+                        PackageCode: gridPackageInfo[0].PackageCode,
+                        PackageName: gridPackageInfo[0].Package,
+                        PackageCost: gridPackageInfo[0].PackageCost,
+                        NoofDays: gridPackageInfo[0].Days,
+                        AmoutBlocked: gridPackageInfo[0].AmountBlocked,
+                        TransactionCode: '301',
+                        PreAuthStatus: $('#AuthStatus').text(),
+                        VchFile: $('#DocFile').val(),
+
+                    });
+                    $.ajax({
+                        url: ServiceURL + "/api/BlockPackage/addPatientBlockPackage",
+                        type: "POST",
+                        data: BlockPkgParams,
+                        dataType: "json",
+                        contentType: "application/json; charset=utf-8",
+                        success: function (data) {
+                            if (data == "2") {
+                                alert('Package Blocked Sucessfully!!');
+                                window.location.href = '@Url.Action("ViewBlockPackage", "BlockPackage")';
+                            }
+                            else if (data == "1") {
+                                alert('Package Request Raised Sucessfully for Approval!!');
+                                window.location.href = '@Url.Action("PreAuthorizationDetails", "PreAuthorization")';
+                            }
+                        },
+                        error: function (error) {
+                            console.log(error.statusText);
+                        }
+                    });
+                }
+            }
+        });
+
+    });
+    function ValidatePackage(ptype) {
+        if (ptype == 1) {
+            if ($('#blockingDt').val() == "") {
+                alert('Please Enter Blocking Date!!');
+                $('#blockingDt').focus();
+                return false;
+            }
+            else if ($('#USPackageHeader').val() == "") {
+                alert('Please Enter Package Header!!');
+                $('#USPackageHeader').focus();
+                return false;
+            }
+            else if ($('#USPackageDetail').val() == "") {
+                alert('Please Enter Package Detail!!');
+                $('#USPackageDetail').focus();
+                return false;
+            }
+            else if ($('#USTreatmentCost').val() == "") {
+                alert('Please Enter Treatment Cost!!');
+                $('#USTreatmentCost').focus();
+                return false;
+            }
+
+            else {
+                return true;
+            }
+        }
+        else if (ptype == 2) {
+            if ($('#blockingDt').val() == "") {
+                alert('Please Enter Blocking Date!!');
+                $('#blockingDt').focus();
+                return false;
+            }
+            else if ($('#PApackageHeader').val() == 0) {
+                alert('Please Select Package Header!!');
+                $('#PApackageHeader').focus();
+                return false;
+            }
+            else if ($('#PApackageDetail').val() == 0) {
+                alert('Please Select Package Detail!!');
+                $('#PApackageDetail').focus();
+                return false;
+            }
+            else if ($('#PAtreatmentCost').val() == "") {
+                alert('Please Enter Treatment Cost!!');
+                $('#PAtreatmentCost').focus();
+                return false;
+            }
+            else if ($('#AuthStatus').text() == 'Y') {
+                if ($('#DocFile').val() == "") {
+                    alert('Please Choose Document!!');
+                    $('#DocFile').focus();
+                    return false;
+                }
+                else {
+                    return true;
+                }
+            }
+            else {
+                return true;
+            }
+        }
+        else if (ptype == 3) {
+
+        }
+        else {
+            alert('Please Select Package Type!!');
+        }
+
+    }
+    function checkDec(evt) {
+        if (!(evt.keyCode == 46 || (evt.keyCode >= 48 && evt.keyCode <= 57))) return false;
+        var parts = evt.srcElement.value.split('.');
+        if (parts.length > 2) return false;
+        if (evt.keyCode == 46) return (parts.length == 1);
+        if (parts[0].length >= 14) return false;
+        if (parts.length == 2 && parts[1].length >= 2) return false;
+    }
+    function checkChar(event) {
+        var inputValue = event.which;
+        // allow letters and whitespaces only.
+        if (!(inputValue >= 65 && inputValue <= 120) && (inputValue != 32 && inputValue != 0)) {
+            event.preventDefault();
+        }
+    }
+    function clearUnSpecified() {
+        $('#blockingDt').val('');
+        $('#USPackageHeader').val('');
+        $('#USPackageDetail').val('');
+        $('#USTreatmentCost').val('');
+    }
+    function clearPreApproved() {
+        $('#blockingDt').val('');
+        $('#PApackageHeader').val(0);
+        $('#PApackageDetail').find('option').remove();
+        $('#PAtreatmentCost').val('');
+        //$('#DocFile').val('');
+    }
+    function checkconfirm() {
+        if (window.confirm("Are you sure to Cancel the treatment?")) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    function checkconfirmReq() {
+        if (window.confirm("Are you sure for request package?")) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    function validateCancellation() {
+        if ($('#CancelDt').val() == '') {
+            alert('Please Enter Cancellation Date!!');
+            $('#CancelDt').focus();
+            return false;
+        }
+        else if ($('#CanReason').val() == '') {
+            alert('Please Enter Cancellation Reason!!');
+            $('#CanReason').focus();
+            return false;
+        }
+        else {
+            return true;
+        }
+
+    }
+    function inputLimiter(e, allow) {
+        var AllowableCharacters = '';
+        if (allow == 'NameCharactersymbol') {
+            AllowableCharacters = ' ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz./&';
+        }
+        if (allow == 'NameCharacters') {
+            AllowableCharacters = ' ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-.\'';
+        }
+        if (allow == 'NameCharactersAndNumbers') {
+            AllowableCharacters = '1234567890 ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-,/.\'';
+        }
+        if (allow == 'Description') {
+            AllowableCharacters = '1234567890 ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-,./\&(){}[]#$:';
+        }
+        if (allow == 'Numbers') {
+            AllowableCharacters = '1234567890';
+        }
+        if (allow == 'Decimal') {
+            AllowableCharacters = '1234567890.';
+        }
+        var k;
+        k = document.all ? parseInt(e.keyCode) : parseInt(e.which);
+        if (k != 13 && k != 8 && k != 0) {
+            if ((e.ctrlKey == false) && (e.altKey == false)) {
+                return (AllowableCharacters.indexOf(String.fromCharCode(k)) != -1);
+            }
+            else {
+                return true;
+            }
+        }
+        else {
+            return true;
+        }
+    }
+</script>
+<div class="container">
+    <div class="row">
+        <div class="col-12 pb-3">
+            <div class="card">
+                <div class="data-info">
+                    <div class="row">
+                        <div class="col">
+                            <h2>Hospital Details</h2>
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <p>State</p>
+                                    <h3 id="hdState"></h3>
+                                </div>
+                                <div class="col-sm-3">
+                                    <p>District</p>
+                                    <h3 id="hdDistrict"></h3>
+                                </div>
+                                <div class="col-sm-3">
+                                    <p>Hospital Code</p>
+                                    <h3 id="hdHospitalCode"></h3>
+                                </div>
+                                <div class="col-sm-3">
+                                    <p>Name</p>
+                                    <h3 id="HdName"></h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <h2>Member Info</h2>
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <p>URN Number</p>
+                                    <h3 id="urnNum"></h3>
+                                    <div id="memberBlockCode" style="visibility:hidden"></div>
+                                    <div id="invNo" style="visibility:hidden"></div>
+                                    <div id="tranID" style="visibility:hidden"></div>
+                                    <div id="WardLogId" style="visibility:hidden"></div>
+                                </div>
+                                <div id="divPageStatus" hidden></div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+
+                </div>
+                <div class="card-body">
+                    <div class="custom-tab-content px-3">
+                        <div>
+                            <form>
+                                <div class="form-group row">
+                                    <label for="beneficiaryNm" class="col-sm-2 col-form-label">Beneficiary Name</label>
+                                    <div class="col-sm-2">
+                                        <p><strong id="benefName"></strong></p>
+                                    </div>
+                                    <label for="regDt" class="col-sm-2 col-form-label">Registration Date</label>
+                                    <div class="col-sm-2">
+                                        <p><strong id="regDate"></strong></p>
+                                    </div>
+                                    <label for="blockingDt" class="col-sm-2 col-form-label" id="lblBlockingDt">Cancellation Date <b><span style="color:red">*</span></b></label>
+                                    <div class="col-sm-2">
+                                        <div class="input-group mb-3">
+                                            <input type="text" id="CancelDt" class="form-control datepicker" placeholder="dd mmm yyyy" aria-label="Username" aria-describedby="basic-addon1" maxlength="15">
+                                            <div class="input-group-prepend">
+                                                <label for="blockingDt" class="input-group-text"><i class="fa fa-calendar"></i></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="beneficiaryNm" class="col-sm-2 col-form-label">Cancellation Reason <b><span style="color:red">*</span></b></label>
+                                    <div class="col-sm-2">
+                                        <textarea id="CanReason" class="form-control" placeholder="Enter here" onkeypress="return inputLimiter(event,'NameCharactersAndNumbers')"></textarea>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="mortality" class="col-sm-2 col-form-label"></label>
+                                    <div class="col-sm-2">
+                                        <span id="CancelReason" class="max_char" style="color: Red; position: initial !important;">
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group row" hidden>
+                                    <div class="col-sm-12">
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="packageType" id="Unspecified" value="Unspecified">
+                                            <label class="form-check-label" for="Unspecified"><strong>Unspecified</strong></label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="packageType" id="preApproved" value="preApproved" checked>
+                                            <label class="form-check-label" for="preApproved"><strong>Pre-approved</strong></label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="packageType" id="Medical" value="Medical">
+                                            <label class="form-check-label" for="Medical"><strong>Medical</strong></label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="form-group row" id="DivUnSpecified" hidden>
+                                    <label for="packageHeader" class="col-sm-2 col-form-label">Package Header <b><span style="color:red">*</span></b></label>
+                                    <div class="col-sm-2">
+                                        <input type="text" class="form-control" id="USPackageHeader" placeholder="Package Header" onkeypress="return checkChar(event)" maxlength="20" />
+                                    </div>
+                                    <label for="packageDetail" class="col-sm-2 col-form-label">Package Detail <b><span style="color:red">*</span></b></label>
+                                    <div class="col-sm-2">
+                                        <input type="text" class="form-control" id="USPackageDetail" placeholder="Package Detail" onkeypress="return checkChar(event)" maxlength="50" />
+                                    </div>
+                                    <label for="treatmentCost" class="col-sm-2 col-form-label">Treatment Cost (Rs.) <b><span style="color:red">*</span></b></label>
+                                    <div class="col-sm-2">
+                                        <input type="text" class="form-control" id="USTreatmentCost" placeholder="Enter here" onkeypress="return checkDec(event)" maxlength="15" />
+
+                                    </div>
+                                </div>
+                                <div class="form-group row" id="DivPre-approved" hidden>
+                                    <label for="packageHeader" class="col-sm-2 col-form-label">Package Header <b><span style="color:red">*</span></b></label>
+                                    <div class="col-sm-2">
+                                        <select name="" id="PApackageHeader" class="form-control"></select>
+                                    </div>
+                                    <label for="packageDetail" class="col-sm-2 col-form-label">Package Detail <b><span style="color:red">*</span></b></label>
+                                    <div class="col-sm-2">
+                                        <select name="" id="PApackageDetail" class="form-control"></select>
+                                    </div>
+                                    <label for="treatmentCost" class="col-sm-2 col-form-label">Treatment Cost (Rs.) <b><span style="color:red">*</span></b></label>
+                                    <div class="col-sm-2">
+                                        <input type="text" class="form-control" id="PAtreatmentCost" placeholder="Enter here" onkeypress="return checkDec(event)" maxlength="15" readonly="readonly" />
+                                        <div id="PackageCost" hidden="hidden"></div>
+                                        <div id="Days" hidden="hidden"></div>
+                                        <div id="AuthStatus" hidden="hidden"></div>
+                                    </div>
+                                </div>
+                                <div class="form-group row" id="DocInfo" style="visibility:hidden">
+                                    <label for="packageDetail" class="col-sm-2 col-form-label">Clinical Doc</label>
+                                    <div id="divDoc" class="col-sm-2"></div>
+                                    <label for="packageHeader" class="col-sm-2 col-form-label">Document <b><span style="color:red">*</span></b></label>
+                                    <div class="col-sm-2">
+                                        <input type="file" class="form-control" id="DocFile" />
+                                    </div>
+                                </div>
+
+                                <div class="text-right py-3" hidden>
+                                    <input class="btn btn-success my-2 my-sm-0" type="button" id="btnAddPackage" value="Add Package" />
+                                </div>
+                                <div class="table table-striped table-bordered" id="jsGrid" hidden>
+                                </div>
+                                <div class="text-right py-3">
+                                    <input type="button" value="Back" class="btn btn-outline-danger my-2 my-sm-0" id="btnBack" />
+                                    <button class="btn btn-outline-success my-2 my-sm-0" type="button" id="btnSubmit">Cancel Treatment</button>
+                                    @*<input class="btn btn-outline-success my-2 my-sm-0" type="button" value="Block" id="btnBlock" style="visibility:hidden">*@
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Body content Ends here -->
+<!-- START HERE: Registration confirmation modal content -->
+<div class="modal fade" id="admissionConfirmation" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="alert text-info" role="alert">
+                    Are you sure want to Register ?
+                </div>
+                <div class="text-right">
+                    <button type="button" class="btn btn-outline-secondary btn-sm" data-dismiss="modal">NO</button>
+                    <a href="javascript: void(0);" class="btn btn-outline-success btn-sm ml-1">YES</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- END HERE: Registration confirmation modal content -->
+<script type="text/javascript">
+    $(function () {
+        $('.secondary-menu li a').tooltip();
+    });
+</script>
+
+
+

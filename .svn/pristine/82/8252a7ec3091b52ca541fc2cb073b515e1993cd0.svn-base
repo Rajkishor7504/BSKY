@@ -1,0 +1,452 @@
+﻿
+@{
+    /**/
+
+    ViewBag.Title = "AddUnblockPackage";
+    Layout = "~/Views/Shared/_CommonLayout.cshtml";
+}
+@functions{
+    public string TokenHeaderValue()
+    {
+        string cookieToken, formToken;
+        AntiForgery.GetTokens(null, out cookieToken, out formToken);
+        return cookieToken + ":" + formToken;
+    }
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#path').html('<a href="@Url.Action("ViewUnblockPackage", "UnblockPackage")">Unblock Package List</a> / Unblock Package');
+        $('#lblRemarks').hide();
+        $('#UnRemarks').hide();
+        $('#divRemarks').hide();
+
+         var params = {
+            HospitalCode: '@Session["HospitalCode"]'
+        };
+        $.ajax({
+            url: ServiceURL + "/api/Hospital/GetHospitalInformation",
+            type: "GET",
+            data: params,
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            success: function (data) {
+                $("#hdState").html(data.hospitalState);
+                $("#hdDistrict").html(data.hospitalDistrict);
+                $("#hdHosCode").html(data.hospitalCode);
+                $("#HdName").html(data.hospitalname);
+               // console.log(data);
+            },
+            error: function (error) {
+                console.log(error.statusText);
+            }
+        });
+        if (localStorage.getItem('UnlockPackageInfo') != null) {
+            var PackageInfo = JSON.parse(localStorage.getItem('UnlockPackageInfo'));
+            $('#urnNum').html(PackageInfo[0].urn);
+            $('#headOfFamily').html(PackageInfo[0].headMemberName);
+            $('#headOfFamilyID').html(PackageInfo[0].headMemberID);
+            $('#patientName').val(PackageInfo[0].memberName);
+            $('#state').html(PackageInfo[0].memberStateName);
+            $('#district').html(PackageInfo[0].memberDistrictName);
+            $('#districtCode').html(PackageInfo[0].memberDistrictCode);
+            $('#RegInvNo').html(PackageInfo[0].invoiceNo);
+            $('#divSchCode').html(PackageInfo[0].schemeCode);
+            $('#SchName').html(PackageInfo[0].schemeName);
+            $('#familyID').html(PackageInfo[0].familyID);
+            if (PackageInfo[0].urn != "") {
+                var BalanceParams = {
+                    Action: 'R',
+                    URN: PackageInfo[0].urn,
+                    FamilyId: $('#familyID').text()
+                };
+                $.ajax({
+                    url: ServiceURL + "/api/Common/GetAvailBalance",
+                    type: "GET",
+                    data: BalanceParams,
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    success: function (result) {
+                        if (result != null) {
+                            $('#AvlCover').html(result.availableBalance);
+                            $('#TraBlkAmnt').html(result.amountBlocked);
+
+                        }
+                        else {
+                            $('#AvlCover').html('NA');
+                            $('#TraBlkAmnt').html('NA');
+                        }
+
+                        //if (result.length > 0) {
+                        //    // console.log(data);
+                        //    //$('#IPNumber').html(data[0].policynumber)
+                        //    //$('#StartDt').html(data[0].policyStartDate)
+                        //    //$('#EndDt').html(data[0].policyEnddate)
+                        //}
+                    },
+                    error: function (error) {
+                        console.log(error.responseText);
+                    }
+                });
+            }
+            if (PackageInfo[0].memberDistrictCode != "") {
+                var PolicyParams = {
+                    //MemberDistrictCode: PackageInfo[0].memberDistrictCode,
+                    // SchemeCode:$('#divSchCode').text()
+                    URN: $('#urnNum').text()
+                };
+                $.ajax({
+                    url: ServiceURL + "/api/Common/GetPolicy",
+                    type: "GET",
+                    data: PolicyParams,
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    success: function (data) {
+                        if (data.length > 0) {
+                            // console.log(data);
+                            $('#IPNumber').html(data[0].policynumber)
+                            $('#StartDt').html(data[0].policyStartDate)
+                            $('#EndDt').html(data[0].policyEnddate)
+                        }
+                    },
+                    error: function (error) {
+                        console.log(error.responseText);
+                    }
+                });
+            }
+             $('#jsGrid').jsGrid({
+            height: "auto",
+            width: "100%",
+            sorting: true,
+            paging: true,
+            pageSize: 10,
+            autoload: true,
+            controller: {
+                loadData: function () {
+                    var d = $.Deferred();
+                    d.resolve($.map(PackageInfo, function (item, itemIndex) {
+                        return $.extend(item, { "Index": itemIndex + 1 });
+                    }
+                    ));
+                    return d.promise();
+                }
+            },
+             fields: [
+                 { name: "Index", type: "number", width: 60, title: "Unique ID", align: "center", visible: false },
+                 { name: "transactionID", title: "transactionID", type: "number", visible: false},
+                 { name: "procedureName", type: "text", width: 115, title: "Procedure", align: "center" },
+                 { name: "procedureCode", title: "procedureCode", type: "number", visible: false },
+                 { name: "category", type: "text", width: 155, title: "Category", align: "center" },
+                 { name: "categoryCode", title: "Category Code", type: "text", visible: false },
+                 { name: "packageName", type: "text", width: 155, title: "Package", align: "center" },
+                 { name: "packageCode", title: "packageCode", type: "text", visible: false },
+                 { name: "packageCode", title: "packageCode", type: "text", visible: false },               
+                 { name: "registrationDate", type: "text", width: 85, title: "Registration Date", align: "center" },
+                 { name: "amoutBlocked", type: "text", width: 85, title: "Amount Blocked(Rs.)", align: "center" },
+                 { name: "invoiceNo", type: "text", width: 85, title: "Blocking Invoice No.", align: "center" },
+                ]
+        });
+
+        }
+        var UnblockParams = {
+            Action: 'P'
+        };
+        $.ajax({
+            url: ServiceURL + "/api/Common/GetUnblockingReason",
+            type: "GET",
+            data: UnblockParams,
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            success: function (data) {
+                // console.log(data);
+                $('#reason').empty().append('<option selected="selected" value="0">--select--</option>');
+                $.each(data, function () {
+                    $('#reason').append($("<option></option>").val(this['unblockReasonId']).text(this['unblockingReasons']));
+                });
+            },
+            error: function (error) {
+                console.log(error.responseText);
+            }
+        });
+        $('#UnBlock').click(function () {
+            var validate = validateUnblock();
+            if (validate == true) {
+                var confirm = checkconfirm();
+                if (confirm == true) {
+                    $('#divLoader').show();
+                    var gridPackageInfo = $("#jsGrid").jsGrid("option", "data");
+                    var UnBlkReason;
+                    if ($("option:selected", $("#reason")).text() == 'Others') {
+                        UnBlkReason = $('#UnRemarks').val();
+                    }
+                    else {
+                        UnBlkReason = $("option:selected", $("#reason")).text();
+                    }
+                    if (gridPackageInfo.length > 0) {
+                        var UnblockPkgParams = JSON.stringify({
+                            ACTIONCODE: 'R'
+                            , SchemeCode: '0'
+                            , DistrictCode: $('#districtCode').text()
+                            , MemberDistrictName: $('#district').text()
+                            ,URN: $('#urnNum').text()
+                            , PolicyStartDate: $('#StartDt').text()
+                            , PolicyEndDate: $('#EndDt').text()
+                            // ,MemberID: '0'
+                            , PatientName: $('#patientName').val()
+                            // ,PatientContactNumber: '0'
+                            //,Gender: '0'
+                            // ,PatientCardGender: '0'
+                            // ,Age: '0'
+                            // ,PatientCardAge: '0'
+                            , HeadMemberID: $('#headOfFamilyID').text()
+                            , HeadMemberName: $('#headOfFamily').text()
+                            , HospitalCode: $('#hdHosCode').text()
+                            , HospitalName: $('#HdName').text()
+                            , HospitalState: $('#hdState').text()
+                            , HospitalDistrict: $('#hdDistrict').text()
+                            // ,TransactionDate: '0'
+                            // ,BlockingInvoiceNo: '0'
+                            // ,BlockingUserDate: gridPackageInfo[0].BlockingDate
+                            // ,DATEOFADMISSION: $('#regDate').text()
+                            , ProcedureCode: gridPackageInfo[0].procedureCode
+                            , ProcedureName: gridPackageInfo[0].procedureName
+                            , PackageCode: gridPackageInfo[0].packageCode
+                            , PackageName: gridPackageInfo[0].packageName
+                            // ,PackageCost: '0'
+                            // ,NoofDays: '0'
+                            // ,AmoutBlocked: gridPackageInfo[0].AmountBlocked
+                            , UnblockingDesc: UnBlkReason
+                            , TransactionCode: '302'
+                            , TransactionID: gridPackageInfo[0].transactionID
+                            , BlockingInvoiceNo: $('#RegInvNo').text()
+                            , Category: gridPackageInfo[0].category
+                            , CategoryCode: gridPackageInfo[0].categoryCode
+                            //,patientSlip: '0'
+                        });
+                        $.ajax({
+                            url: ServiceURL + "/api/UnblockPackage/addPatientUnblockPackage",
+                            type: "POST",
+                            data: UnblockPkgParams,
+                            dataType: "json",
+                            contentType: "application/json; charset=utf-8",
+                            headers: {
+                                'RequestVerificationToken': '@TokenHeaderValue()'
+                             },
+                            success: function (data) {
+                                $('#divLoader').hide();
+                                if (data == "1") {
+                                    alert('Package Unblocked Successfully !!');
+                                    window.location.href = '@Url.Action("ViewUnblockPackage", "UnblockPackage")';
+                                }
+                                else if (data == "2") {
+                                    alert('Cannot Unblock Medical Ward Package After Ward Change!!');
+                                    @*window.location.href = '@Url.Action("ViewUnblockPackage", "UnblockPackage")';*@
+                                }
+                            },
+                            error: function (error) {
+                                $('#divLoader').hide();
+                                console.log(error.statusText);
+                            }
+                        });
+                    }
+                }
+            }
+
+        });
+        $('#reason').change(function () {
+            if ($("option:selected", $("#reason")).text() == 'Others') {
+                $('#UnRemarks').show();
+                $('#lblRemarks').show();
+                $('#divRemarks').show();
+            }
+            else {
+                $('#lblRemarks').hide();
+                $('#UnRemarks').hide();
+                $('#divRemarks').hide();
+            }
+        });
+        var ml = 200;
+        $('#Desc').text("(Maximum " + ml + " characters are allowed.)");
+        $('#UnRemarks').keydown(function () {
+            var text = $(this).val();
+            var textLength = text.length;
+            if (textLength > ml) {
+                $(this).val(text.substring(0, (ml)));
+                var charactersLeft = ml - textLength + 1;
+            }
+            else {
+                var charactersLeft = ml - textLength;
+            }
+            $('#Desc').text("(Maximum " + (charactersLeft) + " characters are allowed.)");
+        });
+    });
+    function checkconfirm() {
+        if (window.confirm("Are you sure to Unblock the package ?")) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    function validateUnblock() {
+        if ($("#reason").val() == 0) {
+            alert('Please Select the reason!!');
+            $("#reason").focus();
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+</script>
+<!-- Dashboard Body content part starts -->
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12 pb-3">
+            <div class="card">
+                <div class="data-info">
+                    <div class="row">
+                        <div class="col">
+                            <h2>Hospital Details</h2>
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <p>State</p>
+                                    <h3 id="hdState"></h3>
+                                </div>
+                                <div class="col-sm-3">
+                                    <p>District</p>
+                                    <h3 id="hdDistrict"></h3>
+                                </div>
+                                <div class="col-sm-3">
+                                    <p>Hospital Code</p>
+                                    <h3 id="hdHosCode"></h3>
+                                </div>
+                                <div class="col-sm-3">
+                                    <p>Name</p>
+                                    <h3 id="HdName"></h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <h2>Member Info</h2>
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <p>HIMCARE Number</p>
+                                    <h3 id="urnNum"></h3>
+                                </div>
+                                <div class="col-sm-3">
+                                    <p>Head of Family</p>
+                                    <h3 id="headOfFamily"></h3>
+                                    <h3 id="headOfFamilyID" style="visibility:hidden"></h3>
+                                    <div id="familyID" hidden></div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <p>State</p>
+                                    <h3 id="state"></h3>
+                                </div>
+                                <div class="col-sm-3">
+                                    <p>District</p>
+                                    <h3 id="district"></h3>
+                                    <h3 id="districtCode" style="visibility:hidden"></h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col">
+                            <h2>Insurance Policy Details</h2>
+                            <div class="row pb-3">
+                                <div class="col-sm-3">
+                                    <p>Scheme Name</p>
+                                    <h3 id="SchName"></h3>
+                                    <div id="divSchCode" hidden></div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <p>Policy Number</p>
+                                    <h3 id="IPNumber"></h3>
+                                </div>
+                                <div class="col-sm-3">
+                                    <p>Start Date</p>
+                                    <h3 id="StartDt"></h3>
+                                </div>
+                                <div class="col-sm-3">
+                                    <p>End Date</p>
+                                    <h3 id="EndDt"></h3>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col">
+                            <h2>&nbsp;</h2>
+                            <div class="row pb-3">
+                                <div class="col-sm-4">
+                                    <p>Transaction Blocked Amount</p>
+                                    <h3 id="TraBlkAmnt"></h3>
+                                </div>
+                                <div class="col-sm-3">
+                                    <p>Available Cover</p>
+                                    <h3 id="AvlCover"></h3>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="tab-content custom-tab-content" id="myTabContent">
+                        <div>
+                            <form>
+                                <div class="form-group row">
+                                    <label for="regInvNo" class="col-sm-2 col-form-label">Registration Invoice Number</label>
+                                    <div class="col-sm-2">
+                                        <p class="form-control"><strong id="RegInvNo"></strong></p>
+                                    </div>
+                                    <label for="patientName" class="col-sm-2 col-form-label">Patient Name</label>
+                                    <div class="col-sm-2">
+                                        <input type="text" class="form-control" id="patientName" readonly placeholder="Enter here" />
+                                    </div>
+                                    <label for="reason" class="col-sm-2 col-form-label">Unblocking Reason <b><span style="color:red">*</span></b></label>
+                                    <div class="col-sm-2">
+                                        <select name="" id="reason" class="form-control"></select>
+                                    </div>
+
+                                    <label for="Remarks" class="col-sm-2 col-form-label" id="lblRemarks">Remarks <b><span style="color:red">*</span></b></label>
+                                    <div class="col-sm-2">
+                                        <textarea id="UnRemarks" class="form-control" placeholder="Enter here"></textarea>
+                                    </div>
+
+                                </div>
+                                <div class="form-group row" id="divRemarks">
+                                    <label for="description" class="col-sm-2 col-form-label"></label>
+                                    <div class="col-sm-2">
+                                        <span id="Desc" class="max_char" style="color: Red; position: initial !important;">
+
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="table table-striped table-bordered" id="jsGrid">
+                                </div>
+                                <div class="text-right py-3">
+                                    <a href='@Url.Action("ViewUnblockPackage", "UnblockPackage")' class="btn btn-outline-danger my-2 my-sm-0">Back</a>
+                                    <button class="btn btn-outline-success my-2 my-sm-0" type="button" id="UnBlock">Un-Block</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="loader" id="divLoader" style="display:none">
+    <div class="center">
+        <img src="~/imgs/DataLoading.gif" alt="Loader..." />
+    </div>
+</div>
+<!-- Body content Ends here -->
+<script type="text/javascript">
+    $(function () {
+        $('.secondary-menu li a').tooltip();
+    });
+</script>
+

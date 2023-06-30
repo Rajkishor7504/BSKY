@@ -1,0 +1,223 @@
+﻿
+@{
+    ViewBag.Title = "ViewDischargeSlip";
+}
+
+@using System.Configuration
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>TreatmentCompletionCertificate</title>
+    <script src="~/js/jquery.min.js" type="text/javascript"></script>
+    <script src="~/js/popper.min.js" type="text/javascript"></script>
+    <!-- <link rel="stylesheet" href="~/css/style.css" /> -->
+    <link rel="stylesheet" href="~/css/print.css" />
+
+</head>
+
+<body class="print_bg">
+    <div class="tm_invoice_btns tm_hide_print row">
+        <div class="col-md-1 text-align-right">
+            <a href="javascript:window.print()" class="tm_invoice_btn tm_color1" id="printbutton">
+                <span class="tm_btn_icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><path d="M384 368h24a40.12 40.12 0 0040-40V168a40.12 40.12 0 00-40-40H104a40.12 40.12 0 00-40 40v160a40.12 40.12 0 0040 40h24" fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="32" /><rect x="128" y="240" width="256" height="208" rx="24.32" ry="24.32" fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="32" /><path d="M384 128v-24a40.12 40.12 0 00-40-40H168a40.12 40.12 0 00-40 40v24" fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="32" /><circle cx="392" cy="184" r="24" fill='currentColor' /></svg>
+                </span>
+                <span class="tm_btn_text">Print</span>
+            </a>
+        </div>
+    </div>
+    <div class="tm_invoice tm_style1 tm_type1">
+        <div class="tm_invoice_in">
+            <div class="tm_invoice_head tm_top_head tm_align_center">
+                <div class="tm_invoice_left">
+                    <div class="tm_logo"><img src="~/imgs/logo.png"></div>
+                </div>
+                <div class="tm_invoice_info left_sec">
+                    <div class="tm_invoice_number tm_m0"> <b> Case No: </b> <label id="lblCaseno"></label> </div>
+                </div>
+                <div class="tm_invoice_right">
+                    <div class="tm_invoice_info_list ">
+                        <div class="tm_invoice_date tm_m0"> <b> Printed On : </b> <label id="lblDatetime"></label> </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tm_invoice_wrap">
+                <div class="tm_align_center brd_btm">
+                    <div class="tm_text"> Discharge Document For Hospital</div>
+                    @*<div class="tm_card_note"> Discharge Transaction:  Surgical </div>*@
+                </div>
+                <table class="table table_none disdoc_sec">
+                    <thead>
+                        <tr>
+                            <td class="font-weight-normal"> <b> URN  </b></td>
+                            <td> <span class="dot_cl mr-3"> : </span>  <label id="lblUrn"></label>  </td>
+                            <td class="font-weight-normal"> <b>Hospital Code</b> </td>
+                            <td> <span class="dot_cl mr-3"> : </span>  <label id="lblHospitalCode"></label>  </td>
+                        </tr>
+                        <tr>
+                            <td class="font-weight-normal"> <b>Benificiary Name</b>  </td>
+                            <td> <span class="dot_cl mr-3"> : </span> <label id="lblbenificiaryname"></label> </td>
+                            <td class="font-weight-normal"> <b>Hospital Name</b>  </td>
+                            <td> <span class="dot_cl mr-3"> : </span>  <label id="lblHospitalName"></label></td>
+                        </tr>
+                        <tr>
+                            <td class="font-weight-normal"> <b>Family Head Name</b> </td>
+                            <td><span class="dot_cl mr-3"> : </span> <label id="lblfamilyhead"></label> </td>
+
+                            <td class="font-weight-normal"> <b>Hospital Authority ID</b> </td>
+                            <td> <span class="dot_cl mr-3"> : </span> <label id="lblHuspitalAuthority"></label></td>
+                        </tr>
+                        <tr>
+                            <td class="font-weight-normal"> <b>Family Relation</b> </td>
+                            <td> <span class="dot_cl mr-3"> : </span>  <label id="lblfamilyrelation"></label>  </td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+
+                <div class="tm_align_center brd_top">
+                    <div class="tm_text"> Package Wise Discharge Details </div>
+                </div>
+
+                <table class="disdoc_sec" width="100%" border="1">
+                    <thead>
+                        <tr>
+                            <th class="font-weight-normal text-left">  <b> Package Name </b> </th>
+                            <th class="font-weight-normal text-left"> <b> Package Code </b> </th>
+                            <th class="font-weight-normal text-left"> <b> Actual Date of Discharge </b> </th>
+                            <th class="font-weight-normal text-left"> <b> Trnsaction Date </b> </th>
+                            <th class="font-weight-normal text-right"> <b> Blocked Amount </b> </th>
+                            <th class="font-weight-normal text-right"> <b> Hospital Claim Amount </b> </th>
+                            <th class="font-weight-normal text-left"> <b> Verifer Name </b> </th>
+                            <th class="font-weight-normal text-left"> <b> Verifer Through </b> </th>
+                        </tr>
+                    </thead>
+                    <tbody id="packageDetailsbody">
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3"> <label> &nbsp; </label>  </td>
+                            <td class='text-right'> <label> <b>Total : </b>  </label>  </td>
+                            <td class='text-right'> <label> <b id="totalblockedamount" > </b> </label>  </td>
+                            <td class='text-right'> <label> <b id="totalclaimedamount" > </b> </label>  </td>
+                            <td colspan="2"> <label> &nbsp; </label></td>
+                        </tr>
+                    </tfoot>
+                </table>
+
+                <table class="table table_none disdoc_sec">
+                    <tr>
+                        <td class="font-weight-normal" width="33%"> <b>Balance Available Family Fund</b>  <span class="dot_cl mr-3"> : </span><label id="lblfamiyFund"></label>  </td>
+
+                        <td class="font-weight-normal" width="33%"> <b>Balance Available Female Fund </b> <span class="dot_cl mr-3"> : </span><label id="lblFemaleFund"></label> </td>
+
+                        <td class="font-weight-normal text-right" width="33%"> <b>Amount Insufficent </b> <span class="dot_cl mr-3"> : </span> <label id="lblinsufficentAmount"></label> </td>
+                    </tr>
+                </table>
+
+                <div class="auth-bg"> <b> Authenticated by : </b> <span> <label id="lblAutheticateBy"></label> </span> </div>
+
+            </div>
+        </div>
+
+
+    </div>
+
+    <script>
+        $("#printbutton").click(function () {
+            $("#printbutton").css("display", "none");
+        });
+    </script>
+
+</body>
+</html>
+<script>
+    ServiceURL = "@ConfigurationManager.AppSettings["ServiceURL"]";
+    console.log("url", ServiceURL);
+    $(document).ready(function () {
+        if (localStorage.getItem('InsertedData') != null) {
+            var PackageInfo = JSON.parse(localStorage.getItem('InsertedData'));
+            console.log('DischageSlip Data', PackageInfo);
+        }
+        var modeldata = JSON.stringify({
+            Action: 'C',
+            URN: PackageInfo.URN,
+            MemberId: PackageInfo.MemberId,
+            HospitalCode: PackageInfo.HospitalCode,
+            Invoiceno: PackageInfo.Invoiceno,
+        });
+        $.ajax({
+            url: ServiceURL + "/api/Discharge/GetDischargeSlip",
+            type: "POST",
+            data: modeldata,
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $("#loader").show();
+            },
+            success: function (response) {
+                console.log("Discharslip", response.dischargeslip);
+                $('#lblCaseno').text(response.dischargeslip.caseno);
+                $('#lblDatetime').text(response.dischargeslip.datetime);
+                $('#lblUrn').text(response.dischargeslip.urn);
+                $('#lblTranscationDate').text(response.dischargeslip.transactiondate);
+                $('#lblbenificiaryname').text(response.dischargeslip.membername);
+                $('#lblfamilyhead').text(response.dischargeslip.headmembername);
+                $('#lblfamilyrelation').text(response.dischargeslip.familyrelation);
+                $('#lblVerifiername').text(response.dischargeslip.verifiedname);
+                $('#lblVerifierRelation').text(response.dischargeslip.verifiedrelation);
+                $('#lblTreamtmentName').text(response.dischargeslip.treatments);
+                $('#lblPackage').text(response.dischargeslip.package);
+                $('#lblhospitalclaimamount').text(toIndianCurrency(parseFloat(response.dischargeslip.hospitalclaimamount)));
+                $('#lblAmount').text(toIndianCurrency(parseFloat(response.dischargeslip.amount)));
+                $('#lblinsufficentAmount').text(toIndianCurrency(parseFloat(response.dischargeslip.insufficientamount)));
+                $('#lblHospitalCode').text(response.dischargeslip.hospitalcode);
+                $('#lblHuspitalAuthority').text(response.dischargeslip.hospitalauthoritycode);
+                $('#lblHospitalName').text(response.dischargeslip.hospitalname);
+                $('#lblfamiyFund').text(toIndianCurrency(parseFloat(response.dischargeslip.familyfund)));
+                $('#lblFemaleFund').text(toIndianCurrency(parseFloat(response.dischargeslip.femalefund)));
+                $('#lblAutheticateBy').text(response.dischargeslip.hospitalname);
+                for (var i = 0; i < response.dischargePackageDetails.length; i++) {
+                    var slno = i + 1;
+                    console.log("tr", response.dischargePackageDetails[i]);
+                    var AddParameter = "<tr>" +
+                        "<td><label> " + response.dischargePackageDetails[i].treatments + " </td >"+
+                        "<td> <label> " + response.dischargePackageDetails[i].package + "</label> </td>"+
+                        "<td> <label> " + response.dischargePackageDetails[i].actualdateofdischarge + " </label>  </td>"+
+                        "<td> <label> " + response.dischargePackageDetails[i].transactiondate + " </label>  </td>"+
+                        "<td class='text-right'> <label> " + toIndianCurrency(parseFloat(response.dischargePackageDetails[i].amount)) + " </label>  </td>"+
+                        "<td class='text-right'> <label> " + toIndianCurrency(parseFloat(response.dischargePackageDetails[i].hospitalclaimamount)) + " </label>  </td>"+
+                        "<td> <label> " + response.dischargePackageDetails[i].verifiedname + " </label>  </td>"+
+                        "<td> <label> " + response.dischargePackageDetails[i].verifiedthrough + " </label> </td>"+
+                        "</tr>"
+                    $("#packageDetailsbody").append(AddParameter);
+                }
+                $('#totalblockedamount').text(toIndianCurrency(parseFloat(response.dischargeslip.totalblockedamount)));
+                $('#totalclaimedamount').text(toIndianCurrency(parseFloat(response.dischargeslip.totalclaimedamount)));
+            },
+            complete: function () {
+                $('#loader').hide();
+            },
+            failure: function (response) {
+                alert(response.d);
+            },
+            error: function (response) {
+                alert(response.d);
+            }
+        });
+    });
+    const toIndianCurrency = (num) => {
+        const curr = num.toLocaleString('en-IN', {
+            style: 'currency',
+            currency: 'INR'
+        });
+        return curr;
+    };
+</script>

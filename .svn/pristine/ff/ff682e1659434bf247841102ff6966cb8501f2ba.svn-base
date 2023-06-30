@@ -1,0 +1,1065 @@
+﻿
+@{
+    ViewBag.Title = "AddDischarge";
+    Layout = "~/Views/Shared/_CommonLayout.cshtml";
+}
+@Scripts.Render("~/bundles/discharge")
+<script type="text/javascript">
+$(document).ready(function () {
+    arrDischargePackage = [];
+    arrPrevPackage = [];
+    arrAddOnPackage = [];
+    $('#CurBlkHeader').hide();
+    $('#PrevBlkHeader').hide();
+    $('#AddOnBlkHeader').hide();
+    $('#path').html('<a href="@Url.Action("ViewDischarge", "Discharge")">Discharge List</a> / Discharge');
+    //$('.datepicker').datepicker({
+    //    format: 'dd M yyyy',
+    //    endDate: 'today',
+    //    autoclose: true
+    //}); //code for datepicker
+    //$(".datepicker").datepicker("setDate", (new Date().toDateString()));
+    $('#mSummery').val('No');
+    $('#btnDischarge').hide();
+    $('#divLoader').hide();
+    //$('#dischargeDate').attr('readonly', true);
+    //$('.datepicker').datepicker('remove');
+    var params = {
+        HospitalCode: '@Session["HospitalCode"]'
+    };
+    $.ajax({
+        url: ServiceURL + "/api/Hospital/GetHospitalInformation",
+        type: "GET",
+        data: params,
+        dataType: "json",
+        contentType: "application/json; charset=utf-8",
+        success: function (data) {
+            $("#HdState").html(data.hospitalState);
+            $("#HdDistrict").html(data.hospitalDistrict);
+            $("#HdCode").html(data.hospitalCode);
+            $("#HdName").html(data.hospitalname);
+            // console.log(data);
+        },
+        error: function (error) {
+            console.log(error.statusText);
+        }
+    });
+    if (localStorage.getItem('DischargeInfo') != null) {
+        var DischargeInfo = JSON.parse(localStorage.getItem('DischargeInfo'));
+        var RegParams = {
+            Action: 'B',
+            InvoiceNo: DischargeInfo[0].blockingInvoiceNo
+        };
+        $.ajax({
+           url: ServiceURL + "/api/Registration/GetPreviousAddOnPackageDetailsByInvoiceNo",
+           type: "GET",
+           data: RegParams,
+           dataType: "json",
+           contentType: "application/json; charset=utf-8",
+           success: function (data) {
+               if (data.length > 0) {
+                   for (var i = 0; i < data.length; i++) {
+                       arrAddOnPackage.push({
+                          invoiceNo:DischargeInfo[0].blockingInvoiceNo,
+                          procedureName:data[i].procedureName,
+                          procedureCode:data[i].procedureCode,
+                          categoryName:data[i].categoryName,
+                          categoryCode:data[i].categoryCode,
+                          packageName:data[i].packageName,
+                          packageCode:data[i].packageCode,
+                          blockingDate:data[i].blockingDate,
+                          blockingAmount: data[i].blockingAmount,
+                          actualAmount:data[i].blockingAmount
+
+                       });
+                   }
+               }
+           },
+           error: function (error) {
+               console.log(error.statusText);
+           },
+       });
+        var DischargeParam = {
+            HospitalCode: '@Session["HospitalCode"]',
+            Action: 'B',
+            URN: DischargeInfo[0].urn,
+            BlockingInVoiceNo: DischargeInfo[0].blockingInvoiceNo
+        };
+        $.ajax({
+            url: ServiceURL + "/api/Registration/GetDischargeDetail",
+            type: "GET",
+            data: DischargeParam,
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            success: function (data) {
+                if (data.length > 0) {
+                    //console.log(data)
+                    $('#SumDisAmnt').html(data[0].sumAmountBlocked)
+                    for (var i = 0; i < data.length; i++) {
+                        if (data[i].packageChangeStatus == 0) {
+                            arrDischargePackage.push({
+                                invoiceNo: data[i].invoiceNo,
+                                dateofadmission: data[i].dateofadmission,
+                                procedureCode: data[i].procedureCode,
+                                procedureName: data[i].procedureName,
+                                packageCode: data[i].packageCode,
+                                packageName: data[i].packageName,
+                                amoutBlocked: data[i].amoutBlocked,
+                                isMedSergical: data[i].isMedSergical,
+                                packageMode: data[i].packageMode,
+                                noofDays: data[i].noofDays,
+                                urn: data[i].urn,
+                                CappedAmount: data[i].cappedAmount,
+                                ISExtensionofstay: data[i].isExtensionofstay,
+                                dtmNextRequestdate: data[i].dtmNextRequestdate,
+                                category: data[i].category,
+                                categoryCode: data[i].categoryCode,
+                                TransactionID: data[i].transactionID,
+                                WardId: data[i].wardId
+                            });
+                        }
+                        else {
+                            arrPrevPackage.push({
+                                invoiceNo: data[i].invoiceNo,
+                                dateofadmission: data[i].dateofadmission,
+                                procedureCode: data[i].procedureCode,
+                                procedureName: data[i].procedureName,
+                                packageCode: data[i].packageCode,
+                                packageName: data[i].packageName,
+                                amoutBlocked: data[i].amoutBlocked,
+                                isMedSergical: data[i].isMedSergical,
+                                packageMode: data[i].packageMode,
+                                noofDays: data[i].noofDays,
+                                urn: data[i].urn,
+                                CappedAmount: data[i].cappedAmount,
+                                ISExtensionofstay: data[i].isExtensionofstay,
+                                dtmNextRequestdate: data[i].dtmNextRequestdate,
+                                category: data[i].category,
+                                categoryCode: data[i].categoryCode,
+                                TransactionID: data[i].transactionID,
+                                WardId: data[i].wardId,
+                                TempDischargeDate: data[i].temporaryDischargeDate,
+                                TemporaryDiscargeAmount: data[i].temporaryDiscargeAmount,
+                            });
+                        }
+                    }
+                    $('#UrnNo').html(data[0].urn);
+                    $('#HeadOfFamily').html(data[0].headMemberName);
+                    $('#State').html(data[0].memberStateName);
+                    $('#StateCode').html(data[0].memberStateCode);
+                    $('#District').html(data[0].memberDistrictName);
+                    $('#DistrictCode').html(data[0].memberDistrictCode);
+                    $('#PatientNm').html(data[0].memberName);
+                    $('#divSchCode').html(data[0].schemeCode);
+                    $('#SchName').html(data[0].schemeName);
+                    $('#familyID').html(data[0].familyID);
+                    var date1_ms = new Date(data[data.length-1].lastPackageBlockingDate).getTime();
+                    var date2_ms = new Date().getTime();
+                    var difference_ms = date2_ms - date1_ms;
+                    difference_ms = difference_ms / 1000;
+                    difference_ms = difference_ms / 60;
+                    difference_ms = difference_ms / 60;
+                    var days = Math.floor(difference_ms / 24);
+                    $('.datepicker').datepicker({
+                        format: 'dd M yyyy',
+                        startDate: '-' + days + 'd',
+                        endDate: 'today',
+                        autoclose: true
+                    }); //code for datepicker
+                    $(".datepicker").datepicker("setDate", (new Date().toDateString()));
+                    if (data[0].urn != "") {
+                        var BalanceParams = {
+                            Action: 'R',
+                            URN: data[0].urn,
+                            FamilyId: $('#familyID').text()
+                        };
+                        $.ajax({
+                            url: ServiceURL + "/api/Common/GetAvailBalance",
+                            type: "GET",
+                            data: BalanceParams,
+                            dataType: "json",
+                            contentType: "application/json; charset=utf-8",
+                            success: function (result) {
+                                if (result != null) {
+                                    $('#AvlCover').html(result.availableBalance);
+                                    $('#TraBlkAmnt').html(result.amountBlocked);
+
+                                }
+                                else {
+                                    $('#AvlCover').html('NA');
+                                    $('#TraBlkAmnt').html('0');
+                                }
+
+                                //if (result.length > 0) {
+                                //    // console.log(data);
+                                //    //$('#IPNumber').html(data[0].policynumber)
+                                //    //$('#StartDt').html(data[0].policyStartDate)
+                                //    //$('#EndDt').html(data[0].policyEnddate)
+                                //}
+                            },
+                            error: function (error) {
+                                console.log(error.responseText);
+                            }
+                        });
+                    }
+                    if (data[0].memberDistrictCode != "") {
+                        var PolicyParams = {
+                            URN: $('#UrnNo').text()
+                            //MemberDistrictCode: data[0].memberDistrictCode,
+                            //SchemeCode: $('#divSchCode').text()
+                        };
+                        $.ajax({
+                            url: ServiceURL + "/api/Common/GetPolicy",
+                            type: "GET",
+                            data: PolicyParams,
+                            dataType: "json",
+                            contentType: "application/json; charset=utf-8",
+                            success: function (data) {
+                                if (data.length > 0) {
+                                    // console.log(data);
+                                    $('#IPNumber').html(data[0].policynumber)
+                                    $('#StartDt').html(data[0].policyStartDate)
+                                    $('#EndDt').html(data[0].policyEnddate)
+                                }
+                            },
+                            error: function (error) {
+                                console.log(error.responseText);
+                            }
+                        });
+                    }
+                }
+            },
+            error: function (error) {
+                console.log(error.responseText);
+            }
+        });
+    }
+    $('#btnViewPackage').click(function () {
+        if (validateDischarge()) {
+            if (arrDischargePackage.length > 0) {
+                 $('#CurBlkHeader').show();
+
+                arrDischargePackageWithActueal = [];
+                if (arrDischargePackage.length == 1 && arrDischargePackage[0].isMedSergical == 'M') {
+                    var DtAdmission = new Date(arrDischargePackage[0].dateofadmission);
+                    var DtDischarge = new Date($('#dischargeDate').val());
+                    var ActDays = 0;
+                    var ActAmnt = 0;
+                    if (DtDischarge - DtAdmission === 0) {
+                        ActDays = 1;
+                        ActAmnt = arrDischargePackage[0].amoutBlocked * ActDays;
+                    }
+                    else {
+                        if (arrDischargePackage[0].packageMode == '1') {
+                            var Diff = new Date(DtDischarge - DtAdmission);
+                            ActDays = Diff / 1000 / 60 / 60 / 24;
+                            ActAmnt = arrDischargePackage[0].amoutBlocked * ActDays;
+                        }
+                        else if (arrDischargePackage[0].packageMode == '2') {
+                            var Diff = new Date(DtDischarge - DtAdmission);
+                            ActDays = Diff / 1000 / 60 / 60 / 24;
+                            ActAmnt = '--';
+                        }
+                        else {
+                            var Diff = new Date(DtDischarge - DtAdmission);
+                            ActDays = Diff / 1000 / 60 / 60 / 24;
+                            ActAmnt = arrDischargePackage[0].amoutBlocked;
+                        }
+                    }
+
+                    //arrDischargePackage[0].push({ ActDays: ActDays, ActAmnt: ActAmnt });
+                    arrDischargePackageWithActueal.push({
+                        invoiceNo: arrDischargePackage[0].invoiceNo,
+                        dateofadmission: arrDischargePackage[0].dateofadmission,
+                        procedureCode: arrDischargePackage[0].procedureCode,
+                        procedureName: arrDischargePackage[0].procedureName,
+                        packageCode: arrDischargePackage[0].packageCode,
+                        packageName: arrDischargePackage[0].packageName,
+                        amoutBlocked: arrDischargePackage[0].amoutBlocked,
+                        noofDays: arrDischargePackage[0].noofDays,
+                        ActDays: ActDays,
+                        ActAmnt: ActAmnt,
+                        isMedSergical: arrDischargePackage[0].isMedSergical,
+                        packageMode: arrDischargePackage[0].packageMode,
+                        urn: arrDischargePackage[0].urn,
+                        CappedAmount: arrDischargePackage[0].CappedAmount,
+                        ISExtensionofstay: arrDischargePackage[0].ISExtensionofstay,
+                        dtmNextRequestdate: arrDischargePackage[0].dtmNextRequestdate,
+                        category: arrDischargePackage[0].category,
+                        categoryCode: arrDischargePackage[0].categoryCode,
+                        transactionID: arrDischargePackage[0].TransactionID,
+                        wardId: arrDischargePackage[0].WardId
+                    });
+                }
+                else {
+                    var ActDays;
+                    var DOA;
+                    for (var i = 0; i < arrDischargePackage.length; i++) {
+                        if (arrDischargePackage[i].dateofadmission == null || arrDischargePackage[i].dateofadmission == '') {
+                            ActDays = '--';
+                            DOA = '--';
+                        }
+                        else {
+                            DOA = arrDischargePackage[i].dateofadmission;
+                            var DtAdmission = new Date(arrDischargePackage[i].dateofadmission);
+                            var DtDischarge = new Date($('#dischargeDate').val());
+
+                            if (DtDischarge - DtAdmission === 0) {
+                                ActDays = 1;
+                            }
+                            else {
+                                var Diff = new Date(DtDischarge - DtAdmission);
+                                ActDays = Diff / 1000 / 60 / 60 / 24;
+                            }
+                        }
+                        arrDischargePackageWithActueal.push({
+                            invoiceNo: arrDischargePackage[i].invoiceNo,
+                            dateofadmission: DOA,
+                            procedureCode: arrDischargePackage[i].procedureCode,
+                            procedureName: arrDischargePackage[i].procedureName,
+                            packageCode: arrDischargePackage[i].packageCode,
+                            packageName: arrDischargePackage[i].packageName,
+                            amoutBlocked: arrDischargePackage[i].amoutBlocked,
+                            noofDays: arrDischargePackage[i].noofDays,
+                            ActDays: ActDays,
+                            ActAmnt: arrDischargePackage[i].amoutBlocked,
+                            isMedSergical: arrDischargePackage[i].isMedSergical,
+                            packageMode: arrDischargePackage[i].packageMode,
+                            urn: arrDischargePackage[0].urn,
+                            CappedAmount: arrDischargePackage[i].CappedAmount,
+                            ISExtensionofstay: arrDischargePackage[i].ISExtensionofstay,
+                            dtmNextRequestdate: arrDischargePackage[i].dtmNextRequestdate,
+                            category: arrDischargePackage[i].category,
+                            categoryCode: arrDischargePackage[i].categoryCode,
+                            transactionID: arrDischargePackage[i].TransactionID,
+                            wardId: arrDischargePackage[i].WardId
+                        });
+                    }
+                }
+                $('#jsGrid').jsGrid({
+                    height: "auto",
+                    width: "100%",
+                    sorting: true,
+                    paging: true,
+                    pageSize: 10,
+                    autoload: true,
+
+                    controller: {
+                        loadData: function () {
+                            var d = $.Deferred();
+                            //d.resolve(arrDischargePackageWithActueal);
+                            //return d.promise();
+                            d.resolve($.map(arrDischargePackageWithActueal, function (item, itemIndex) {
+                                return $.extend(item, { "Index": itemIndex + 1 });
+                            }
+                            ));
+                            return d.promise();
+                        },
+
+                        deleteItem: function (deletingClient) {
+                            debugger;
+                            var clientIndex = $.inArray(deletingClient, arrDischargePackageWithActueal);
+                            arrDischargePackageWithActueal.splice(clientIndex, 1);
+                        }
+                    },
+                    fields: [{ name: "Index", type: "text", width: 50, title: "#Sl", align: "center" },
+                    { name: "invoiceNo", type: "text", title: "Blocking Invoice No.", align: "center" },
+                    { name: "dateofadmission", title: "Blocked Date", type: "text", align: "center" },
+                    { name: "procedureCode", title: "procedureCode", type: "number", align: "center", visible: false },
+                    { name: "urn", title: "urn", type: "number", align: "center", visible: false },
+                    { name: "procedureName", title: "Procedure", type: "number", align: "center" },
+                    { name: "category", title: "Category", type: "text", align: "center" },
+                    { name: "categoryCode", title: "Category Code", type: "text", align: "center", visible: false },
+                    { name: "packageCode", title: "packageCode", type: "number", align: "center", visible: false },
+                    { name: "isMedSergical", title: "isMedSergical", type: "number", align: "center", visible: false },
+                    { name: "packageMode", title: "packageMode", type: "number", align: "center", visible: false },
+                    { name: "packageName", title: "Package", type: "text", align: "center" },
+                    { name: "amoutBlocked", title: "Amount Blocked", type: "text", align: "center" },
+                    { name: "noofDays", title: "Days", type: "text", align: "center" },
+                    { name: "ActDays", title: "Actual Days", type: "text", align: "center" },
+                    { name: "ActAmnt", title: "Actual Amount", type: "text", align: "center" },
+                    { name: "CappedAmount", title: "CappedAmount", type: "text", align: "center", visible: false },
+                    { name: "ISExtensionofstay", title: "ISExtensionofstay", type: "text", align: "center", visible: false },
+                    { name: "dtmNextRequestdate", title: "dtmNextRequestdate", type: "text", align: "center", visible: false },
+                    {
+                        type: "control", title: "Remove", visible: false, editButton: false, headerTemplate: function () {
+                            return $("<div>").prop("title", "Remove").text("Remove");
+                        }
+                    },
+
+                    {
+                          type: "control", editButton: true, deleteButton: false,width: 90, align: "center",
+                        itemTemplate: function (value, item) {
+                           // console.log(item.wardId);
+                              if (item.wardId != 0 && item.wardId != null && item.wardId != '') {
+                                  return $("<button>").attr({ type: "button", class: "btn btn-outline-primary focusedBtn btn-sm my-2 my-sm-0" }).text("View Ward Details")
+                                      .on("click", function () {
+                                          var arrWardTransactionInfo = [];
+                                          arrWardTransactionInfo.push({
+                                              TranId: item.transactionID
+                                          });
+                                          localStorage.setItem('WardTransactionInfo', JSON.stringify(arrWardTransactionInfo));
+                                          window.open('../BlockPackage/ViewPreviousWardDetails?TranId='+item.transactionID +'&Date='+$('#hfDiscDt').text(),'_blank', 'location=yes,height=570,width=1250,scrollbars=yes,status=yes');
+                                      });
+                              }
+                              else {
+                                  return false;
+                              }
+                          },
+                          headerTemplate: function () {
+                              return $("<div>").prop("title", "Action").text("View Details");
+                          }
+
+                    }
+
+                    ]
+                });
+                $('#btnDischarge').show();
+                $('#hfDiscDt').text($('#dischargeDate').val());
+            }
+            if (arrPrevPackage.length > 0) {
+                $('#PrevBlkHeader').show();
+                arrPrevDischargePackageWithActueal = [];
+                if (arrPrevPackage.length == 1 && arrPrevPackage[0].isMedSergical == 'M') {
+                    var DtAdmission = new Date(arrPrevPackage[0].dateofadmission);
+                    var DtDischarge = new Date(arrPrevPackage[0].TempDischargeDate);
+                    var ActDays = 0;
+                    var ActAmnt = 0;
+                    if (DtDischarge - DtAdmission === 0) {
+                        ActDays = 1;
+                        ActAmnt = arrPrevPackage[0].TemporaryDiscargeAmount;
+                    }
+                    else {
+                        if (arrPrevPackage[0].packageMode == '1') {
+                            var Diff = new Date(DtDischarge - DtAdmission);
+                            ActDays = Diff / 1000 / 60 / 60 / 24;
+                            ActAmnt = arrPrevPackage[0].amoutBlocked * ActDays;
+                        }
+                        else if (arrPrevPackage[0].packageMode == '2') {
+                            var Diff = new Date(DtDischarge - DtAdmission);
+                            ActDays = Diff / 1000 / 60 / 60 / 24;
+                            ActAmnt = '--';
+                        }
+                        else {
+                            var Diff = new Date(DtDischarge - DtAdmission);
+                            ActDays = Diff / 1000 / 60 / 60 / 24;
+                            ActAmnt = arrPrevPackage[0].amoutBlocked;
+                             }
+
+                    }
+
+                    //arrDischargePackage[0].push({ ActDays: ActDays, ActAmnt: ActAmnt });
+                    arrPrevDischargePackageWithActueal.push({
+                        invoiceNo: arrPrevPackage[0].invoiceNo,
+                        dateofadmission: arrPrevPackage[0].dateofadmission,
+                        procedureCode: arrPrevPackage[0].procedureCode,
+                        procedureName: arrPrevPackage[0].procedureName,
+                        packageCode: arrPrevPackage[0].packageCode,
+                        packageName: arrPrevPackage[0].packageName,
+                        amoutBlocked: arrPrevPackage[0].amoutBlocked,
+                        noofDays: arrPrevPackage[0].noofDays,
+                        ActDays: ActDays,
+                        ActAmnt: ActAmnt,
+                        isMedSergical: arrPrevPackage[0].isMedSergical,
+                        packageMode: arrPrevPackage[0].packageMode,
+                        urn: arrPrevPackage[0].urn,
+                        CappedAmount: arrPrevPackage[0].CappedAmount,
+                        ISExtensionofstay: arrPrevPackage[0].ISExtensionofstay,
+                        dtmNextRequestdate: arrPrevPackage[0].dtmNextRequestdate,
+                        category: arrPrevPackage[0].category,
+                        categoryCode: arrPrevPackage[0].categoryCode,
+                        transactionID: arrPrevPackage[0].TransactionID,
+                        wardId: arrPrevPackage[0].WardId,
+                        temporaryDischargeDate:arrPrevPackage[0].TempDischargeDate
+                    });
+                }
+                else {
+                    var ActDays=0;
+                    var DOA;
+                    var ActAmnt = 0;
+                    for (var i = 0; i < arrPrevPackage.length; i++) {
+                        if (arrPrevPackage[i].dateofadmission == null || arrPrevPackage[i].dateofadmission == '') {
+                            ActDays = '--';
+                            DOA = '--';
+                        }
+                        else {
+                            DOA = arrPrevPackage[i].dateofadmission;
+                            var DtAdmission = new Date(arrPrevPackage[i].dateofadmission);
+                            var DtDischarge = new Date(arrPrevPackage[i].TempDischargeDate);
+
+                            if (DtDischarge - DtAdmission === 0) {
+                                ActDays = 1;
+                                ActAmnt = arrPrevPackage[i].TemporaryDiscargeAmount;
+                            }
+                            else {
+                                var Diff = new Date(DtDischarge - DtAdmission);
+                                ActDays = Diff / 1000 / 60 / 60 / 24;
+                                ActAmnt = arrPrevPackage[i].TemporaryDiscargeAmount;
+                            }
+                             if (arrPrevPackage[i].packageMode=='2') {
+                                ActAmnt = '--';
+                             }
+                        }
+                        arrPrevDischargePackageWithActueal.push({
+                            invoiceNo: arrPrevPackage[i].invoiceNo,
+                            dateofadmission: DOA,
+                            procedureCode: arrPrevPackage[i].procedureCode,
+                            procedureName: arrPrevPackage[i].procedureName,
+                            packageCode: arrPrevPackage[i].packageCode,
+                            packageName: arrPrevPackage[i].packageName,
+                            amoutBlocked: arrPrevPackage[i].amoutBlocked,
+                            noofDays: arrPrevPackage[i].noofDays,
+                            ActDays: ActDays,
+                            ActAmnt: ActAmnt,
+                            isMedSergical: arrPrevPackage[i].isMedSergical,
+                            packageMode: arrPrevPackage[i].packageMode,
+                            urn: arrPrevPackage[0].urn,
+                            CappedAmount: arrPrevPackage[i].CappedAmount,
+                            ISExtensionofstay: arrPrevPackage[i].ISExtensionofstay,
+                            dtmNextRequestdate: arrPrevPackage[i].dtmNextRequestdate,
+                            category: arrPrevPackage[i].category,
+                            categoryCode: arrPrevPackage[i].categoryCode,
+                            transactionID: arrPrevPackage[i].TransactionID,
+                            wardId: arrPrevPackage[i].WardId,
+                            temporaryDischargeDate:arrPrevPackage[i].TempDischargeDate
+                        });
+                    }
+                }
+                $('#jsGridPrev').jsGrid({
+                    height: "auto",
+                    width: "100%",
+                    sorting: true,
+                    paging: true,
+                    pageSize: 10,
+                    autoload: true,
+
+                    controller: {
+                        loadData: function () {
+                            var d = $.Deferred();
+                            //d.resolve(arrDischargePackageWithActueal);
+                            //return d.promise();
+                            d.resolve($.map(arrPrevDischargePackageWithActueal, function (item, itemIndex) {
+                                return $.extend(item, { "Index": itemIndex + 1 });
+                            }
+                            ));
+                            return d.promise();
+                        },
+
+                        deleteItem: function (deletingClient) {
+                            debugger;
+                            var clientIndex = $.inArray(deletingClient, arrPrevDischargePackageWithActueal);
+                            arrPrevDischargePackageWithActueal.splice(clientIndex, 1);
+                        }
+                    },
+                    fields: [{ name: "Index", type: "text", width: 50, title: "#Sl", align: "center" },
+                    { name: "invoiceNo", type: "text", title: "Blocking Invoice No.", align: "center" },
+                    { name: "dateofadmission", title: "Blocked Date", type: "text", align: "center" },
+                    { name: "procedureCode", title: "procedureCode", type: "number", align: "center", visible: false },
+                    { name: "urn", title: "urn", type: "number", align: "center", visible: false },
+                    { name: "procedureName", title: "Procedure", type: "number", align: "center" },
+                    { name: "category", title: "Category", type: "text", align: "center" },
+                    { name: "categoryCode", title: "Category Code", type: "text", align: "center", visible: false },
+                    { name: "packageCode", title: "packageCode", type: "number", align: "center", visible: false },
+                    { name: "isMedSergical", title: "isMedSergical", type: "number", align: "center", visible: false },
+                    { name: "packageMode", title: "packageMode", type: "number", align: "center", visible: false },
+                    { name: "packageName", title: "Package", type: "text", align: "center" },
+                    { name: "temporaryDischargeDate", title: "DischargeDate", type: "text", align: "center"},
+                    { name: "amoutBlocked", title: "Amount Blocked", type: "text", align: "center" },
+                    { name: "noofDays", title: "Days", type: "text", align: "center" },
+                    { name: "ActDays", title: "Actual Days", type: "text", align: "center" },
+                    { name: "ActAmnt", title: "Actual Amount", type: "text", align: "center" },
+                    { name: "CappedAmount", title: "CappedAmount", type: "text", align: "center", visible: false },
+                    { name: "ISExtensionofstay", title: "ISExtensionofstay", type: "text", align: "center", visible: false },
+                    { name: "dtmNextRequestdate", title: "dtmNextRequestdate", type: "text", align: "center", visible: false },
+
+                    {
+                        type: "control", title: "Remove", visible: false, editButton: false, headerTemplate: function () {
+                            return $("<div>").prop("title", "Remove").text("Remove");
+                        }
+                    },
+
+                    {
+                          type: "control", editButton: true, deleteButton: false,width: 90, align: "center",
+                        itemTemplate: function (value, item) {
+                           // console.log(item.wardId);
+                              if (item.wardId != 0 && item.wardId != null && item.wardId != '') {
+                                  return $("<button>").attr({ type: "button", class: "btn btn-outline-primary focusedBtn btn-sm my-2 my-sm-0" }).text("View Ward Details")
+                                      .on("click", function () {
+                                          var arrWardTransactionInfo = [];
+                                          arrWardTransactionInfo.push({
+                                              TranId: item.transactionID
+                                          });
+                                          localStorage.setItem('WardTransactionInfo', JSON.stringify(arrWardTransactionInfo));
+                                          window.open('../BlockPackage/ViewPreviousWardDetails?TranId='+item.transactionID +'&Date='+item.temporaryDischargeDate,'_blank', 'location=yes,height=570,width=1250,scrollbars=yes,status=yes');
+                                      });
+                              }
+                              else {
+                                  return false;
+                              }
+                          },
+                          headerTemplate: function () {
+                              return $("<div>").prop("title", "Action").text("View Details");
+                          }
+
+                    }
+
+                    ]
+                });
+                $('#btnDischarge').show();
+                $('#hfDiscDt').text($('#dischargeDate').val());
+            }
+            if (arrAddOnPackage.length > 0) {
+                $('#AddOnBlkHeader').show();
+                $('#jsGridAddOn').jsGrid({
+                    height: "auto",
+                    width: "100%",
+                    sorting: true,
+                    paging: true,
+                    pageSize: 10,
+                    autoload: true,
+
+                    controller: {
+                        loadData: function () {
+                            var d = $.Deferred();
+                            //d.resolve(arrDischargePackageWithActueal);
+                            //return d.promise();
+                            d.resolve($.map(arrAddOnPackage, function (item, itemIndex) {
+                                return $.extend(item, { "Index": itemIndex + 1 });
+                            }
+                            ));
+                            return d.promise();
+                        }
+                    },
+                      fields: [
+                           { name: "Index", width: 50, type: "number", title: "#Sl", align: "center", filtering: false },
+                           { name: "invoiceNo", type: "text", title: "Blocking Invoice No.", align: "center" },
+                           { name: "blockingDate", type: "text", title: "Blocking Date", align: "center"},
+                           { name: "procedureName", type: "text", title: "Procedure", align: "center" },
+                           { name: "procedureCode", type: "text", title: "Procedure Code", align: "center",visible: false },
+                           { name: "categoryName", type: "text", title: "Category", align: "center" },
+                           { name: "categoryCode", type: "text", title: "Category Code", align: "center", visible: false },
+                           { name: "packageName", type: "text", title: "Package Name", align: "center" },
+                           { name: "packageCode", type: "text", title: "Package Code", align: "center", visible: false },
+                           { name: "blockingAmount", type: "text", title: "Blocking Amount(Rs.)", align: "center" },
+                           { name: "actualAmount", type: "text", title: "Actual Amount(Rs.)", align: "center" }
+                      ]
+                });
+            }
+        }
+    });
+    var ml = 200;
+    $('#Desc').text("(Maximum " + ml + " characters are allowed.)");
+    $('#description').keydown(function () {
+        var text = $(this).val();
+        var textLength = text.length;
+        if (textLength > ml) {
+            $(this).val(text.substring(0, (ml)));
+            var charactersLeft = ml - textLength + 1;
+        }
+        else {
+            var charactersLeft = ml - textLength;
+        }
+        $('#Desc').text("(Maximum " + (charactersLeft) + " characters are allowed.)");
+    });
+    $('#MSummery').text("(Maximum " + ml + " characters are allowed.)");
+    $('#mSummery').keydown(function () {
+        var text = $(this).val();
+        var textLength = text.length;
+        if (textLength > ml) {
+            $(this).val(text.substring(0, (ml)));
+            var charactersLeft = ml - textLength + 1;
+        }
+        else {
+            var charactersLeft = ml - textLength;
+        }
+        $('#MSummery').text("(Maximum " + (charactersLeft) + " characters are allowed.)");
+    });
+    $('#mortality').change(function () {
+        if ($('#mortality').val() == '1') {
+            $('#MotSummery').css('visibility', 'visible');
+            $('#mSummery').val('');
+            $('#lblMotSum').css('visibility', 'visible');
+            $('#MSummery').css('visibility', 'visible');
+        }
+        else {
+            $('#MotSummery').css('visibility', 'hidden');
+            $('#mSummery').val('No');
+            $('#lblMotSum').css('visibility', 'hidden');
+            $('#MSummery').css('visibility', 'hidden');
+        }
+    });
+    $('#btnDischarge').click(function () {
+        if (parseInt($('#AvlCover').text()) < 0) {
+            alert('Your discharge Amount is higher than card balance!');
+        }
+        var def = $.Deferred();
+        if (checkconfirm()) {
+            $('#divLoader').show();
+            var gridDischarge = $("#jsGrid").jsGrid("option", "data");
+            var TotActAmnt = 0;
+            var TotCardBal;
+            if ($('#AvlCover').text() != 'NA') {
+                TotCardBal = parseInt($('#AvlCover').text()) + parseInt($('#TraBlkAmnt').text());
+            }
+            else {
+                TotCardBal = 0;
+            }
+            if (gridDischarge.length > 0) {
+                for (var i = 0; i < gridDischarge.length; i++) {
+                    TotActAmnt += parseInt(gridDischarge[i].ActAmnt);
+                    if (gridDischarge.length == 1) {
+                        if (gridDischarge[0].ISExtensionofstay == '1') {  // for check extension of stay date.........
+                            var NextReqDate;
+                            if (gridDischarge[0].dtmNextRequestdate == null || gridDischarge[0].dtmNextRequestdate == '') {
+                                NextReqDate = new Date($('#dischargeDate').val());
+                            }
+                            else {
+                                NextReqDate = new Date(gridDischarge[0].dtmNextRequestdate);
+                            }
+                            var DateDischarge = new Date($('#dischargeDate').val());
+                            if (DateDischarge >= NextReqDate) {
+                                if (cinformDischargedate(NextReqDate)) {
+                                    AddDischarge();
+                                    def.resolve();
+                                }
+                            }
+                            else {
+                                AddDischarge();
+                                def.resolve();
+                            }
+                        }
+                        if (gridDischarge[0].CappedAmount != 0) {  // for check capped amount........
+                            if (parseInt(TotActAmnt) > parseInt(gridDischarge[0].CappedAmount)) {
+                                alert('Your Capped Amount is: ' + gridDischarge[0].CappedAmount);
+                            }
+                        }
+                    }
+                }
+                if (parseInt(TotActAmnt) > parseInt(TotCardBal)) {
+                    if (BalCheckCinform()) {
+                        AddDischarge();
+                        def.resolve();
+                    }
+                }
+                else {
+                    if (gridDischarge[0].ISExtensionofstay != '1') {
+                        AddDischarge();
+                        def.resolve();
+                    }
+                }
+            }
+        }
+        return def.promise();
+    });
+    $('#TreComCertificate').on('change', function (e) {
+        if (!ValidateFile('TreComCertificate', 'Valid Document')) {
+            return false;
+        };
+        if (!CheckFileType('TreComCertificate', '1')) {
+            return false;
+        };
+    });
+    function AddDischarge() {
+        var d = $.Deferred();
+        var gridDischarge = $("#jsGrid").jsGrid("option", "data");
+        var MortalitySum = '';
+        if (gridDischarge.length > 0) {
+            var DischargeStatus = 'Discharge';
+            for (var i = 0; i < gridDischarge.length; i++) {
+                if (gridDischarge[i].ActDays == '--' || gridDischarge[i].ActDays == '--') {
+                    DischargeStatus = 'NotDischarge'
+                    alert('Cannot Discharge the patient Please Check The PreApproval Status !!');
+                    $('#divLoader').hide();
+                    window.location.href = "@Url.Action("ViewDischarge", "Discharge")";
+                    break;
+                }
+            }
+            if (DischargeStatus == 'Discharge') {
+                if ($("option:selected", $("#mortality")).text() == 'No') {
+                    MortalitySum = 'No';
+                }
+                else {
+                    MortalitySum = $('#mSummery').val();
+                }
+                var fileUpload = $("#TreComCertificate").get(0);
+                var files = fileUpload.files;
+                if (files.length > 0) {
+                    var DischargeParams = new FormData();
+                    DischargeParams.append("__RequestVerificationToken", gettoken());
+                    DischargeParams.append("file", files[0]);
+                    DischargeParams.append("ACTIONCODE", 'R');
+                    DischargeParams.append("BlockingInvoiceNo", gridDischarge[0].invoiceNo);
+                    DischargeParams.append("DischargeDesc", $('#description').val());
+                    DischargeParams.append("DischargeUserDate", $('#dischargeDate').val());
+                    DischargeParams.append("DATEOFDISCHARGE", $('#dischargeDate').val());
+                    DischargeParams.append("Mortality", $("option:selected", $("#mortality")).text());
+                    DischargeParams.append("MortalitySummary", MortalitySum.toString());
+                    DischargeParams.append("ProcedureCode", gridDischarge[0].procedureCode);
+                    DischargeParams.append("ProcedureName", gridDischarge[0].procedureName);
+                    DischargeParams.append("PackageCode", gridDischarge[0].packageCode);
+                    DischargeParams.append("PackageName", gridDischarge[0].packageName);
+                    DischargeParams.append("PackageCost", gridDischarge[0].amoutBlocked);
+                    DischargeParams.append("NoofDays", gridDischarge[0].noofDays);
+                    DischargeParams.append("AmoutBlocked", gridDischarge[0].ActAmnt);
+                    DischargeParams.append("NoofDaysActual", gridDischarge[0].ActDays.toString());
+                    DischargeParams.append("PackageMode", gridDischarge[0].packageMode);
+                    DischargeParams.append("IsMedSergical", gridDischarge[0].isMedSergical);
+                    DischargeParams.append("URN", gridDischarge[0].urn);
+
+                    DischargeParams.append("category", gridDischarge[0].category);
+                    DischargeParams.append("categoryCode", gridDischarge[0].categoryCode);
+
+                    $.ajax({
+                        url: '@Url.Action("AddDischarge", "Discharge")',
+                        type: "POST",
+                        data: DischargeParams,
+                        processData: false,
+                        contentType: false,
+                        success: function (data) {
+                            $('#divLoader').hide();
+                            if (data == "sucess") {
+                                alert('Patient Discharged Successfully !!');
+                                window.location.href = "@Url.Action("ViewDischarge", "Discharge")";
+                                d.resolve();
+
+                            }
+                        },
+                        error: function (error) {
+                            $('#divLoader').hide();
+                            console.log(error.statusText);
+                            d.resolve();
+                        }
+                    });
+                }
+            }
+        }
+        return d.promise();
+    }
+});
+</script>
+<!-- Dashboard Body content part starts -->
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12 pb-3">
+            <div class="card">
+                <div class="data-info">
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <h2>Hospital Details</h2>
+                            <div class="row">
+                                @*<div class="col-sm-3">
+                                        <p>State</p>
+                                        <h3 id="HdState"></h3>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <p>District</p>
+                                        <h3 id="HdDistrict"></h3>
+                                    </div>*@
+                                <div class="col-sm-5">
+                                    <p>Hospital Code</p>
+                                    <h3 id="HdCode"></h3>
+                                </div>
+                                <div class="col-sm-7">
+                                    <p>Name</p>
+                                    <h3 id="HdName"></h3>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <h2>Member Info</h2>
+                            <div class="row">
+                                <div class="col-sm-5">
+                                    <p>HIMCARE Number</p>
+                                    <h3 id="UrnNo"></h3>
+                                </div>
+                                <div class="col-sm-4">
+                                    <p>Head of Family</p>
+                                    <h3 id="HeadOfFamily"></h3>
+                                    <div id="familyID" hidden></div>
+                                </div>
+                                @*<div class="col-sm-3">
+                                        <p>State</p>
+                                        <h3 id="State"></h3>
+                                        <h3 id="StateCode" style="visibility:hidden"></h3>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <p>District</p>
+                                        <h3 id="District"></h3>
+                                        <h3 id="DistrictCode" style="visibility:hidden"></h3>
+                                    </div>*@
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <h2>Insurance Policy Details</h2>
+                            <div class="row pb-3">
+                                @*<div class="col-sm-3">
+                                        <p>Scheme Name</p>
+                                        <h3 id="SchName"></h3>
+                                        <div id="divSchCode" hidden></div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <p>Policy Number</p>
+                                        <h3 id="IPNumber"></h3>
+                                    </div>*@
+                                <div class="col-sm-3">
+                                    <p>Start Date</p>
+                                    <h3 id="StartDt"></h3>
+                                </div>
+                                <div class="col-sm-3">
+                                    <p>End Date</p>
+                                    <h3 id="EndDt"></h3>
+                                </div>
+                                <div class="col-sm-4">
+                                    <p>Transaction Blocked Amount</p>
+                                    <h3 id="TraBlkAmnt"></h3>
+                                </div>
+                                <div class="col-sm-2">
+                                    <p>Available Cover</p>
+                                    <h3 id="AvlCover"></h3>
+                                    <h3 id="SumDisAmnt" hidden></h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @* <hr>
+                        <div class="row">
+                            <div class="col">
+                                <h2>Insurance Policy Details</h2>
+                                <div class="row pb-3">
+                                    <div class="col-sm-3">
+                                        <p>Scheme Name</p>
+                                        <h3 id="SchName"></h3>
+                                        <div id="divSchCode" hidden></div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <p>Policy Number</p>
+                                        <h3 id="IPNumber"></h3>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <p>Start Date</p>
+                                        <h3 id="StartDt"></h3>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <p>End Date</p>
+                                        <h3 id="EndDt"></h3>
+                                    </div>
+
+                                </div>
+                            </div>*@
+                    @*<div class="col">
+                            <h2>&nbsp;</h2>
+                            <div class="row pb-3">
+
+                            </div>
+                        </div>
+
+                                </div>*@
+                </div>
+                <div class="card-body">
+                    <div class="custom-tab-content px-3">
+                        <div>
+                            <form>
+                                <div class="form-group row">
+                                    <label for="patientName" class="col-sm-2 col-form-label">Patient Name</label>
+                                    <div class="col-sm-2">
+                                        <p class="form-control"><strong id="PatientNm"></strong></p>
+                                    </div>
+                                    <label for="dischargeDate" class="col-sm-2 col-form-label">Discharge Date <b><span style="color:red">*</span></b></label>
+                                    <div class="col-sm-2">
+                                        <div class="input-group mb-3">
+                                            <input type="text" id="dischargeDate" class="form-control datepicker" placeholder="dd mmm yyyy" aria-label="Username" aria-describedby="basic-addon1" autofocus>
+                                            <div id="hfDiscDt" hidden></div>
+                                            <div class="input-group-prepend">
+                                                <label for="dischargeDate" class="input-group-text"><i class="icon-calendar"></i></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <label for="dischargeDate" class="col-sm-2 col-form-label">Treatment Completion Certificate <b><span style="color:red">*</span></b></label>
+                                    <div class="col-sm-2">
+                                        <input type="file" class="form-control" id="TreComCertificate" />
+                                        <span style="font-weight: bold; color: Green">Max file size is 200KB</span><br />
+                                        <span style="font-weight: bold; color: Green">Only pdf,jpg,jpeg document allowed</span>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="description" class="col-sm-2 col-form-label">Description <b><span style="color:red">*</span></b></label>
+                                    <div class="col-sm-2">
+                                        <textarea id="description" class="form-control" placeholder="Enter here" onkeypress="return inputLimiter(event,'NameCharactersAndNumbers')"></textarea>
+                                    </div>
+                                    <label for="mortality" class="col-sm-2 col-form-label">Mortality <b><span style="color:red">*</span></b></label>
+                                    <div class="col-sm-2">
+                                        <select name="" id="mortality" class="form-control">
+                                            <option value="0">--select--</option>
+                                            <option value="1">Yes</option>
+                                            <option value="2" selected>No</option>
+                                        </select>
+                                    </div>
+
+                                    <label for="mSummery" class="col-sm-2 col-form-label" id="lblMotSum" style="visibility:hidden">Mortality Summery <b><span style="color:red">*</span></b></label>
+                                    <div class="col-sm-2" id="MotSummery" style="visibility:hidden">
+                                        <textarea id="mSummery" class="form-control" placeholder="Enter here" onkeypress="return inputLimiter(event,'NameCharactersAndNumbers')"></textarea>
+                                    </div>
+
+                                </div>
+                                <div class="form-group row">
+                                    <label for="description" class="col-sm-2 col-form-label"></label>
+                                    <div class="col-sm-2">
+                                        <span id="Desc" class="max_char" style="color: Red; position: initial !important;">
+
+                                        </span>
+                                    </div>
+                                    <label for="mortality" class="col-sm-2 col-form-label"></label>
+                                    <div class="col-sm-2">
+
+                                    </div>
+                                    <label for="mSummery" class="col-sm-2 col-form-label"></label>
+                                    <div class="col-sm-2">
+                                        <span id="MSummery" class="max_char" style="color: Red; position: initial !important;visibility:hidden">
+
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="text-right py-3">
+                                    <input class="btn btn-outline-primary my-2 my-sm-0" type="button" id="btnViewPackage" value="View Package" />
+                                </div>
+                                <div>
+                                    <h5 style="color:darkorange" id="CurBlkHeader" class="noPrint">Current Active Package Details</h5>
+                                    <div class="table table-striped table-bordered" id="jsGrid">
+                                    </div>
+                                    <h5 style="color:darkorange" id="PrevBlkHeader" class="noPrint">Previous Blocked Package Details</h5>
+                                    <div class="table table-striped table-bordered" id="jsGridPrev">
+                                    </div>
+                                    <h5 style="color:darkorange" id="AddOnBlkHeader" class="noPrint">AddOn Blocked Package Details</h5>
+                                    <div class="table table-striped table-bordered" id="jsGridAddOn">
+                                    </div>
+                                </div>
+                                <div class="text-right py-3">
+                                    <input type="button" class="btn btn-outline-danger my-2 my-sm-0" value="Back" onclick="window.location.href = '@Url.Action("ViewDischarge", "Discharge")';" />
+                                    <input class="btn btn-outline-success my-2 my-sm-0" type="button" id="btnDischarge" value="Discharge" />
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="loader" id="divLoader">
+    <div class="center">
+        <img src="~/imgs/DataLoading.gif" alt="Loader..." />
+    </div>
+</div>
+<!-- Body content Ends here -->
+<script type="text/javascript">
+    $(function () {
+        //$('.datepicker').datepicker({
+        //    format: 'dd M yyyy',
+        //    endDate: 'today',
+        //    autoclose: true
+        //}); //code for datepicker
+        $('.secondary-menu li a').tooltip();
+    });
+</script>

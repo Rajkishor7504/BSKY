@@ -1,0 +1,494 @@
+﻿using HPSBYS.Data.Model;
+using HPSBYS.Data.Services;
+using HPSBYS.Web.Models;
+using NLog;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net.Http;
+using System.Web;
+using System.Web.Helpers;
+using System.Web.Mvc;
+
+namespace HPSBYS.Web.Controllers
+{
+    [SessionTimeOutFilter]
+    [Authorize]
+    public class BlockPackageController : Controller
+    {
+        ILogger log = LogManager.GetCurrentClassLogger();
+        string result = string.Empty;
+        // GET: BlockPackage
+        [NonAction]
+        private static string GetTimestamp(DateTime value)
+        {
+            return value.ToString("yyyyMMddHHmmssffff");
+        }
+        [HttpGet]
+        public ViewResult AddBlockPackage()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public JsonResult AddBlockPackage(FormCollection PaitentInfo)
+        {
+            string fname = string.Empty;
+            string ActFileName = string.Empty;
+            string fileExtention = string.Empty;
+            if (Request.Files.Count > 0)
+            {
+                try
+                {
+                    string PreAuthDoc = string.Empty;
+                    HttpFileCollectionBase files = Request.Files;
+                    for (int i = 0; i < files.Count; i++)
+                    {
+                        HttpPostedFileBase file = files[i];
+                        fname = file.FileName;
+                        fileExtention = System.IO.Path.GetExtension(file.FileName);
+                        int Year = DateTime.Now.Year;
+                        string Month = DateTime.Now.ToString("MMMM");
+                        string HopitalCode = Session["HospitalCode"].ToString();
+                        string dirUrl = "~/UploadDocument/" + HopitalCode + "/" + Year + "/" + Month + "/PreAuthDocument";
+                        string dirPath = Server.MapPath(dirUrl);
+                        if (!Directory.Exists(dirPath))
+                        {
+                            Directory.CreateDirectory(dirPath);
+                        }
+                        var newGuid = Guid.NewGuid();
+                        string subGuid = newGuid.ToString().Substring(0, 15);
+                        ActFileName = "PREAUTH_" + PaitentInfo["URN"] + "_" + GetTimestamp(DateTime.Now)+fileExtention;
+                        //ActFileName = subGuid + "_" + fname;
+                        PreAuthDoc = ActFileName;
+                        fname = Path.Combine(Server.MapPath(dirUrl), ActFileName);
+                        file.SaveAs(fname);
+
+                    }
+                }
+                catch (Exception ex)
+                {
+                    log.Error(ex);
+                }
+            }
+            if (PaitentInfo != null)
+            {
+                string VchFileName = string.Empty;
+                if (!string.IsNullOrEmpty(ActFileName))
+                {
+                    VchFileName = ActFileName;
+                }
+                else
+                {
+                    VchFileName = "";
+                }
+                PatientInfo patientInfo = new PatientInfo
+                {
+                    ACTIONCODE = PaitentInfo["ACTIONCODE"],
+                    BlockingInvoiceNo = PaitentInfo["BlockingInvoiceNo"],
+                    BlockingUserDate = PaitentInfo["BlockingUserDate"],
+                    DATEOFADMISSION = PaitentInfo["DATEOFADMISSION"],
+                    ProcedureCode = PaitentInfo["ProcedureCode"],
+                    ProcedureName = PaitentInfo["ProcedureName"],
+                    PackageCode = PaitentInfo["PackageCode"],
+                    PackageName = PaitentInfo["PackageName"],
+                    WardId = PaitentInfo["PackageWard"] == "null" || PaitentInfo["PackageWard"] == "undefined" ? 0 : Convert.ToInt32(PaitentInfo["PackageWard"]),
+                    PackageCost = PaitentInfo["PackageCost"],
+                    NoofDays = PaitentInfo["NoofDays"],
+                    AmoutBlocked = PaitentInfo["AmoutBlocked"],
+                    TransactionCode = PaitentInfo["TransactionCode"],
+                    PreAuthStatus = PaitentInfo["PreAuthStatus"],
+                    VchFile = VchFileName,
+                    CappedAmount = PaitentInfo["CappedAmount"],
+                    IsMedSergical = PaitentInfo["IsMedSergical"],
+                    Category = PaitentInfo["Category"],
+                    CategoryCode = PaitentInfo["CategoryCode"]
+                };
+               
+                using (PatientDataServices dataServices = new PatientDataServices())
+                {
+                    result = dataServices.addPatientBlockPackage(patientInfo);
+                }
+            }
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpGet]
+        public ViewResult ViewBlockPackage()
+        {
+            return View();
+        }
+        [HttpGet]
+        public ViewResult ViewBlockRoomTypeChange()
+        {
+            return View();
+        }
+        [HttpGet]
+        public ViewResult ViewPackageChange()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public ViewResult AddCancellation()
+        {
+            return View();
+        }
+        public ActionResult ViewMultipleBlockPackage()
+        {
+            return View();
+        }
+        [HttpGet]
+        public ViewResult ChangeRoomType()
+        {
+            return View();
+        }
+        [HttpGet]
+        public ViewResult PackageChange()
+        {
+            return View();
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public JsonResult AddPackageChange(FormCollection PaitentInfo)
+        {
+            string fname = string.Empty;
+            string ActFileName = string.Empty;
+            if (Request.Files.Count > 0)
+            {
+                try
+                {
+                    string PreAuthDoc = string.Empty;
+                    HttpFileCollectionBase files = Request.Files;
+                    for (int i = 0; i < files.Count; i++)
+                    {
+                        HttpPostedFileBase file = files[i];
+                        fname = file.FileName;
+                        int Year = DateTime.Now.Year;
+                        string Month = DateTime.Now.ToString("MMMM");
+                        string HopitalCode = Session["HospitalCode"].ToString();
+                        string dirUrl = "~/UploadDocument/" + HopitalCode + "/" + Year + "/" + Month + "/PreAuthDocument";
+                        string dirPath = Server.MapPath(dirUrl);
+                        if (!Directory.Exists(dirPath))
+                        {
+                            Directory.CreateDirectory(dirPath);
+                        }
+                        var newGuid = Guid.NewGuid();
+                        string subGuid = newGuid.ToString().Substring(0, 15);
+                        // ActFileName = subGuid + "_" + fname;
+                        ActFileName = "PACKAGECHANGE_" + PaitentInfo["URN"] + "_" + GetTimestamp(DateTime.Now);
+                        PreAuthDoc = ActFileName;
+                        fname = Path.Combine(Server.MapPath(dirUrl), ActFileName);
+                        file.SaveAs(fname);
+
+                    }
+                }
+                catch (Exception ex)
+                {
+                    log.Error(ex);
+                }
+            }
+            if (PaitentInfo != null)
+            {
+                string VchFileName = string.Empty;
+                if (!string.IsNullOrEmpty(ActFileName))
+                {
+                    VchFileName = ActFileName;
+                }
+                else
+                {
+                    VchFileName = "";
+                }
+                PatientInfo patientInfo = new PatientInfo
+                {
+                    ACTIONCODE = PaitentInfo["ACTIONCODE"],
+                    BlockingInvoiceNo = PaitentInfo["BlockingInvoiceNo"],
+                    BlockingUserDate = PaitentInfo["BlockingUserDate"],
+                    DATEOFADMISSION = PaitentInfo["DATEOFADMISSION"],
+                    ProcedureCode = PaitentInfo["ProcedureCode"],
+                    ProcedureName = PaitentInfo["ProcedureName"],
+                    PackageCode = PaitentInfo["PackageCode"],
+                    PackageName = PaitentInfo["PackageName"],
+                    WardId = PaitentInfo["PackageWard"] == "null" || PaitentInfo["PackageWard"] == "undefined" ? 0 : Convert.ToInt32(PaitentInfo["PackageWard"]),
+                    PackageCost = PaitentInfo["PackageCost"],
+                    NoofDays = PaitentInfo["NoofDays"],
+                    AmoutBlocked = PaitentInfo["AmoutBlocked"],
+                    TransactionCode = PaitentInfo["TransactionCode"],
+                    PreAuthStatus = PaitentInfo["PreAuthStatus"],
+                    VchFile = VchFileName,
+                    CappedAmount = PaitentInfo["CappedAmount"],
+                    IsMedSergical = PaitentInfo["IsMedSergical"],
+                    Category = PaitentInfo["Category"],
+                    CategoryCode = PaitentInfo["CategoryCode"]
+                };
+
+                using (PatientDataServices dataServices = new PatientDataServices())
+                {
+                    result = dataServices.addPatientBlockPackage_PackageChange(patientInfo);
+                }
+            }
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+        [HttpGet]
+        public ViewResult ViewPreviousWardDetails(int? TranId, string Date)
+        {
+            ViewBag.Id = TranId;
+            ViewBag.Dt = Date;
+            return View();
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public JsonResult AddChangeRoomType(FormCollection PaitentInfo)
+        {
+            string fname = string.Empty;
+            string ActFileName = string.Empty;
+            string fileExtention = string.Empty;
+            if (Request.Files.Count > 0)
+            {
+                try
+                {
+                    string PreAuthDoc = string.Empty;
+                    HttpFileCollectionBase files = Request.Files;
+                    for (int i = 0; i < files.Count; i++)
+                    {
+                        HttpPostedFileBase file = files[i];
+                        fname = file.FileName;
+                        fileExtention = System.IO.Path.GetExtension(file.FileName);
+                        int Year = DateTime.Now.Year;
+                        string Month = DateTime.Now.ToString("MMMM");
+                        string HopitalCode = Session["HospitalCode"].ToString();
+                        string dirUrl = "~/UploadDocument/" + HopitalCode + "/" + Year + "/" + Month + "/PreAuthDocument";
+                        string dirPath = Server.MapPath(dirUrl);
+                        if (!Directory.Exists(dirPath))
+                        {
+                            Directory.CreateDirectory(dirPath);
+                        }
+                        var newGuid = Guid.NewGuid();
+                        string subGuid = newGuid.ToString().Substring(0, 15);
+                        ActFileName = "RTC_" + PaitentInfo["URN"] + "_" + GetTimestamp(DateTime.Now)+fileExtention;            //RTC Room Type Change.
+                        //ActFileName = subGuid + "_" + fname;
+                        PreAuthDoc = ActFileName;
+                        fname = Path.Combine(Server.MapPath(dirUrl), ActFileName);
+                        file.SaveAs(fname);
+
+                    }
+                }
+                catch (Exception ex)
+                {
+                    log.Error(ex);
+                }
+            }
+            if (PaitentInfo != null)
+            {
+                string VchFileName = string.Empty;
+                if (!string.IsNullOrEmpty(ActFileName))
+                {
+                    VchFileName = ActFileName;
+                }
+                else
+                {
+                    VchFileName = "";
+                }
+                PatientInfo patientInfo = new PatientInfo
+                {
+                    ACTIONCODE = PaitentInfo["ACTIONCODE"],
+                    BlockingInvoiceNo = PaitentInfo["BlockingInvoiceNo"],
+                    BlockingUserDate = PaitentInfo["BlockingUserDate"],
+                    TransactionID= PaitentInfo["TranId"],
+                    PackageCode = PaitentInfo["PackageCode"],
+                    WardId= Convert.ToInt32(PaitentInfo["WardId"]),
+                    PreAuthStatus = PaitentInfo["PreAuthStatus"],
+                    AmoutBlocked = PaitentInfo["AmoutBlocked"],
+                    VchFile = VchFileName,
+                    HospitalCode= Session["HospitalCode"].ToString()
+                };
+
+                using (PatientDataServices dataServices = new PatientDataServices())
+                {
+                    result = dataServices.addRoomTypeDetails(patientInfo);
+                }
+            }
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+        [HttpGet]
+        public ViewResult AddPackageMedicalToSurgical()
+        {
+            return View();
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public JsonResult AddMedicalToSurgicalPackage(FormCollection PaitentInfo)
+        {
+            string fname = string.Empty;
+            string ActFileName = string.Empty;
+            string fileExtention = string.Empty;
+            if (Request.Files.Count > 0)
+            {
+                try
+                {
+                    string PreAuthDoc = string.Empty;
+                    HttpFileCollectionBase files = Request.Files;
+                    for (int i = 0; i < files.Count; i++)
+                    {
+                        HttpPostedFileBase file = files[i];
+                        fname = file.FileName;
+                        fileExtention = System.IO.Path.GetExtension(file.FileName);
+                        int Year = DateTime.Now.Year;
+                        string Month = DateTime.Now.ToString("MMMM");
+                        string HopitalCode = Session["HospitalCode"].ToString();
+                        string dirUrl = "~/UploadDocument/" + HopitalCode + "/" + Year + "/" + Month + "/PreAuthDocument";
+                        string dirPath = Server.MapPath(dirUrl);
+                        if (!Directory.Exists(dirPath))
+                        {
+                            Directory.CreateDirectory(dirPath);
+                        }
+                        var newGuid = Guid.NewGuid();
+                        string subGuid = newGuid.ToString().Substring(0, 15);
+                        //ActFileName = subGuid + "_" + fname;
+                        ActFileName = "PC_" + PaitentInfo["URN"] + "_" + GetTimestamp(DateTime.Now)+fileExtention;
+                        PreAuthDoc = ActFileName;
+                        fname = Path.Combine(Server.MapPath(dirUrl), ActFileName);
+                        file.SaveAs(fname);
+
+                    }
+                }
+                catch (Exception ex)
+                {
+                    log.Error(ex);
+                }
+            }
+            if (PaitentInfo != null)
+            {
+                string VchFileName = string.Empty;
+                if (!string.IsNullOrEmpty(ActFileName))
+                {
+                    VchFileName = ActFileName;
+                }
+                else
+                {
+                    VchFileName = "";
+                }
+                PatientInfo patientInfo = new PatientInfo
+                {
+                    ACTIONCODE = PaitentInfo["ACTIONCODE"],
+                    BlockingInvoiceNo = PaitentInfo["BlockingInvoiceNo"],
+                    BlockingUserDate = PaitentInfo["BlockingUserDate"],
+                    DATEOFADMISSION = PaitentInfo["DATEOFADMISSION"],
+                    ProcedureCode = PaitentInfo["ProcedureCode"],
+                    ProcedureName = PaitentInfo["ProcedureName"],
+                    PackageCode = PaitentInfo["PackageCode"],
+                    PackageName = PaitentInfo["PackageName"],
+                    WardId = PaitentInfo["PackageWard"] == "null" || PaitentInfo["PackageWard"] == "undefined" ? 0 : Convert.ToInt32(PaitentInfo["PackageWard"]),
+                    PackageCost = PaitentInfo["PackageCost"],
+                    NoofDays = PaitentInfo["NoofDays"],
+                    AmoutBlocked = PaitentInfo["AmoutBlocked"],
+                    TransactionCode = PaitentInfo["TransactionCode"],
+                    PreAuthStatus = PaitentInfo["PreAuthStatus"],
+                    VchFile = VchFileName,
+                    CappedAmount = PaitentInfo["CappedAmount"],
+                    IsMedSergical = PaitentInfo["IsMedSergical"],
+                    Category = PaitentInfo["Category"],
+                    CategoryCode = PaitentInfo["CategoryCode"]
+                };
+
+                using (PatientDataServices dataServices = new PatientDataServices())
+                {
+                    result = dataServices.addPatientBlockPackage_PackageChange(patientInfo);
+                }
+            }
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+        [HttpGet]
+        public ViewResult AddPackageMedicalToMedical()
+        {
+            return View();
+        }
+        [HttpGet]
+        public ViewResult AddOnPackage(string Id)
+        {
+            ViewBag.TrId = Id;
+            return View();
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public JsonResult AddOnPackageType(FormCollection PaitentInfo)
+        {
+            string fname = string.Empty;
+            string fileExtention = string.Empty;
+            string ActFileName = string.Empty;
+            if (Request.Files.Count > 0)
+            {
+                try
+                {
+                    string PreAuthDoc = string.Empty;
+                    HttpFileCollectionBase files = Request.Files;
+                    for (int i = 0; i < files.Count; i++)
+                    {
+                        HttpPostedFileBase file = files[i];
+                        fname = file.FileName;
+                        fileExtention = System.IO.Path.GetExtension(file.FileName);
+                        int Year = DateTime.Now.Year;
+                        string Month = DateTime.Now.ToString("MMMM");
+                        string HopitalCode = Session["HospitalCode"].ToString();
+                        string dirUrl = "~/UploadDocument/" + HopitalCode + "/" + Year + "/" + Month + "/PreAuthDocument";
+                        string dirPath = Server.MapPath(dirUrl);
+                        if (!Directory.Exists(dirPath))
+                        {
+                            Directory.CreateDirectory(dirPath);
+                        }
+                        var newGuid = Guid.NewGuid();
+                        string subGuid = newGuid.ToString().Substring(0, 15);
+                        ActFileName = "ADDON_"+ PaitentInfo["URN"] + "_" + GetTimestamp(DateTime.Now)+ fileExtention;
+                        PreAuthDoc = ActFileName;
+                        fname = Path.Combine(Server.MapPath(dirUrl), ActFileName);
+                        file.SaveAs(fname);
+
+                    }
+                }
+                catch (Exception ex)
+                {
+                    log.Error(ex);
+                }
+            }
+            if (PaitentInfo != null)
+            {
+                string VchFileName = string.Empty;
+                if (!string.IsNullOrEmpty(ActFileName))
+                {
+                    VchFileName = ActFileName;
+                }
+                else
+                {
+                    VchFileName = "";
+                }
+                PatientInfo patientInfo = new PatientInfo
+                {
+                    ACTIONCODE = PaitentInfo["ACTIONCODE"],
+                    TransactionID = PaitentInfo["TranId"],
+                    ProcedureCode= PaitentInfo["ProcedureCode"],
+                    CategoryCode= PaitentInfo["CategoryCode"],
+                    PackageCode = PaitentInfo["PackageCode"],
+                    PreAuthStatus = PaitentInfo["PreAuthStatus"],
+                    AmoutBlocked = PaitentInfo["AmoutBlocked"],
+                    BlockingUserDate = PaitentInfo["BlockingUserDate"],
+                    IsMedSergical= PaitentInfo["IsMedSergical"],
+                    VchFile = VchFileName,
+                };
+
+                using (PatientDataServices dataServices = new PatientDataServices())
+                {
+                    result = dataServices.addAddOnPackageDetails(patientInfo);
+                }
+            }
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+        [HttpGet]
+        public ViewResult ViewAddOnPackageDetails(string InvNo)
+        {
+            ViewBag.InvNo = InvNo;
+            return View();
+        }
+    }
+}

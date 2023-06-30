@@ -1,0 +1,559 @@
+﻿using Dapper;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Threading.Tasks;
+using HPSBYS.Data.Model;
+using NLog;
+
+
+namespace HPSBYS.Data.Services
+{
+    public class PatientDataServices : BaseDataService
+    {
+        string b = string.Empty;
+        string blockPkgStatus = string.Empty;
+        string UnblockPkgStatus = string.Empty;
+        string DischargeStatus = string.Empty;
+        string CancelStatus = string.Empty;
+        string NoticeStatus = string.Empty;
+        ILogger log = LogManager.GetCurrentClassLogger();
+        public string ManagePatientRegistration(PatientInfo obj)
+        {
+            object[] objArray = new object[] {
+            "@P_ACTIONCODE", obj.ACTIONCODE
+            ,"@SchemeCode", obj.SchemeCode
+            ,"@MemberStatecode", obj.MemberStatecode
+            ,"@DistrictCode", obj.DistrictCode
+            ,"@MemberDistrictName", obj.MemberDistrictName
+            ,"@BlockCode", obj.BlockCode
+            ,"@PanchayatCode", obj.PanchayatCode
+            ,"@VillageCode", obj.VillageCode
+            ,"@URN", obj.URN
+             ,"@FamilyID", obj.FamilyID
+            ,"@PolicyStartDate", obj.PolicyStartDate
+            ,"@PolicyEndDate", obj.PolicyEndDate
+            //,"CardType", obj.CardType
+            ,"@MemberID", obj.MemberID
+            ,"@PatientName", obj.PatientName
+            ,"@PatientContactNumber", obj.PatientContactNumber
+            ,"@Gender", obj.Gender
+            ,"@PatientCardGender", obj.PatientCardGender
+            ,"@Age", obj.Age
+            ,"@PatientCardAge", obj.PatientCardAge
+            ,"@HeadMemberID", obj.HeadMemberID
+            ,"@HeadMemberName", obj.HeadMemberName
+            ,"@VerifiedMemberID", obj.VerifiedMemberID
+            ,"@VerifiedMemberName", obj.VerifiedMemberName
+            ,"@InsuranceCompanyCode", obj.InsuranceCompanyCode
+            ,"@InsurancePolicyNumber", obj.InsurancePolicyNumber
+            ,"@HospitalCode", obj.HospitalCode
+            ,"@HospitalName", obj.HospitalName
+            ,"@HospitalState", obj.HospitalState
+            ,"@HospitalDistrict", obj.HospitalDistrict
+            ,"@HospitalAuthorityCode", obj.HospitalAuthorityCode
+            ,"@RegistrationNo", obj.RegistrationNo
+            ,"@RegistrationUserDate", obj.RegistrationUserDate
+            //,"TransactionDate", obj.TransactionDate
+            //,"BlockingInvoiceNo", obj.BlockingInvoiceNo
+            //----------------------------------------------------Used in block package
+            //,"BlockingUserDate", obj.BlockingUserDate
+            //,"DATEOFADMISSION", obj.DATEOFADMISSION
+            //___________________________________________________________________
+            //,"UnblockingInvoiceNo", obj.UnblockingInvoiceNo
+            //,"UnblockingDesc", obj.UnblockingDesc
+
+            //,"UnblockingSystemDate", obj.UnblockingSystemDate
+            //,"DischargeInvoiceNo", obj.DischargeInvoiceNo
+            //,"DischargeDesc", obj.DischargeDesc
+            //,"DischargeUserDate", obj.DischargeUserDate
+            //,"DATEOFDISCHARGE", obj.DATEOFDISCHARGE
+            //,"Mortality", obj.Mortality
+            //,"MortalitySummary", obj.MortalitySummary
+            //----------------------------------------------------Used in block package
+            //,"ProcedureCode", obj.ProcedureCode
+            //,"ProcedureName", obj.ProcedureName
+            //,"PackageCode", obj.PackageCode
+            //,"PackageName", obj.PackageName
+            //,"PackageCost", obj.PackageCost
+            //,"NoofDays", obj.NoofDays
+            //,"AmoutBlocked", obj.AmoutBlocked
+            //-------------------------------------------------------
+
+            //,"NoofDaysActual", obj.NoofDaysActual
+            //,"TotalAmountClaimed", obj.TotalAmountClaimed
+            //,"AvailableBalance", obj.AvailableBalance
+            ,"@TransactionCode", obj.TransactionCode
+            //,"TotalAmtBlockedOnCard", obj.TotalAmtBlockedOnCard
+            //,"InsufficientBalanceAmount", obj.InsufficientBalanceAmount
+            //,"OriginalPackageCost", obj.OriginalPackageCost
+            //,"intClaimStatus", obj.intClaimStatus
+            //,"claimid", obj.claimid
+            ,"@patientSlip", obj.patientSlip
+            ,"@AuthenticationMode", obj.AuthenticationMode
+            ,"@VerifiedDocumentType", obj.VerifiedDocumentType
+            ,"@VerifiedDocumentName", obj.VerifiedDocumentName
+            ,"@PatientPhoto", obj.PatientPhoto
+            };
+            try
+            {
+                DynamicParameters param = objArray.ToDynamicParameters("@P_OUTERRMSG");
+                var result = SqlConnecton.Execute("USP_Transaction_AED", param, commandType: CommandType.StoredProcedure);
+                b = param.Get<string>("P_OUTERRMSG");
+
+            }
+            catch (Exception ex)
+            {
+                // throw new Exception(ex.Message);
+                log.Error(ex);
+            }
+            return b;
+        }
+        public string addPatientBlockPackage(PatientInfo obj)
+        {
+
+            object[] objArray = new object[] {
+            "@P_ACTIONCODE", obj.ACTIONCODE
+            ,"@BlockingInvoiceNo", obj.BlockingInvoiceNo
+            ,"@BlockingUserDate", obj.BlockingUserDate
+            ,"@DATEOFADMISSION", obj.BlockingUserDate
+            ,"@ProcedureCode", obj.ProcedureCode
+            ,"@ProcedureName", obj.ProcedureName
+            ,"@PackageCode", obj.PackageCode
+            ,"@PackageName", obj.PackageName
+            ,"@WardId", obj.WardId
+            ,"@PackageCost", obj.PackageCost
+            ,"@NoofDays", obj.NoofDays
+            ,"@AmoutBlocked", obj.AmoutBlocked
+            ,"@TransactionCode", obj.TransactionCode
+            ,"@PreAuthStatus", obj.PreAuthStatus
+            ,"@VchFile",(obj.VchFile==""?"NA":obj.VchFile)
+            ,"@CappedAmount", obj.CappedAmount
+            ,"@IsMedSergical", obj.IsMedSergical
+            ,"@Category", obj.Category
+            ,"@CategoryCode", obj.CategoryCode
+            };
+            try
+            {
+                DynamicParameters param = objArray.ToDynamicParameters("@P_OUTERRMSG");
+                var result = SqlConnecton.Execute("USP_Transaction_AED_Block", param, commandType: CommandType.StoredProcedure);
+                blockPkgStatus = param.Get<string>("P_OUTERRMSG");
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex);
+            }
+            return blockPkgStatus;
+        }
+        public string addPatientBlockPackage_PackageChange(PatientInfo obj)
+        {
+
+            object[] objArray = new object[] {
+            "@P_ACTIONCODE", obj.ACTIONCODE
+            ,"@BlockingInvoiceNo", obj.BlockingInvoiceNo
+            ,"@BlockingUserDate", obj.BlockingUserDate
+            ,"@DATEOFADMISSION", obj.BlockingUserDate
+            ,"@ProcedureCode", obj.ProcedureCode
+            ,"@ProcedureName", obj.ProcedureName
+            ,"@PackageCode", obj.PackageCode
+            ,"@PackageName", obj.PackageName
+            ,"@WardId", obj.WardId
+            ,"@PackageCost", obj.PackageCost
+            ,"@NoofDays", obj.NoofDays
+            ,"@AmoutBlocked", obj.AmoutBlocked
+            ,"@TransactionCode", obj.TransactionCode
+            ,"@PreAuthStatus", obj.PreAuthStatus
+            ,"@VchFile",(obj.VchFile==""?"NA":obj.VchFile)
+            ,"@CappedAmount", obj.CappedAmount
+            ,"@IsMedSergical", obj.IsMedSergical
+            ,"@Category", obj.Category
+            ,"@CategoryCode", obj.CategoryCode
+            };
+            try
+            {
+                DynamicParameters param = objArray.ToDynamicParameters("@P_OUTERRMSG");
+                var result = SqlConnecton.Execute("USP_Transaction_AED_PackageChangeBlock", param, commandType: CommandType.StoredProcedure);
+                blockPkgStatus = param.Get<string>("P_OUTERRMSG");
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex);
+            }
+            return blockPkgStatus;
+        }
+        public string addRoomTypeDetails(PatientInfo obj)
+        {
+
+            object[] objArray = new object[] {
+            "@P_ACTIONCODE", obj.ACTIONCODE
+            ,"@TransactionId", obj.TransactionID
+            ,"@PackageCode", obj.PackageCode
+            ,"@WardId", obj.WardId
+            ,"@PreAuthStatus", obj.PreAuthStatus
+            ,"@PreAuthDoc",(obj.VchFile==""?"NA":obj.VchFile)
+            ,"@Amount", obj.AmoutBlocked
+            ,"@BlockingInvoiceNo", obj.BlockingInvoiceNo           
+            ,"@WardBlockingDate", obj.BlockingUserDate
+            ,"@HospitalCode", obj.HospitalCode
+            };
+            try
+            {
+                DynamicParameters param = objArray.ToDynamicParameters("@P_OUTERRMSG");
+                var result = SqlConnecton.Execute("USP_Transaction_AED_WardChange", param, commandType: CommandType.StoredProcedure);
+                blockPkgStatus = param.Get<string>("P_OUTERRMSG");
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex);
+            }
+            return blockPkgStatus;
+        }
+        public string addAddOnPackageDetails(PatientInfo obj)
+        {
+
+            object[] objArray = new object[] {
+             "@P_ACTIONCODE", obj.ACTIONCODE
+            ,"@TransactionId", obj.TransactionID
+            ,"@ProcedureCode",obj.ProcedureCode
+            ,"@CategoryCode",obj.CategoryCode
+            ,"@PackageCode", obj.PackageCode
+            ,"@PreAuthStatus", obj.PreAuthStatus
+            ,"@PreAuthDoc",(obj.VchFile==""?"NA":obj.VchFile)
+            ,"@BlockingAmount", obj.AmoutBlocked
+            ,"@AddOnBlockingDate", obj.BlockingUserDate
+            ,"@IsMedSergical",obj.IsMedSergical
+            };
+            try
+            {
+                DynamicParameters param = objArray.ToDynamicParameters("@P_OUTERRMSG");
+                var result = SqlConnecton.Execute("USP_Transaction_AED_AddOn", param, commandType: CommandType.StoredProcedure);
+                blockPkgStatus = param.Get<string>("P_OUTERRMSG");
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex);
+            }
+            return blockPkgStatus;
+        }
+        public string addPatientUnblockPackage(PatientInfo obj)
+        {
+            object[] objArray = new object[] {
+            "@P_ACTIONCODE", obj.ACTIONCODE
+            ,"@SchemeCode", obj.SchemeCode
+            ,"@DistrictCode", obj.DistrictCode
+            ,"@MemberDistrictName", obj.MemberDistrictName
+            ,"@URN", obj.URN
+            ,"@PolicyStartDate", obj.PolicyStartDate
+            ,"@PolicyEndDate", obj.PolicyEndDate
+            ,"@PatientName", obj.PatientName
+            ,"@HeadMemberID", obj.HeadMemberID
+            ,"@HeadMemberName", obj.HeadMemberName
+            ,"@HospitalCode", obj.HospitalCode
+            ,"@HospitalName", obj.HospitalName
+            ,"@HospitalState", obj.HospitalState
+            ,"@HospitalDistrict", obj.HospitalDistrict
+            ,"@ProcedureCode", obj.ProcedureCode
+            ,"@ProcedureName", obj.ProcedureName
+            ,"@PackageCode", obj.PackageCode
+            ,"@PackageName", obj.PackageName
+            ,"@UnblockingDesc", obj.UnblockingDesc
+            ,"@TransactionCode", obj.TransactionCode
+            ,"@TransactionID",obj.TransactionID
+            ,"@BlockingInvoiceNo",obj.BlockingInvoiceNo
+            ,"@Category",obj.Category
+            ,"@CategoryCode",obj.CategoryCode
+            };
+            try
+            {
+                DynamicParameters param = objArray.ToDynamicParameters("@P_OUTERRMSG");
+                var result = SqlConnecton.Execute("USP_Transaction_AED_Unblock", param, commandType: CommandType.StoredProcedure);
+                UnblockPkgStatus = param.Get<string>("P_OUTERRMSG");
+
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex);
+            }
+            return UnblockPkgStatus;
+        }
+        public string addPatientDischarge(PatientInfo obj)
+        {
+            object[] objArray = new object[] {
+            "@P_ACTIONCODE", obj.ACTIONCODE
+            ,"@BlockingInvoiceNo", obj.BlockingInvoiceNo
+            ,"@DischargeDesc", obj.DischargeDesc
+            ,"@DischargeUserDate", obj.DischargeUserDate
+            ,"@DATEOFDISCHARGE", obj.DATEOFDISCHARGE
+            ,"@Mortality", obj.Mortality
+            ,"@MortalitySummary", obj.MortalitySummary
+            ,"@ProcedureCode", obj.ProcedureCode
+            ,"@ProcedureName", obj.ProcedureName
+            ,"@PackageCode", obj.PackageCode
+            ,"@PackageName", obj.PackageName
+            ,"@PackageCost", obj.PackageCost
+            ,"@NoofDays", obj.NoofDays
+            ,"@AmoutBlocked", obj.AmoutBlocked
+            ,"@NoofDaysActual", obj.NoofDaysActual
+            ,"@packagemode", obj.PackageMode
+            ,"@IsMedSergical", obj.IsMedSergical
+            ,"@URN", obj.URN
+            ,"@TreatmentCompletionCer",obj.TreatmentCompletionCer
+            ,"@Category", obj.Category
+            ,"@CategoryCode",obj.CategoryCode
+            };
+            try
+            {
+                DynamicParameters param = objArray.ToDynamicParameters("@P_OUTERRMSG");
+                var result = SqlConnecton.Execute("USP_Transaction_AED_Discharge", param, commandType: CommandType.StoredProcedure);
+                DischargeStatus = param.Get<string>("P_OUTERRMSG");
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex);
+            }
+            return DischargeStatus;
+        }
+        public string AddPreAuthRequest(PreAuth obj)
+        {
+            object[] objArray = new object[] {
+                   "@P_ACTIONCODE", obj.Action
+                  ,"@VCHURNNO", obj.VCHURNNO
+                  ,"@intMemberId", obj.intMemberId
+                  ,"@vchMemberName", obj.vchMemberName
+                  ,"@vchPackageCategory", obj.vchPackageCategory
+                  ,"@VchPackageDetail", obj.VchPackageDetail
+                  //,"@dtmDate", obj.dtmDate
+                  ,"@VchFile", obj.VchFile
+                  //,"@VchRemarks", obj.VchRemarks
+                  //,"@INT_SH_ID", obj.INT_SH_ID
+                  //,"@INT_PHASE_ID", obj.INT_PHASE_ID
+                  ,"@DEC_AMOUNT", obj.DEC_AMOUNT
+                  //,"@INT_SCHEME_ID", obj.INT_SCHEME_ID
+                  //,"@vchActionRemarks", obj.vchActionRemarks
+                  //,"@intAprovedBy", obj.intAprovedBy
+                  //,"@dtmAction", obj.dtmAction
+                  //,"@INT_CREATED_BY", obj.INT_CREATED_BY
+                  //,"@DTM_CREATED_ON", obj.DTM_CREATED_ON       
+                  ,"@BlockingInvoiceNo", obj.BlockingInvoiceNo
+                  };
+            try
+            {
+                DynamicParameters param = objArray.ToDynamicParameters("@P_OUTERRMSG");
+                var result = SqlConnecton.Execute("USP_T_PreAuth_ADD", param, commandType: CommandType.StoredProcedure);
+                DischargeStatus = param.Get<string>("P_OUTERRMSG");
+
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex);
+            }
+            return DischargeStatus;
+        }
+        public string PreAuthPackageBlock(PreAuthApprovedPackageBlock obj)
+        {
+            object[] objArray = new object[] {
+                   "@P_ACTIONCODE", obj.ACTION
+                  ,"@VCHURNNO", obj.URN
+                  ,"@BlockingInvoiceNo", obj.BlockingInvoiceNo
+                  ,"@TransactionID", obj.TransactionID
+                  ,"@VchFile",obj.VchFileName==""||obj.VchFileName==null?"NA":obj.VchFileName
+                  ,"@BlockinguserDate", obj.BlockinguserDate==""||obj.BlockinguserDate==null?"NA":obj.BlockinguserDate
+                  ,"@HospitalAuthorityCode",obj.HospitalAuthorityCode==""||obj.HospitalAuthorityCode==null?"NA":obj.HospitalAuthorityCode
+                  ,"@hospitalcode",obj.HospitalCode==""||obj.HospitalCode==null?"NA":obj.HospitalCode
+                  };
+            try
+            {
+                DynamicParameters param = objArray.ToDynamicParameters("@P_OUTERRMSG");
+                var result = SqlConnecton.Execute("USP_T_PreAuth_ADD", param, commandType: CommandType.StoredProcedure);
+                DischargeStatus = param.Get<string>("P_OUTERRMSG");
+            }
+
+            catch (Exception ex)
+            {
+                log.Error(ex);
+            }
+            return DischargeStatus;
+        }
+        public string PreWardAuthPackageBlock(PreAuthApprovedPackageBlock obj)
+        {
+            object[] objArray = new object[] {
+                   "@P_ACTIONCODE", obj.ACTION                                  
+                  ,"@TransactionID", obj.TransactionID                 
+                  ,"@WardBlockingDate",obj.BlockinguserDate               
+                  ,"@WardLogId",obj.WardLogId
+                  ,"@Amount",obj.Amount
+                  ,"@PreAuthDoc",obj.VchFileName
+                  };
+            try
+            {
+                DynamicParameters param = objArray.ToDynamicParameters("@P_OUTERRMSG");
+                var result = SqlConnecton.Execute("USP_Transaction_AED_WardChange", param, commandType: CommandType.StoredProcedure);
+                DischargeStatus = param.Get<string>("P_OUTERRMSG");
+            }
+
+            catch (Exception ex)
+            {
+                log.Error(ex);
+            }
+            return DischargeStatus;
+        }
+        public string AddOnPreAuthPackageBlock(PreAuthApprovedPackageBlock obj)
+        {
+            object[] objArray = new object[] {
+                   "@P_ACTIONCODE", obj.ACTION
+                  ,"@TransactionID", obj.TransactionID
+                  ,"@AddOnBlockingDate",obj.BlockinguserDate
+                  ,"@AddOnLogId",obj.WardLogId
+                  ,"@BlockingAmount",obj.Amount
+                  ,"@PreAuthDoc",obj.VchFileName
+                  };
+            try
+            {
+                DynamicParameters param = objArray.ToDynamicParameters("@P_OUTERRMSG");
+                var result = SqlConnecton.Execute("USP_Transaction_AED_AddOn", param, commandType: CommandType.StoredProcedure);
+                DischargeStatus = param.Get<string>("P_OUTERRMSG");
+            }
+
+            catch (Exception ex)
+            {
+                log.Error(ex);
+            }
+            return DischargeStatus;
+        }
+        //Insert Extension Of Stay Details
+        public string AddExtensionOfStayRequest(PackageExtension obj)
+        {
+            object[] objArray = new object[] {
+                   "@P_VCHURNNO", obj.URN
+                  ,"@P_HospitalCode", obj.HospitalCode
+                  ,"@P_TransactionID", obj.TransactionId
+                  ,"@P_NoofextendDays", obj.NoofextendDays
+                  ,"@P_vchPrescription", obj.VchFile
+                  ,"@P_BlockingInvoiceNo", obj.BlockingInvoiceNo
+                  };
+            try
+            {
+                DynamicParameters param = objArray.ToDynamicParameters("@P_MSGOUT");
+                var result = SqlConnecton.Execute("USP_ADD_PACKAGEEXTENSIONINFO", param, commandType: CommandType.StoredProcedure);
+                DischargeStatus = param.Get<string>("P_MSGOUT");
+
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex);
+            }
+            return DischargeStatus;
+        }
+        public string addCancelPackage(CancelPackage obj)
+        {
+            object[] objArray = new object[] {
+                   "@P_ACTIONCODE",obj.Action
+                  ,"@BlockingInvoiceNo",obj.BlockingINVOICENO
+                  ,"@TransactionID",obj.TransactionID
+                  ,"@CancelReason",obj.CancelReason==null?"":obj.CancelReason
+                  ,"@CancelDate",obj.CancelDate==null?"":obj.CancelDate
+                  };
+            try
+            {
+                DynamicParameters param = objArray.ToDynamicParameters("@P_OUTERRMSG");
+                var result = SqlConnecton.Execute("USP_Transaction_Cancel", param, commandType: CommandType.StoredProcedure);
+                CancelStatus = param.Get<string>("P_OUTERRMSG");
+
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex);
+            }
+            return CancelStatus;
+        }
+        public string addWardCancelPackage(CancelPackage obj)
+        {
+            object[] objArray = new object[] {
+                   "@P_ACTIONCODE",obj.Action
+                  ,"@CancelReason",obj.CancelReason
+                  ,"@CancelDate",obj.CancelDate
+                  ,"@WardLogId",obj.WardLogId                 
+                  };
+            try
+            {
+                DynamicParameters param = objArray.ToDynamicParameters("@P_OUTERRMSG");
+                var result = SqlConnecton.Execute("USP_Transaction_AED_WardChange", param, commandType: CommandType.StoredProcedure);
+                CancelStatus = param.Get<string>("P_OUTERRMSG");
+
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex);
+            }
+            return CancelStatus;
+        }
+        public string addAddOnCancelPackage(CancelPackage obj)
+        {
+            object[] objArray = new object[] {
+                   "@P_ACTIONCODE",obj.Action
+                  ,"@CancelReason",obj.CancelReason
+                  ,"@CancelDate",obj.CancelDate
+                  ,"@AddOnLogId",obj.WardLogId
+                  };
+            try
+            {
+                DynamicParameters param = objArray.ToDynamicParameters("@P_OUTERRMSG");
+                var result = SqlConnecton.Execute("USP_Transaction_AED_AddOn", param, commandType: CommandType.StoredProcedure);
+                CancelStatus = param.Get<string>("P_OUTERRMSG");
+
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex);
+            }
+            return CancelStatus;
+        }
+        public string addNotice(Notice obj)
+        {
+            object[] objNotice = new object[] {
+                 "@P_ACTIONCODE","A"
+                ,"@StartDate",obj.StartDate
+                ,"@EndDate",obj.EndDate
+                ,"@Notice",obj.Notices
+                ,"@NoticeDocument",obj.NoticeDocument
+            };
+            try
+            {
+                DynamicParameters param = objNotice.ToDynamicParameters("@P_OUTERRMSG");
+                var result = SqlConnecton.Execute("USP_AddNotice", param, commandType: CommandType.StoredProcedure);
+                NoticeStatus = param.Get<string>("P_OUTERRMSG");
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex);
+            }
+            return NoticeStatus;
+        }
+        public string addDownwardReferal(DownwardReferalInfo obj)
+        {
+            object[] objDownwardReferal = new object[] {
+                 "@P_ActionCode",obj.Action
+                ,"@P_URN",obj.URN
+                ,"@P_BlockingInvoiceNo",obj.BlockingInvoiceNo
+                ,"@P_IsReferalRequired",obj.IsReferalRequired
+                ,"@P_DistrictCode",obj.DistrictCode
+                ,"@P_BlockCode",obj.BlockCode
+                ,"@P_PHCCode",obj.PHCCode
+                ,"@P_SubCenterCode",obj.SubCenterCode
+            };
+            try
+            {
+                DynamicParameters param = objDownwardReferal.ToDynamicParameters("@P_OutPutMsg");
+                var result = SqlConnecton.Execute("USP_AddDownwardReferal", param, commandType: CommandType.StoredProcedure);
+                NoticeStatus = param.Get<string>("P_OutPutMsg");
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex);
+            }
+            return NoticeStatus;
+        }
+        
+    }
+}
+

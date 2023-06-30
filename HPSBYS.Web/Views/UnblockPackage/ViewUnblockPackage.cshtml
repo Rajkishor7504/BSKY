@@ -1,0 +1,320 @@
+﻿
+@{
+    ViewBag.Title = "ViewUnblockPackage";
+    Layout = "~/Views/Shared/_CommonLayout.cshtml";
+}
+<style type="text/css">
+    tr.highlight td.jsgrid-cell {
+        background-color: lightgoldenrodyellow;
+    }
+
+    .jsgrid-grid-header,
+    .jsgrid-grid-body {
+        overflow: auto;
+    }
+</style>
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 pb-3">
+            <div class="card">
+                <div class="card-body">
+                    <div class="form-box-bg mb-4">
+                        <ul class="nav nav-tabs custom-tab mb-4">
+                            <li class="nav-item">
+                                <a class="nav-link active" href="@Url.Action("ViewUnblockPackage","UnblockPackage")">Add</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="@Url.Action("ViewUnblockPackageDetails","UnblockPackage")">View</a>
+                            </li>
+                        </ul>
+                        <div class="col-md-12 p-0">
+                            <div class="form-row">
+                                <div class="col-xl-2 col-lg-2 col-md-3 col-sm-3 col-12">
+                                    <div class="mb-4">
+
+                                        <label class="pkg-label mb-1">Admission From Date :</label>
+                                        <input type="text" id="txtFromDate" class="form-control datepicker" />
+                                    </div>
+                                </div>
+                                @*<input type="hidden" id="hospitalcode" value="@Session["HospitalCode"]" />*@
+                                <div class="col-xl-2 col-lg-2 col-md-3 col-sm-3 col-12">
+                                    <div class="mb-4">
+                                        <label class="pkg-label mb-1">Admission To Date :</label>
+                                        <input type="text" id="txtToDate" class="form-control datepicker" />
+                                    </div>
+                                </div>
+                                <div class="col-xl-2 col-lg-2 col-md-3 col-sm-3 col-12">
+                                    <div class="mb-4">
+                                        <label class="pkg-label mb-1">Type :</label>
+                                        <select id="ddAdmissionDateType" class="form-control form-group">
+                                            <option value="A">Admission Date</option>
+                                            <option value="B">Blocking Date</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-xl-2 col-lg-2 col-md-3 col-sm-3 col-12 d-flex justify-content-start align-items-center">
+                                    <input class="btn btn-outline-success" type="button" value="Search" id="btnSearch">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table id="grdBlockPackage" data-toggle="table" class="table table-striped">
+                            </table>
+
+
+                            <!-- View Un-block package details -->
+                            @*<table class="table table-striped" cellspacing="0" width="100%">
+                                <thead>
+                                    <tr>
+                                        <th>Sl No</th>
+                                        <th>URN</th>
+                                        <th>
+                                            <div class="prehed-bold"> Member Details </div>
+                                            <div class="prehed-small"> ID | Name </div>
+                                        </th>
+                                        <th>Case No</th>
+                                        <th>Admission Date</th>
+                                        <th>Blocking Date</th>
+                                        <th>Contact No</th>
+                                        <th> Action </th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>26061211365</td>
+                                        <td>
+                                            <b class="text-success"> 59776523 </b>
+                                            <div class="pre-bold"> Sri Sudhanshu Sekhar Tripathy </div>
+                                        </td>
+                                        <td> CASE/27237006/16052023/005 </td>
+                                        <td> 16-May-23 </td>
+                                        <td> 16-May-23 </td>
+                                        <td> 9585758585</td>
+                                        <td> <button type="button" class="btn btn-outline-success btn-sm">  Un-Block </button> </td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td>26061211365</td>
+                                        <td>
+                                            <b class="text-success"> 59776523 </b>
+                                            <div class="pre-bold"> Sri Sudhanshu Sekhar Tripathy </div>
+                                        </td>
+                                        <td> CASE/27237006/16052023/005 </td>
+                                        <td> 16-May-23 </td>
+                                        <td> 16-May-23 </td>
+                                        <td> 9585758585</td>
+                                        <td>
+                                            <button type="button" class="btn btn-outline-success btn-sm">  Un-Block </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>3</td>
+                                        <td>26061211365</td>
+                                        <td>
+                                            <b class="text-success"> 59776523 </b>
+                                            <div class="pre-bold"> Sri Rajendra Kumar Rout </div>
+                                        </td>
+                                        <td> CASE/27237006/16052023/005 </td>
+                                        <td> 16-May-23 </td>
+                                        <td> 16-May-23 </td>
+                                        <td> 9585758585</td>
+                                        <td>
+                                            <button type="button" class="btn btn-outline-success btn-sm">  Un-Block </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>*@
+                            <!-- View Un-block package details -->
+
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var arrUnblockPackage = [];
+    $(document).ready(function () {
+        loadNavigation('ViewUnblockPackage', 'Mlunblockpackage', 'pl', 'Unblock Package', 'View Unblock Package', '');
+        var d = new Date();
+        var currentDate = d.getDate();
+        var currMonth = d.getMonth();
+        var currYear = d.getFullYear();
+        var startDate = new Date(currYear, currMonth, 1);
+        var endDate = new Date(currYear, currMonth, currentDate);
+        $("#txtFromDate").val(moment(startDate).format("DD-MMM-YY"));
+        $("#txtToDate").val(moment(endDate).format("DD-MMM-YY"));
+
+        getGridData();
+        $('#path').html('Unblock Package List');
+        var arrUnblockPackage = [];
+    });
+
+    function getGridData() {
+         var MemberinformationParams = {
+            'Action': 'A',
+            'Urn': null,
+            'MemberId': null,
+            'HospitalCode': '@Session["HospitalCode"]',
+            'TransactionId': 0, 'FromDate': $('#txtFromDate').val(), 'ToDate': $('#txtToDate').val(),
+            'AdmissionDateType': $('#ddAdmissionDateType').val()
+        };
+        MemberinformationParams = JSON.stringify(MemberinformationParams);
+        $.ajax({
+            url: ServiceURL + "/api/Common/GetUnblockinginformationByMemberNew",
+            type: "POST",
+            data: MemberinformationParams,
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $("#loader").show();
+            },
+            success: function (response) {
+                bindgrdBlockPackage(response);
+            },
+            complete: function () {
+                $("#loader").hide();
+            },
+            failure: function (response) {
+                alert(response.d);
+            },
+            error: function (response) {
+                alert(response.d);
+            }
+        });
+    }
+
+    function bindgrdBlockPackage(uData) {
+        $("#grdBlockPackage").DataTable({
+            bLengthChange: true,
+            autoWidth: false,
+            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+            bDestroy: true,
+            bFilter: true,
+            bSort: true,
+            paging: true,
+            data: uData,
+            columns: [
+                { data: 'id', type: "text", title: "Sl#", align: "left", render: function (data, type, row, meta) { return meta.row + meta.settings._iDisplayStart + 1; } },
+                { data: "urn", type: "text", title: "URN", align: "left" },
+                { /*data: "memberName",*/ type: "text", title: '<span><div class="prehed-bold"> Member Details </div><div class="prehed-small"> ID | Name </div></span>',
+                    align: "left",
+                    render: function (data, type, row, meta) {
+                        return '<span><b class= "text-success">' + row.memberID + '</b><div class="pre-bold">'+row.memberName+'</div></span>'
+                }                     
+                },
+                /*{ data: "memberID", type: "text", title: "Member Id", align: "left" },*/
+                { data: "caseno", type: "text", title: "Case No", align: "left" },
+                { data: "dateofadmission", type: "text", title: "Admission Date", align: "left" },
+                { data: "blockingDate", type: "text", title: "Blocking Date", align: "left" },
+                { data: "patientContactNumber", type: "text", title: "Contact Number", align: "center" },
+            ],
+            columnDefs: [
+                {
+                    targets: 7,
+                    data: null,
+                    title: "Action",
+                    defaultContent: "<button type='button' onclick='btnUnblock(this)' class='btn btn-outline-success focusedBtn btn-sm my-2 my-sm-0'>Unblock</button>"
+                }]
+        });
+    }
+
+    $("#btnSearch").click(function () {
+        var fromDt = $("#txtFromDate").val();
+        var toDt = $("#txtToDate").val();
+        var from = "";
+        var to = "";
+        if (fromDt != "")
+            from = new Date($("#txtFromDate").val());
+        if (toDt != "")
+            to = new Date($("#txtToDate").val());
+        if (to != "" && from === "") {
+            swal({
+                text: "Please select From date",
+                confirmButtonColor: "#36A865",
+                type: "error",
+                confirmButtonText: "OK",
+                closeOnConfirm: false
+            }).then(function () {
+                $("#txtFromDate").focus();
+            });
+        }
+        else if (from != "" && to === "") {
+            swal({
+                text: "Please select To date",
+                confirmButtonColor: "#36A865",
+                type: "error",
+                confirmButtonText: "OK",
+                closeOnConfirm: false
+            }).then(function () {
+                $("#txtToDate").focus();
+            });
+        }
+        else if (from > to) {
+            swal({
+                text: "From date should not be greater than To date",
+                confirmButtonColor: "#36A865",
+                type: "error",
+                confirmButtonText: "OK",
+                closeOnConfirm: false
+            }).then(function () {
+                $("#txtFromDate").focus();
+            });
+        }
+        else {
+            getGridData();
+        }
+    });
+
+    $(function () {
+        $(".datepicker").datepicker({
+            numberOfMonths: 1,
+            changeMonth: true,
+            dateFormat: "dd-M-y",
+            changeYear: true
+        });
+    });
+
+    function btnUnblock(ele) {
+        var dataRow = $('#grdBlockPackage').DataTable().row($(ele).closest('tr')).data();
+       arrUnblockPackage.push({
+           schemeCode: dataRow.schemeCode,
+           schemeName: dataRow.schemeName,
+           urn: dataRow.urn,
+           cardNo: dataRow.cardNo,
+           memberName: dataRow.memberName,
+           patientContactNumber: dataRow.patientContactNumber,
+           memberID: dataRow.memberID,
+           invoiceNo: dataRow.blockingInvoiceNo,
+           registrationDate: dataRow.registrationDate,
+           headMemberID: dataRow.headMemberID,
+           headMemberName: dataRow.headMemberName,
+           memberDistrictCode: dataRow.memberDistrictCode,
+           memberDistrictName: dataRow.memberDistrictName,
+           memberStateName: dataRow.memberStateName,
+           procedureCode: dataRow.procedureCode,
+           procedureName: dataRow.procedureName,
+           category: dataRow.category,
+           categoryCode: dataRow.categoryCode,
+           packageCode: dataRow.packageCode,
+           packageName: dataRow.packageName,
+           amoutBlocked: dataRow.amoutBlocked,
+           transactionID: dataRow.transactionID,
+           familyID: dataRow.familyID,
+           hospitalCode: dataRow.hospitalCode
+       })
+      localStorage.setItem('UnlockPackageInfo', JSON.stringify(arrUnblockPackage));
+      window.location.href = '@Url.Action("AddUnblockPackage", "UnblockPackage")';
+    };
+
+</script>
+
+
+

@@ -1,0 +1,431 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using HPSBYS.Data.Model;
+using Dapper;
+using Dapper.Contrib;
+using NLog;
+using System.Security.Cryptography;
+using System.Data;
+
+namespace HPSBYS.Data.Services
+{
+    public class CommonDataServices : BaseDataService
+    {
+        string changePasswordStatus = string.Empty;
+        ILogger log = LogManager.GetCurrentClassLogger();
+        public IList<Scheme> GetScheme(int Schemecode)
+        {
+            List<Scheme> SchemeInformation = new List<Scheme>();
+            try
+            {
+                using (SqlConnecton)
+                {
+                    SchemeInformation = SqlConnecton.Query<Scheme>("Exec USP_T_Scheme_INFO @P_Schemecode=" + Schemecode + "").ToList();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                SchemeInformation = null;
+                log.Error(ex);
+            }
+
+            return SchemeInformation;
+        }
+
+
+        public IList<PACKAGECATEGORY> GetPACKAGECATEGORY(string Action)
+        {
+            List<PACKAGECATEGORY> GetPACKAGECATEGORYInfo = new List<PACKAGECATEGORY>();
+
+            try
+            {
+                using (SqlConnecton)
+                {
+                    GetPACKAGECATEGORYInfo = SqlConnecton.Query<PACKAGECATEGORY>("Exec USP_MOB_GetProcedures @P_Action='" + Action + "'").ToList();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                GetPACKAGECATEGORYInfo = null;
+                log.Error(ex);
+            }
+
+            return GetPACKAGECATEGORYInfo;
+        }
+        public IList<PACKAGECATEGORY> GetPACKAGECATEGORY_PackageChange(string Action)
+        {
+            List<PACKAGECATEGORY> GetPACKAGECATEGORYInfo = new List<PACKAGECATEGORY>();
+
+            try
+            {
+                using (SqlConnecton)
+                {
+                    GetPACKAGECATEGORYInfo = SqlConnecton.Query<PACKAGECATEGORY>("Exec USP_MOB_GetProcedures @P_Action='" + Action + "'").ToList();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                GetPACKAGECATEGORYInfo = null;
+                log.Error(ex);
+            }
+
+            return GetPACKAGECATEGORYInfo;
+        }
+        public IList<SUBPACKAGECATEGORY> GetSubPackageDetail(string Action, string PACKAGECATEGORY)
+        {
+            List<SUBPACKAGECATEGORY> GetSubPackageInfo = new List<SUBPACKAGECATEGORY>();
+
+            try
+            {
+                using (SqlConnecton)
+                {
+                    GetSubPackageInfo = SqlConnecton.Query<SUBPACKAGECATEGORY>("Exec USP_MOB_GetPackages @P_Action='" + Action + "', @P_PackageCategoryCode='" + PACKAGECATEGORY + "'").ToList();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                GetSubPackageInfo = null;
+                log.Error(ex);
+            }
+
+            return GetSubPackageInfo;
+        }
+        public IList<SUBPACKAGECATEGORY> GetSubPackageDetail_PackageChange(string Action, string PACKAGECATEGORY)
+        {
+            List<SUBPACKAGECATEGORY> GetSubPackageInfo = new List<SUBPACKAGECATEGORY>();
+
+            try
+            {
+                using (SqlConnecton)
+                {
+                    GetSubPackageInfo = SqlConnecton.Query<SUBPACKAGECATEGORY>("Exec USP_MOB_GetPackages @P_Action='" + Action + "', @P_PackageCategoryCode='" + PACKAGECATEGORY + "'").ToList();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                GetSubPackageInfo = null;
+                log.Error(ex);
+            }
+
+            return GetSubPackageInfo;
+        }
+        public IList<PackageInformation> GetPackageDetail_PackageChange(string Action, string PACKAGECATEGORY,string PackageSubCategoryCode)
+        {
+            List<PackageInformation> GetPackageInfo = new List<PackageInformation>();
+
+            try
+            {
+                using (SqlConnecton)
+                {
+                    GetPackageInfo = SqlConnecton.Query<PackageInformation>("Exec USP_MOB_GetPackages @P_Action='" + Action + "',@P_PackageSubCategoryCode='" + PackageSubCategoryCode + "', @P_PackageCategoryCode='" + PACKAGECATEGORY + "'").ToList();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                GetPackageInfo = null;
+                log.Error(ex);
+            }
+
+            return GetPackageInfo;
+        }
+        public IList<PackageInformation> GetPackageDetail(string Action, string PACKAGECATEGORY, string PackageSubCategoryCode)
+        {
+            List<PackageInformation> GetPackageInfo = new List<PackageInformation>();
+
+            try
+            {
+                using (SqlConnecton)
+                {
+                    GetPackageInfo = SqlConnecton.Query<PackageInformation>("Exec USP_MOB_GetPackages @P_Action='" + Action + "',@P_PackageSubCategoryCode='" + PackageSubCategoryCode + "', @P_PackageCategoryCode='" + PACKAGECATEGORY + "'").ToList();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                GetPackageInfo = null;
+                log.Error(ex);
+            }
+
+            return GetPackageInfo;
+        }
+        public IList<WardDetail> GetWardDetails(string Action, string PreAuthStatus)
+        {
+            List<WardDetail> WardDtls = new List<WardDetail>();
+
+            try
+            {
+                using (SqlConnecton)
+                {
+                    WardDtls = SqlConnecton.Query<WardDetail>("Exec USP_T_Ward_INFO @P_Action='" + Action + "', @P_PreAuthStatus='" + PreAuthStatus + "'").ToList();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                WardDtls = null;
+                log.Error(ex);
+            }
+
+            return WardDtls;
+        }
+        //To get Insurance Information
+        public IList<PolicyDetails> GetInsuranceDetail(string URN)
+        {
+            List<PolicyDetails> GetPolicy = new List<PolicyDetails>();
+
+            try
+            {
+                using (SqlConnecton)
+                {
+                    GetPolicy = SqlConnecton.Query<PolicyDetails>("Exec USP_T_Policy_INFO @URN='" + URN + "'").ToList();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                GetPolicy = null;
+                log.Error(ex);
+            }
+
+            return GetPolicy;
+        }
+
+        //To get  UnblockingReasonl
+        public IList<UnblockingReason> GetUnblockingReason(string Action)
+        {
+            List<UnblockingReason> GetUnblockingReason = new List<UnblockingReason>();
+
+            try
+            {
+                using (SqlConnecton)
+                {
+                    GetUnblockingReason = SqlConnecton.Query<UnblockingReason>("Exec USP_T_UnblockReason_INFO @P_Action='" + Action + "'").ToList();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                GetUnblockingReason = null;
+                log.Error(ex);
+            }
+
+            return GetUnblockingReason;
+        }
+
+
+        public Login GetLogin(string Username, string Passworrd)
+        {
+            Login GetLoginobj = new Login();
+
+            try
+            {
+                using (SqlConnecton)
+                {
+                    GetLoginobj = SqlConnecton.Query<Login>("Exec USP_T_UserLogin @P_Username='" + Username + "',@P_Passwd='" + GenerateHash(Passworrd) + "'").FirstOrDefault();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                GetLoginobj = null;
+                log.Error(ex);
+            }
+
+            return GetLoginobj;
+        }
+
+        public BalanceInfo getBalanceInfo(string Action, string URN, string FamilyId)
+        {
+            BalanceInfo balanceInfo = new BalanceInfo();
+            try
+            {
+                using (SqlConnecton)
+                {
+                    balanceInfo = SqlConnecton.Query<BalanceInfo>("Exec USP_CardBalanceInfo @P_ACTIONCODE='" + Action + "',@VCHURNNO='" + URN + "',@Familyid='" + FamilyId + "'").FirstOrDefault();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                balanceInfo = null;
+                log.Error(ex);
+            }
+
+            return balanceInfo;
+        }
+        public IList<PatientInfo> getPatientStatus(string Action, string URN)
+        {
+            List<PatientInfo> info = new List<PatientInfo>();
+            try
+            {
+                using (SqlConnecton)
+                {
+                    info = SqlConnecton.Query<PatientInfo>("Exec USP_T_GetPatientStatus @P_ACTION='" + Action + "',@P_URN='" + URN + "'").ToList();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                info = null;
+                log.Error(ex);
+            }
+
+            return info;
+        }
+        public IList<Notice> getNotices(string Action)
+        {
+            List<Notice> info = new List<Notice>();
+            try
+            {
+                using (SqlConnecton)
+                {
+                    info = SqlConnecton.Query<Notice>("Exec USP_T_GetNotices @P_ACTION='" + Action+"'").ToList();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                info = null;
+                log.Error(ex);
+            }
+
+            return info;
+        }
+        public string changePassword(Login login)
+        {
+
+            object[] objArray = new object[] {
+                   "@Action",'A'
+                  ,"@intUserId",login.USERID
+                  ,"@vchUserName",login.USERNAME
+                  ,"@vchOldPassword",GenerateHash(login.Password)
+                  ,"@vchNewPassword",GenerateHash(login.NewPassword)
+                  };
+            try
+            {
+                DynamicParameters param = objArray.ToDynamicParameters("@P_MSGOUT");
+                var result = SqlConnecton.Execute("USP_Transaction_ChangePassword", param, commandType: CommandType.StoredProcedure);
+                changePasswordStatus = param.Get<string>("P_MSGOUT");
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex);
+            }
+            return changePasswordStatus;
+        }
+        private string GenerateHash(string SourceText)
+        {
+            UTF8Encoding Ue = new UTF8Encoding();
+            string pwdString;
+            MD5CryptoServiceProvider Md5 = new MD5CryptoServiceProvider();
+            Byte[] ByteHash = Md5.ComputeHash(Ue.GetBytes(SourceText));
+            pwdString = BitConverter.ToString(ByteHash);
+            pwdString = pwdString.Replace("-", null);
+            return pwdString;
+        }
+        public IList<Dist> getAllDist(string Action)
+        {
+            List<Dist> info = new List<Dist>();
+            try
+            {
+                using (SqlConnecton)
+                {
+                    info = SqlConnecton.Query<Dist>("Exec USP_T_GET_Districts @vchAction='" + Action + "'").ToList();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                info = null;
+                log.Error(ex);
+            }
+
+            return info;
+        }
+        public IList<Block> getAllBlockByDistCode(string Action,int DistCode)
+        {
+            List<Block> info = new List<Block>();
+            try
+            {
+                using (SqlConnecton)
+                {
+                    info = SqlConnecton.Query<Block>("Exec USP_T_GET_Districts @vchAction='" + Action + "',@DistrictCode='"+DistCode+"'").ToList();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                info = null;
+                log.Error(ex);
+            }
+
+            return info;
+        }
+        public IList<PHC> getAllPHCByDistCodeAndBlockCode(string Action, int DistCode, int BlockCode)
+        {
+            List<PHC> info = new List<PHC>();
+            try
+            {
+                using (SqlConnecton)
+                {
+                    info = SqlConnecton.Query<PHC>("Exec USP_T_GET_Districts @vchAction='" + Action + "',@DistrictCode='" + DistCode + "',@BlockCode='"+ BlockCode + "'").ToList();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                info = null;
+                log.Error(ex);
+            }
+
+            return info;
+        }
+        public IList<SubCentre> getAllSubCentreByDistBlockAndPHCCode(string Action, int DistCode, int BlockCode,int PHCCode)
+        {
+            List<SubCentre> info = new List<SubCentre>();
+            try
+            {
+                using (SqlConnecton)
+                {
+                    info = SqlConnecton.Query<SubCentre>("Exec USP_T_GET_Districts @vchAction='" + Action + "',@DistrictCode='" + DistCode + "',@BlockCode='" + BlockCode + "',@PHCCode='"+PHCCode+"'").ToList();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                info = null;
+                log.Error(ex);
+            }
+
+            return info;
+        }
+        public IList<DownwardReferalInfo> getDownwardReferalByBlockingInvoiceNo(string Action, string InvoiceNo)
+        {
+            List<DownwardReferalInfo> info = new List<DownwardReferalInfo>();
+            try
+            {
+                using (SqlConnecton)
+                {
+                    info = SqlConnecton.Query<DownwardReferalInfo>("Exec USP_ViewDownwardReferal @P_ActionCode='" + Action + "',@P_BlockingInvoiceNo='" + InvoiceNo + "'").ToList();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                info = null;
+                log.Error(ex);
+            }
+
+            return info;
+        }
+    }
+}

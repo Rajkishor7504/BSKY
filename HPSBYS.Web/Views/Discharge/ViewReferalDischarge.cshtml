@@ -1,0 +1,489 @@
+﻿@{
+    ViewBag.Title = "ViewReferalDischarge";
+    Layout = "~/Views/Shared/_CommonLayout.cshtml";
+}
+@Scripts.Render("~/bundles/viewreferaldischarge")
+
+<div class="container">
+    <div class="card-body">
+        <div class="form-box-bg mb-4">
+            @*tab section*@
+            <ul class="nav nav-tabs custom-tab mb-4">
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("AddDischarge", "Discharge")"> Add </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="@Url.Action("ViewReferalDischarge","Discharge")">View</a>
+                </li>
+            </ul>
+            <div class="col-md-12 p-0">
+                <div class="row">
+                    <div class="col-lg-2">
+                        <div class="mb-4">
+                            <label class="pkg-label"> Search Type :</label>
+                            <select id="ddlSearchByFilter" class="form-control">
+                                <option value="0"> Select </option>
+                                <option value="A"> Admission Date </option>
+                                <option value="D"> Discharge Date </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-2">
+                        <div class="mb-4">
+                            <label class="pkg-label"> From Date :</label>
+                            <input type="text" id="fromdate" class="form-control datepicker" />
+                        </div>
+                    </div>
+                    @*<input type="hidden" id="hospitalcode" value="@Session["HospitalCode"]" />*@
+                    <div class="col-lg-2">
+                        <div class="mb-4">
+                            <label class="pkg-label"> To Date :</label>
+                            <input type="text" id="todate" class="form-control datepicker" />
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <input class="btn btn-outline-success" type="button" value="Search" onclick="search();" id="btnSearch">
+                    </div>
+                </div>
+            </div>
+            <div class="mb-2">
+                @*<table class="table table-striped" id="newData1">
+        </table>*@
+                <table id="newData1" class="table table-striped border preauth-tbl" width="100%">
+                    <thead>
+                        <tr>
+                            <th style="width:5% !important;"> l No</th>
+                            <th style="width:10% !important;">URN</th>
+                            <th style="width:20% !important;"> <div class="prehed-bold"> Member Details </div> <div class="prehed-small"> ID | Name </div> </th>
+                            <th style="width:15% !important;">Case No</th>
+                            <th style="width:12% !important;"> Discharge Date </th>
+                            <th style="width:15% !important;"> Actual Discharge Date </th>
+                            <th style="width:10% !important;"> Status </th>
+
+                            <th style="width:20% !important;" class="text-center"> Action </th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>02120610257</td>
+                            <td> <b class="text-success"> 59776523 </b> <div class="pre-bold"> SRI SRI RAJENDRA BALIAR SINGH DEO </div> </td>
+                            <td> CASE/27237006/16052023/005 </td>
+                            <td> 16-May-23 </td>
+                            <td> 16-May-23 </td>
+                            <td> <div class="badge badge-success mb-3 p-2"> Fully Discharged </div> </td>
+                            <td align="center">
+                                <div>
+                                    <button type="button" tooltip="Hospital Slip" class="btn btn-outline-secondary focusedBtn btn-sm my-2 my-sm-0 mr-2"><i class="fa fa-files-o"></i></button>
+                                    <button type="button" tooltip="Patient Slip" class="btn btn-outline-warning focusedBtn btn-sm my-2 my-sm-0 mr-2"><i class="fa fa-file-text-o"></i></button>
+                                    <button type="button" tooltip="View Details" toggle="modal" class="btn btn-outline-danger focusedBtn btn-sm my-2 mr-2 my-sm-0"> <i class="fa fa-eye"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>02120610257</td>
+                            <td> <b class="text-success"> 59776523 </b> <div class="pre-bold"> SRI SRI SUDHANSHU SEKHAR TRIPATHY </div> </td>
+                            <td> CASE/27237006/16052023/005 </td>
+                            <td> 16-May-23 </td>
+                            <td> 16-May-23 </td>
+                            <td> <div class="badge badge-danger mb-3 p-2"> Not Discharged </div> </td>
+                            <td align="center">
+                                <div>
+                                    <button type="button" tooltip="Hospital Slip" class="btn btn-outline-secondary focusedBtn btn-sm my-2 my-sm-0 mr-2"><i class="fa fa-files-o"></i></button>
+                                    <button type="button" tooltip="Patient Slip" class="btn btn-outline-warning focusedBtn btn-sm my-2 my-sm-0 mr-2"><i class="fa fa-file-text-o"></i></button>
+                                    <button type="button" tooltip="View Details" toggle="modal" class="btn btn-outline-danger focusedBtn btn-sm my-2 mr-2 my-sm-0"> <i class="fa fa-eye"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- View details unblock package modal start -->
+<div class="modal fade wow fadeInUp animated" id="DischargeView" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="col-lg-10 px-0">
+                    <div class="form-row">
+                        <div class="col-md-6">
+                            <div class="heading-pkg px-0"><h5 class="mb-0"> View Discharge Details </h5> </div>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-4">
+                    <div class="row heading-pkg border-bottom mb-3">
+                        <h5> Patient Details </h5>
+                        <input type="hidden" id="invoiceno">
+                        <input type="hidden" id="urnid">
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-3 mb-2">
+                            <label class="pkg-label font-weight-normal">Name :</label>
+                            <div class="pkghead-txt">
+                                <span id="PatientName"></span>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 mb-2">
+                            <label class="pkg-label font-weight-normal">Member ID :</label>
+                            <div class="pkghead-txt">
+                                <span id="memberid"></span>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 mb-2">
+                            <label class="pkg-label font-weight-normal">Gender : </label>
+                            <div class="pkghead-txt">
+                                <span id="gender"></span>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 mb-2">
+                            <label class="pkg-label font-weight-normal">Age :</label>
+                            <div class="pkghead-txt">
+                                <span id="age"></span>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 mb-2">
+                            <label class="pkg-label font-weight-normal">Aadhaar Card :</label>
+                            <div class="pkghead-txt">
+                                <span id="adharno"></span>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 mb-2">
+                            <label class="pkg-label font-weight-normal">Treatment Type :</label>
+                            <div class="pkghead-txt">
+                                <span id="surgicaltype"></span>
+                            </div>
+                        </div>
+                       @* <div class="col-lg-3 mb-2">
+                            <label class="pkg-label font-weight-normal mb-2"> Discharge Document :</label>
+                            <div class="pkghead-txt">
+                                <button id="dischargedoc" class="btn btn-outline-success btn-sm" onclick="DownloadDoc(this);" download  title="Download"> <i class="fa fa-file-pdf-o"></i> Download </button>
+                            </div>
+                        </div>*@
+                    </div>
+                </div>
+
+                <div class="row heading-pkg border-bottom mb-3">
+                    <h5> Admission Details </h5>
+                </div>
+                <div class="row mx-0 mb-4">
+                    <div class="table-responsive border">
+                        <table class="table" id="tbladmissiondetails">
+                            <thead><tr><th>Sl#</th><th>Actual Date of Admission</th><th>Doctor Name</th><th>Doctor Phone No</th><th>Patient Phone No</th><th>Override Code</th><th>Referal Code</th><th>Description</th></tr></thead>
+                            <tbody>
+                                <tr>
+                                    <td> 1 </td>
+                                    <td id="admissiondate">23-Feb-23</td>
+                                    <td id="doctorname">null</td>
+                                    <td id="doctorphno">null</td>
+                                    <td id="patientcontactnumber">6755353454</td>
+                                    <td id="overridecode">0</td>
+                                    <td id="referalcode">0</td>
+                                    <td id="description">fgfdgfd</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="row heading-pkg border-bottom mb-3">
+                    <h5> Package Details </h5>
+                </div>
+                <div class="row mx-0 mb-4">
+                    <div class="table-responsive border">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Sl#</th>
+                                    <th>Package Header</th>
+                                    <th>Sub-Package</th>
+                                    <th>Package Details</th>
+                                    <th>Treatment Cost</th>
+                                    <th>Treatment Days</th>
+                                    <th>Approval Require</th>
+                                    <th>Block Package</th>
+                                    <th colspan="2"> Action </th>
+                                </tr>
+                            </thead>
+                            <tbody id="packageDetailsbody">
+                                <tr>
+                                    <td> 1 </td>
+                                    <td>Burns Management</td>
+                                    <td>Electrical Contact Burns</td>
+                                    <td>BM004A</td>
+                                    <td>51187</td>
+                                    <td>0</td>
+                                    <td>NO</td>
+                                    <td>23-Feb-23</td>
+                                    <td> <button type="button" class="btn btn-outline-success focusedBtn btn-sm my-2 my-sm-0" data-toggle="collapse" data-target="#pkgmodalcls"> View Details <i class="fa fa-eye"></i></button> </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="12" class="m-0 p-0 border-0">
+                                        <div class="accordian-body collapse" id="pkgmodalcls">
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 mt-3">
+                                                <div class="headingpkg-bg"> Package Details </div>
+                                                <div class="row d-flex align-items-center">
+                                                    <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                                                        <div class="impl_head"> Implant Details </div>
+                                                    </div>
+                                                    <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                                                        <div class="row d-flex align-items-center">
+                                                            <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12">
+                                                                <div class="impl_head"> HighEndDrugs Details </div>
+                                                            </div>
+                                                            <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-lg-6" id="table-scroll">
+                                                        <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12 mt-3"></div>
+                                                        <table class="table table-striped tblImplView" id="tblImplantView1">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th style="background-color:#fff !important;"> Implant Name</th>
+                                                                    <th style="background-color:#fff !important;"> Unit </th>
+                                                                    <th style="background-color:#fff !important;"> Price </th>
+                                                                    <th style="background-color:#fff !important;"> Total Price </th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody></tbody>
+                                                            <tfoot>
+                                                                <tr>
+                                                                    <td class="font-weight-5">Total </td>
+                                                                    <td class="font-weight-5"></td>
+                                                                    <td></td>
+                                                                    <td colspan="2" class="font-weight-5 clsImplTotalInner1"></td>
+                                                                </tr>
+                                                            </tfoot>
+                                                        </table>
+                                                    </div>
+                                                    <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12 mt-3">
+                                                        <div id="table-scroll" class="table-scroll table-responsive mb-3">
+                                                            <table id="tblHgDrugsInnerList1" class="main-table table table-striped">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th style="background-color:#fff !important;"> HighEndDrugs Name </th>
+                                                                        <th style="background-color:#fff !important;"> Unit </th>
+                                                                        <th style="background-color:#fff !important;"> Price </th>
+                                                                        <th style="background-color:#fff !important;"> Total Price </th>
+                                                                        <th style="background-color:#fff !important;"> Pre-Auth Required </th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <td>IV immunoglobins</td>
+                                                                        <td>1<input type="hidden" id="hdnTabname" name="hdHedltabName" value="tblHgDrugsInnerList1"></td>
+                                                                        <td>250000.00</td>
+                                                                        <td>250000.00</td>
+                                                                        <td class="hedPreAuth"><input type="hidden" name="hedPreAuthcls" value="isPackAuthReq1">Yes<input type="hidden" id="hdnParentIsPreAuth" name="hdnnmParentIsPreAuth" value="YES"></td>
+                                                                    </tr>
+                                                                </tbody>
+                                                                <tfoot>
+                                                                    <tr>
+                                                                        <td colspan="1">Total </td>
+                                                                        <td class="font-weight-5">&nbsp;</td>
+                                                                        <td>&nbsp;</td>
+                                                                        <td class="font-weight-5" colspan="3">₹2,51,700.00</td>
+                                                                    </tr>
+                                                                </tfoot>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="8"> <b> Total Cost (Total Package Cost +Implant Cost +Highend Drugs Cost) </b> </td>
+                                    <td colspan="2" align="right"> <b id="TotalPackageCost"></b></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    <!-- package details section -->
+                </div>
+
+                <div id="implantdetailsid" style="display: none;">
+                    <div class="row heading-pkg border-bottom mb-3">
+                        <h5>Implant Details </h5>
+                    </div>
+                    <div class="row mx-0 mb-4">
+                        <div class="table-responsive border">
+                            <table class="table" id="tblimplantdetails">
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div id="highenddrugid" style="display: none;">
+                    <div class="row heading-pkg border-bottom mb-3">
+                        <h5>Highend Drugs Details </h5>
+                    </div>
+                    <div class="row mx-0 mb-4">
+                        <div class="table-responsive border">
+                            <table class="table" id="tblhighendrugddetails">
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+           @*     <div>
+                    <div class="row heading-pkg mt-4 border-bottom mb-3">
+                        <h5> Verified Details </h5>
+                    </div>
+                    <div class="row mx-0 mb-4">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Sl#</th>
+                                        <th>Member Id</th>
+                                        <th>Name</th>
+                                        <th>Ration Card No</th>
+                                        <th>Verified Through</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tblverifieddetails">
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>*@
+
+
+
+                    <div class="mb-4" id="referralStatus">
+                        <div class="row heading-pkg border-bottom mb-3">
+                            <h5> Referral Details</h5>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3 mb-2">
+                                <label class="pkg-label font-weight-normal">From Hospital Name :</label>
+                                <div class="pkghead-txt">
+                                    <span id="fromhospitalname"></span>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 mb-2">
+                                <label class="pkg-label font-weight-normal">From Doctor Name:</label>
+                                <div class="pkghead-txt">
+                                    <span id="fromdrname"></span>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 mb-2">
+                                <label class="pkg-label font-weight-normal">From Dept Name : </label>
+                                <div class="pkghead-txt">
+                                    <span id="fromdeptname"></span>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 mb-2">
+                                <label class="pkg-label font-weight-normal">From Referral Date :</label>
+                                <div class="pkghead-txt">
+                                    <span id="fromreferraldate"></span>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 mb-2">
+                                <label class="pkg-label font-weight-normal">To Hospital:</label>
+                                <div class="pkghead-txt">
+                                    <span id="tohospital"></span>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 mb-2">
+                                <label class="pkg-label font-weight-normal">Referral Code :</label>
+                                <div class="pkghead-txt">
+                                    <span id="referralcode"></span>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 mb-2">
+                                <label class="pkg-label font-weight-normal mb-2"> Reason For Refer :</label>
+                                <div class="pkghead-txt">
+                                    <span id="reasonforrefer"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="row">
+                  @*      <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                            <div class="row heading-pkg mt-4 border-bottom mb-3">
+                                <h5> Vital Parameter </h5>
+                            </div>
+
+                            <div class="row mx-0 mb-4">
+                                <div class="table-responsive border">
+                                    <table class="table table-striped">
+                                        <thead><tr><th width="50">Sl#</th><th width="200">Vital Name</th><th width="200">Vital Value</th></tr></thead>
+                                        <tbody id="tbldVitaletails"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>*@
+
+
+                   @*     <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                            <div class="row heading-pkg mt-4 border-bottom mb-3">
+                                <h5>Photographs</h5>
+                            </div>
+                            <div class="row mx-0 mb-4">
+                                <div class="col-lg-6 mb-2 border-right">
+                                    <label class="pkg-label mb-2">
+                                        Intra Surgery
+                                    </label>
+                                    <div class="pkghead-txt">
+       <button id="intrasurgery" class="btn btn-outline-success btn-sm" onclick="DownloadDoc(this);" target="_blank"  title="Download"> 
+                                        <i class="fa fa-image"></i> Download </button>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 mb-2">
+                                    <label class="pkg-label mb-2">
+                                        Post Surgery
+                                    </label>
+                                    <div class="pkghead-txt">
+                                        <button id="postsurgery" class="btn btn-outline-success btn-sm" onclick="DownloadDoc(this);"  target="_blank" download  title="Download"> <i class="fa fa-image"></i> Download </button>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 mb-2 border-right">
+                                    <label class="pkg-label mb-2">Pre Surgery </label>
+                                    <div class="pkghead-txt">
+                                        <button id="presurgery" class="btn btn-outline-success btn-sm"  onclick="DownloadDoc(this);" target="_blank" download  title="Download"> <i class="fa fa-image"></i> Download </button>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 mb-2">
+                                    <label class="pkg-label mb-2">Specimen Removal</label>
+                                    <div class="pkghead-txt">
+                                        <button  id="specimenremoval" class="btn btn-outline-success btn-sm" onclick="DownloadDoc(this);" target="_blank" download title="Download"> <i class="fa fa-image"></i> Download </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>*@
+                    </div>
+                </div>
+        </div>
+    </div>
+</div>
+<!-- View details unblock package modal end -->
+<div class="loader" id="divLoader" style="display:none">
+    <div class="center">
+        <img src="~/imgs/DataLoading.gif" alt="Loader..." />
+    </div>
+</div>
+<script>
+    document.mynamespace = {};
+    document.mynamespace.hospitalcode = '@HttpContext.Current.Session["HospitalCode"]';
+   
+</script>

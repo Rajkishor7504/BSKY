@@ -1,0 +1,3 @@
+2020-07-02 11:08:14.1873 ERROR System.NullReferenceException: Object reference not set to an instance of an object.
+   at HPSBYS.Data.Services.CommonExtension.ToDynamicParameters(Object[] parameters, String outParameter, DbType dbType) in D:\Ram\HPSBYS_1.2.0.0\HPSBYS.Data\Services\CommonExtension.cs:line 37
+   at HPSBYS.Data.Services.PatientDataServices.PreWardAuthPackageBlock(PreAuthApprovedPackageBlock obj) in D:\Ram\HPSBYS_1.2.0.0\HPSBYS.Data\Services\PatientDataServices.cs:line 325

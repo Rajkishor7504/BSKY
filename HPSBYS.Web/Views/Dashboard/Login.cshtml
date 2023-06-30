@@ -1,0 +1,655 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <script type="text/javascript">
+        function preventBack() { window.history.forward(); }
+        setTimeout("preventBack()", 0);
+        window.onunload = function () { null };
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>BSKY :: Login</title>
+    <link rel="icon" type="image/png" href="~/imgs/favicon.png" />
+    <link rel="stylesheet" href="~/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="~/css/style.css" />
+    <link rel="stylesheet" href="~/css/animate.min.css" />
+    <link rel="stylesheet" href="~/css/sweetalert.css" />
+    <link rel="stylesheet" href="~/css/icon.css" />
+    <script src="~/js/jquery.min.js" type="text/javascript"></script>
+    <script src="~/js/popper.min.js" type="text/javascript"></script>
+    <script src="~/js/sweetalert.min.js" type="text/javascript"></script>
+    <script src="~/js/bootstrap.min.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('.onlynum').keypress(function (e) {
+                var charCode = (e.which) ? e.which : event.keyCode
+                if (String.fromCharCode(charCode).match(/[^0-9]/g))
+                    return false;
+            });
+            $(".toggle-password").click(function () {
+                $(this).toggleClass("fa-eye fa-eye-slash");
+                var input = $($(this).attr("toggle"));
+                if (input.attr("type") == "password") {
+                    input.attr("type", "text");
+                } else {
+                    input.attr("type", "password");
+                }
+            });
+        });
+    </script>
+    <script type="text/javascript">
+        $(document).keydown(function (event) {
+            event = (event || window.event);
+            if (event.keyCode == 13) {
+                loginClick();
+
+            }
+
+        });
+        $(document).ready(function () {
+            $('#hdnQus').val("");
+            //showRandomText();
+            loadCaptcha();
+            $('#name').focus();
+            $('#btnLogin').click(function () {
+                loginClick();
+            });
+            $('#imgbtnRefresh').click(function () {
+                //showRandomText();
+                loadCaptcha();
+            });
+            $('#name').bind("cut copy paste", function (e) {
+                e.preventDefault();
+            });
+            $('#password').bind("cut copy paste", function (e) {
+                e.preventDefault();
+            });
+            $('#captcha').bind("cut copy paste", function (e) {
+                e.preventDefault();
+            });
+
+        });
+
+            function gettoken() {
+                var token = '@Html.AntiForgeryToken()';
+                token = $(token).val();
+                return token;
+            }
+
+        function loginClick() {
+                if (validate()) {
+                    var CaptchaData = $('#hdnQus').val();
+                    var inputCaptch = $('#captcha').val();
+                    if (CaptchaData == inputCaptch) {
+
+                    @*
+                    var userId = $('#name').val();
+                    var userPassword = $('#password').val();
+                    var credentials = [];
+                    credentials.push(userId, userPassword);
+                    getLoginData(credentials);
+                    return false;
+                    *@
+                        //:: Kisan encrypt Format Start
+                        var passwordEncrypt = $('#password').val();
+                        var key = CryptoJS.enc.Utf8.parse('8080808080808080');
+                        var iv = CryptoJS.enc.Utf8.parse('8080808080808080');
+                        var encryptedlogin = CryptoJS.AES.encrypt(CryptoJS.enc.Utf8.parse(passwordEncrypt), key,
+                            { keySize: 128 / 8, iv: iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 });
+                        passwordEncrypt = encryptedlogin;
+                        //:: Kisan encrypt Format End
+
+                        var Logindata = new FormData();
+                        Logindata.append("__RequestVerificationToken", gettoken());
+                        Logindata.append("UserID", $('#name').val());
+                        Logindata.append("Password", passwordEncrypt);
+                        Logindata.append("Captcha", inputCaptch);
+                        $.ajax({
+                            url: '@Url.Action("ValidateLogin", "Dashboard")',
+                            type: "POST",
+                            data: Logindata,
+                            processData: false,
+                            contentType: false,
+                            beforeSend: function () {
+                                $("#loader").show();
+                            },
+                            success: function (data) {
+                                //debugger;
+                                if (data == "InvalidCaptcha") {
+                                    sweetAlert1('', 'Invalid Captcha!!');
+                                    $('#captcha').focus();
+                                }
+                                else if (data == "404") {
+                                    sweetAlert1('', 'Invalid username and password!!', 'pageReload');
+                                }
+                                // Newly Added start dt: 23-05-2023
+                                else if (data == "504") {
+                                    sweetAlert1('', 'Your account has been blocked, please contact your administrator', 'pageReload');
+                                }
+                                else if (data.STATUS == "2") {
+                                    sweetAlert1('', 'Invalid credential, ' + (3 - parseInt(data.attempted_status)) + ' attempt(s) left', 'pageReload');
+                                }
+                                //Newly added end dt: 23-05-2023
+                                else if (data.STATUS == "100") {
+                                    //getGeoLocation(data);
+                                    setUserSession(data) // Changed by Ashutosh Pradhan
+                                }
+                                //else if (data.STATUS == 504) {
+                                //    sweetAlert1('', 'Your account has been blocked, please contact your administrator');
+                                //}
+                                //else if (data.STATUS == "2") {
+                                //    if (data.attempted_status == 1) {
+                                //        sweetAlert1('', 'Invalid credential, 2 attempts left');
+                                //    }
+                                //    else if (data.attempted_status == 2) {
+                                //        sweetAlert1('', 'Invalid credential, 1 attempts left');
+                                //    }
+                                //    else if (data.attempted_status == 3) {
+                                //        sweetAlert1('', 'Invalid credential,  Your account has been blocked for 24 hours');
+                                //    }
+                                //}
+                                else if (data.STATUS == "4") {
+                                        sweetAlert1('', 'Invalid Username');
+                                }
+                            },
+                            complete: function () {
+                                $("#loader").hide();
+                            },
+                           error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                window.location.href = '@Url.Action("Error", "Errors")';
+                            }
+                        });
+                    }
+                    else {
+                        sweetAlert1('', 'Invalid Captcha!!');
+                        $('#hdnQus').val(CaptchaData);
+                        $('#captcha').focus();
+                    }
+                }
+            }
+            function loadCaptcha() {
+                $.ajax({
+                    type: 'POST',
+                    url:'@Url.Action("loadCaptcha", "Dashboard")',
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    cache: false,
+                    success: function (data) {
+                        var captch = data.data +  " + " + data.data2 ;
+                        console.log(captch);
+                        $('#hdnQus').val(parseInt(data.data) + parseInt(data.data2));
+                        $('#question').html(captch);
+                    }
+                });
+            }
+
+            function showRandomText() {
+                var minimum = 1;
+                var maximum = 10;
+                var int1 = Math.floor(Math.random() * (maximum - minimum + 1)) + minimum;
+                var int2 = Math.floor(Math.random() * (maximum - minimum + 1)) + minimum;
+                document.getElementById('question').innerHTML = int1 + " " + "+" + " " + int2;
+                var qanswer = int1 + int2;
+
+                var ImgUrl = '@Url.Content("~/captcha.ashx?random=")' + qanswer;
+                $('#imgCapcha').attr("src", ImgUrl);
+                $('#captcha').val('');
+                $('#hdnQus').val(qanswer);
+            }
+
+            function validate() {
+                if ($('#name').val() == "") {
+                    sweetAlert1('Alert', 'Please Enter Username!!');
+                    $('#name').focus();
+                    return false;
+                }
+                else if ($('#password').val() == "") {
+                    sweetAlert1('Alert', 'Please Enter Password!!');
+                    $('#password').focus();
+                    return false;
+                }
+                else if ($('#captcha').val() == "") {
+                    sweetAlert1('Alert', 'Please Enter Captcha!!');
+                    $('#captcha').focus();
+                    return false;
+                }
+                else {
+                    return true;
+                }
+            }
+
+            function setUserSession(uData) { // For Db based login
+                //debugger;
+                var Logindata = new FormData();
+                Logindata.append("__RequestVerificationToken", gettoken());
+                Logindata.append("UserID", uData.USERID);
+                Logindata.append("UserName", uData.USERNAME);
+                Logindata.append("Password", uData.USERPASSWORD);
+                Logindata.append("HospitalCode", uData.HospitalCode);
+                Logindata.append("HospitalName", uData.HospitalName);
+                Logindata.append("HospitalDistName", uData.HospitalDistName);
+                Logindata.append("HOSPITALSTATE", uData.HOSPITALSTATE);
+                Logindata.append("RegBackMonth", uData.RegBackMonth);
+                Logindata.append("STATECODE", uData.STATECODE);
+                Logindata.append("Hospitaldistrictcode", uData.Hospitaldistrictcode);
+                Logindata.append("LastUpdateDate", "3"); // uData.LastUpdateDate (getting null)
+                Logindata.append("HospitalCategoryId", uData.HOSPITAL_CATEGORYID);
+                Logindata.append("HospitalauthorityId", uData.HOSPITALAUTHORITYID);
+                Logindata.append("exceptionhospital", uData.exceptionhospital);
+                Logindata.append("moustatus", uData.moustatus);
+                Logindata.append("empanelmentstatus_flag", uData.empanelmentstatus_flag);
+                Logindata.append("mou_startdate", uData.mou_startdate);
+                Logindata.append("mou_enddate", uData.mou_enddate);
+                Logindata.append("mouleftdays", uData.mouleftdays);
+                Logindata.append("mounoticeflag", uData.mounoticeflag);
+                Logindata.append("backdate_admission", uData.backdate_admission);
+                Logindata.append("backdate_discharge", uData.backdate_discharge);
+                Logindata.append("is_block_active", uData.is_block_active);
+                Logindata.append("groupid", uData.groupid);
+                //console.log(uData);
+                $.ajax({
+                    url: '@Url.Action("SetUserLoginSession", "Dashboard")',
+                    type: "POST",
+                    data: Logindata,
+                    processData: false,
+                    contentType: false,
+                    beforeSend: function () {
+                        $("#loader").show();
+                    },
+                    success: function (data) {
+                        //debugger;
+                        console.log(data);
+                        if (data == "100") {
+                            window.location.href = '@Url.Action("Index", "Dashboard")';
+                        }
+                        else if (data == "105") {
+                            sweetAlert1('Alert', 'Your password is expired. Please Change your password!!');
+                            window.location.href = '@Url.Action("ChangePassword", "Dashboard")';
+                        }
+                    },
+                    complete: function () {
+                        $("#loader").hide();
+                    },
+                    error: function (error) {
+                        console.log(error.statusText);
+                    }
+                });
+            }
+
+            function getLoginData(cData) { // For API based login
+                ////debugger;
+                var LoginParams = {
+                    "userName": cData[0],
+                    "passWord": cData[1]
+                };
+                LoginParams = JSON.stringify(LoginParams);
+                console.log(LoginParams);
+                $.ajax({
+                    url: 'http://203.193.144.115/bsky_service_testI/api/login/authenticate',
+                    type: 'POST',
+                    contentType: 'application/json; charset=UTF-8',
+                    data: LoginParams,
+                    success: function (response) {
+                        //console.log(response);
+                        if (response.status == "fail") {
+                            alert(response.msg);
+                            window.location.reload();
+                            return false;
+                        }
+                        else if (response.status == "400") {
+                            alert(response.error);
+                            window.location.reload();
+                            return false;
+                        }
+                        else if (response.status == "success") {
+                            getGeoLocation(response);
+                            alert('Success (Login)');
+                        }
+                    },
+                    error: function (jqXhr, textStatus, errorMessage) {
+                        console.log(textStatus);
+                        alert('Unknown error.');
+                    }
+                });
+            }
+
+            function validateUserLogin(uData) {  // For API based login
+                ////debugger;
+                var Logindata = new FormData();
+                Logindata.append("__RequestVerificationToken", gettoken());
+                Logindata.append("UserID", uData.data.user.userId);
+                Logindata.append("UserName", uData.data.user.userName);
+                Logindata.append("Password", uData.USERPASSWORD);
+                Logindata.append("HospitalCode", uData.data.user.hospitalCode);
+                Logindata.append("HospitalName", uData.data.user.hospitalName);
+                Logindata.append("HospitalDistName", uData.data.user.hospitalDistName);
+                Logindata.append("RegBackMonth", uData.data.user.regBackMonth);
+                Logindata.append("LastUpdateDate", uData.data.user.LastUpdateDate);
+
+                $.ajax({
+                    url: '@Url.Action("ValidateUserLogin", "Dashboard")',
+                    type: "POST",
+                    data: Logindata,
+                    processData: false,
+                    contentType: false,
+                    success: function (data) {
+                        ////debugger;
+                        console.log(data);
+                        if (data == "100") {
+                            window.location.href = '@Url.Action("Index", "Dashboard")';
+                        }
+                        else if (data == "105") {
+                            alert("Your password is expired.Please Change your password!");
+                            window.location.href = '@Url.Action("ChangePassword", "Dashboard")';
+                        }
+                    },
+                    error: function (error) {
+                        console.log(error.statusText);
+                    }
+                });
+            }
+
+            function getGeoLocation(hData) {
+                //debugger;
+                    if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(function (position) {
+                            successCallback(position, hData);
+                        }, errorCallback, {
+                                enableHighAccuracy: true,
+                                timeout: 30000
+                        });
+                    }
+                    else {
+                        sweetAlert1('Configuration Error', 'Geolocation not supported by browser.','pageReload');
+                    }
+            }
+
+            function successCallback(position, coordData) {
+                //debugger;
+                var latiHospital = coordData.Latitude; //(20.796359604950634, 85.78007418712627 -> Estd. CSM office coord)
+                var longHospital = coordData.Longitude; //(20.29908888722507, 85.83094572742641 -> Estd. OCAC building coord)
+                var latiUser = position.coords.latitude;
+                var longUser = position.coords.longitude;
+                console.log("latiUser", latiUser);
+                console.log("longUser", longUser);
+                console.log("latiHospital", latiHospital);
+                console.log("longHospital", longHospital);
+                var distance = calculateDistance(latiHospital, longHospital, latiUser, longUser, 'MT');
+
+                if (distance > 500) {
+                    sweetAlert1('Latitude & Longitutde', 'User located beyond authorized zone', 'pageReload');
+                    return false;
+                }
+                sweetAlert('Latitude & Longitutde', 'User Within - ' + distance.toFixed(2) + 'm.<br/> Authorized Range - 500 m. <br/> Difference - '
+                    + (distance - 500).toFixed(2) + 'm.', coordData);
+            }
+
+            function errorCallback(error) {
+                const locationErrors = {
+                    1: 'Permission denied, please enable location access',
+                    2: 'User location unavailable',
+                    3: 'User location access timeout'
+                };
+                sweetAlert('Latitude & Longitutde', 'Error:- ' + locationErrors[error.code]);
+            }
+
+            function useGeoLocation(position, hdata) { // Not required in new update (Akshat) 31-Jan-23
+                //debugger;
+                var latiHospital = '20.29908888722507'; //hdata.latitude (20.796359604950634, 85.78007418712627 -> Estd. CSM office coord)
+                var longHospital = '85.83094572742641'; //hdata.longitude (20.29908888722507, 85.83094572742641 -> Estd. OCAC building coord)
+                var latiUser = position.coords.latitude;
+                var longUser = position.coords.longitude;
+                var distance = calculateDistance(latiHospital, longHospital, latiUser, longUser, 'MT');
+
+                sweetAlert('Latitude & Longitutde', 'User Within - ' + distance.toFixed(2) + 'm. <br/> Authorized Range - 500 m.<br/> Difference - '
+                    + (distance - 500).toFixed(2) + 'm');
+                if (distance < 0) {
+                    sweetAlert1('Validation Error', 'User located beyond authorized zone!!', 'pageReload');
+
+                    return false;
+                }
+            }
+
+            function calculateDistance(latiH, longH, latiU, longU, unit) {
+                //debugger;
+                if ((latiH == latiU) && (longH == longU)) {
+                    return 0;
+                }
+                else {
+                    var radlatiH = Math.PI * latiH / 180;
+                    var radlatiU = Math.PI * latiU / 180;
+                    var theta = longH - longU;
+                    var radtheta = Math.PI * theta / 180;
+                    var dist = Math.sin(radlatiH) * Math.sin(radlatiU) + Math.cos(radlatiH) * Math.cos(radlatiU) * Math.cos(radtheta);
+                    if (dist > 1) {
+                        dist = 1;
+                    }
+                    dist = Math.acos(dist);
+                    dist = dist * 180 / Math.PI;
+                    dist = dist * 60 * 1.1515;
+                    if (unit == "KM") { dist = dist * 1.609344 }
+                    if (unit == "MT") { dist = dist * 1609.344 }
+                    console.log(dist);
+                    return dist;
+                }
+            }
+
+            function inputLimiter(e, allow) {
+                var AllowableCharacters = '';
+                if (allow == 'NameCharactersymbol') {
+                    AllowableCharacters = ' ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz./&';
+                }
+                if (allow == 'NameCharacters') {
+                    AllowableCharacters = ' ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-.\'';
+                }
+                if (allow == 'NameCharactersAndNumbers') {
+                    AllowableCharacters = '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_';
+                }
+                if (allow == 'Description') {
+                    AllowableCharacters = '1234567890 ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-,./\&(){}[]#$:';
+                }
+                if (allow == 'Numbers') {
+                    AllowableCharacters = '1234567890';
+                }
+                if (allow == 'Decimal') {
+                    AllowableCharacters = '1234567890.';
+                }
+                var k;
+                k = document.all ? parseInt(e.keyCode) : parseInt(e.which);
+                if (k != 13 && k != 8 && k != 0) {
+                    if ((e.ctrlKey == false) && (e.altKey == false)) {
+                        return (AllowableCharacters.indexOf(String.fromCharCode(k)) != -1);
+                    }
+                    else {
+                        return true;
+                    }
+                }
+                else {
+                    return true;
+                }
+        }
+    </script>
+
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC6v5-2uaq_wusHDktM9ILcqIrlPtnZgEk&sensor=false"></script>
+
+    <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false&libraries=places">
+
+    </script>
+
+    <script type="text/javascript">
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(success);
+        } else {
+            alert("There is Some Problem on your current browser to get Geo Location!");
+        }
+
+        function success(position) {
+            var lat = position.coords.latitude;
+            var long = position.coords.longitude;
+            var city = position.coords.locality;
+            var LatLng = new google.maps.LatLng(lat, long);
+            console.log("Lat", lat);
+            console.log("Lng", long);
+        }
+    </script>
+
+</head>
+
+<body class="loginBg h-100" oncontextmenu="return false;">
+    @*oncontextmenu="return false;"*@
+    <div class="container  h-100">
+        <div class="row justify-content-center align-items-center h-100">
+            <div class="card wow fadeInLeft animated" data-wow-delay="0.3s">
+                <div class="card-body">
+                    <div class="logo-height"><img src="~/imgs/logo.png" alt=""></div>
+                    <h1 class="text-left mb-4">Login</h1>
+                    <form class="mt-3" autocomplete="off">
+                        <div class="form-group">
+                            <label for="exampleFormControlInput1">Enter User ID </label>
+                            <input type="text" class="form-control" id="name" placeholder="Username" maxlength="20" autocomplete="off" onkeypress="return inputLimiter(event,'NameCharactersAndNumbers')">
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleFormControlInput1"> Password </label>
+                            <input type="password" name="password" class="form-control" id="password" placeholder="Password" maxlength="20" autocomplete="off">
+                            <div class="password_ic">
+                                <span toggle="#password" class="fa fa-fw fa-eye field-icon toggle-password"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="col-lg-8 col-md-8 col-sm-7 col-xs-12">
+                                <label for="exampleFormControlInput1"> Captcha </label>
+                                <input type="hidden" id="hdnQus" />
+                                <input type="text" class="form-control onlynum" id="captcha" placeholder="Captcha" maxlength="6">
+                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-5 col-xs-12">
+                                @*<div class="login-cpt">
+                                                <img alt="Captcha" id="imgCapcha" src="~/captcha.ashx">
+                                                <button class="btn refresh-btn" type="button" id="imgbtnRefresh" style="width:100px; height:42px;"><i class="fi-rr-refresh"></i></button>
+                                    </div>*@
+                                <div class="login-cpt">
+                                    <h2 id="question" class="captch-bg"></h2>
+                                    <div id="imgbtnRefresh" src="~/captcha.ashx">
+                                        <i class="fa fa-refresh refrsh-pos"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            @* <div class="col-md-1 mt-4">
+                                    <button class="btn refresh-btn" type="button" id="imgbtnRefresh"><i class="fi-rr-refresh"></i></button>
+                                </div>*@
+                        </div>
+                        @*<p>@ViewBag.macAddress</p>*@
+                        <input type="button" id="btnLogin" value="LOGIN" class="btn btn-block btn-link mt-4 loginBtn" name="login" />
+                        @*<button type="button" class="btn btn-danger text-white mt-2" id="warning"> <i class="fa fa-map-marker"></i> </button>*@
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- loader section -->
+    <div id="loader" class="spinner-bg">
+        <div class="spin-inner">
+            <img src="~/imgs/bsky_loader.gif" alt="">
+        </div>
+    </div>
+    <!-- loader section -->
+
+
+    <script>
+        var minimum = 1;
+        var maximum = 10;
+        var int1 = Math.floor(Math.random() * (maximum - minimum + 1)) + minimum;
+        var int2 = Math.floor(Math.random() * (maximum - minimum + 1)) + minimum;
+        document.getElementById('question').innerHTML = int1 + " " + "+" + " " + int2;
+        var qanswer = int1 + int2;
+        function fire() {
+            var uanswer = document.getElementById('answer').value;
+            if (uanswer == qanswer) {
+                alert("Captcha match Successfully");
+            } else {
+                alert("WRONG CAPTCHA!")
+            }
+        }
+
+    </script>
+
+    <!-- sweetalert js here -->
+    <script>
+        // (New) ADDED by Akshat (30-Jan-23)
+        function sweetAlert(stitle, sdata, sparam) {
+            swal({
+                //title: stitle,
+                type: "success",
+                html: "<div class='row'> <div class='mb-1 col-md-12 text-center'>" + sdata + "</div> </div>",
+                confirmButtonColor: "#36A865",
+                confirmButtonText: "OK"
+            }).then(function (isConfirm) {
+                if (sparam != null) {
+                    if (sparam == 'pageReload') {
+                        window.location.reload();
+                    }
+                    else {
+                        setUserSession(sparam);
+                    }
+                }
+            });
+        }
+
+        function sweetAlert1(stitle, sdata, sparam) {
+            swal({
+                //title: stitle,
+                type: "error",
+                html: "<div class='row'> <div class='mb-1 col-md-12 text-center'>" + sdata + "</div> </div>",
+                confirmButtonColor: "#36A865",
+                confirmButtonText: "OK"
+            }).then(function (isConfirm) {
+                if (sparam != null) {
+                    if (sparam == 'pageReload') {
+                        window.location.reload();
+                    }
+                    else {
+                        setUserSession(sparam);
+                    }
+                }
+            });
+        }
+
+        $('#warning').click(function () {
+            swal({
+                title: "Longitiude & Latitude",
+                imageUrl: "imgs/location.png",
+                html: "<div class='row'> <div class='mb-1 col-md-6 text-right'>User Within - </div> <div class='mb-1 col-md-6 text-left'>2747.61m.</div>  <div class='mb-1 col-md-6 text-right'> Autorized Range - </div> <div class='mb-1 col-md-6 text-left'>200m. </div><div class='mb-1 col-md-6 text-right'> Difference - </div>  <div class='mb-1 col-md-6 text-left'>2547.61m.</b> </div></div>",
+                confirmButtonColor: "#36A865",
+                confirmButtonText: "OK"
+
+            });
+        });
+    </script>
+    <script>
+        // Disable right-click with f12 click
+        document.addEventListener('contextmenu', (e) => e.preventDefault());
+        function ctrlShiftKey(e, keyCode) {
+            return e.ctrlKey && e.shiftKey && e.keyCode === keyCode.charCodeAt(0);
+        }
+        document.onkeydown = (e) => {
+            // Disable F12, Ctrl + Shift + I, Ctrl + Shift + J, Ctrl + U
+            if (
+                event.keyCode === 123 ||
+                ctrlShiftKey(e, 'I') ||
+                ctrlShiftKey(e, 'J') ||
+                ctrlShiftKey(e, 'C') ||
+                (e.ctrlKey && e.keyCode === 'U'.charCodeAt(0))
+            )
+                return false;
+        };
+    </script>
+    <!-- sweetalert js here -->
+</body>
+</html>

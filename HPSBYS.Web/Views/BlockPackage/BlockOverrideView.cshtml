@@ -1,0 +1,187 @@
+﻿
+@{
+    ViewBag.Title = "BlockOverrideView";
+    Layout = "~/Views/Shared/_CommonLayout.cshtml";
+}
+
+<script typeof="javascript">
+    $(document).ready(function () {
+        $('#path').html('Block Override View');
+        $('#DvOverrideView').hide();
+        $("#btnSearch").click(function () {
+            if (validate()) {
+                bindgrdOverrideView();
+            }
+        });
+    });
+
+    function bindgrdOverrideView() {
+        ////debugger;
+        $('#grdOverrideView').jsGrid({
+            width: "100%",
+            sorting: true,
+            paging: true,
+            pageSize: 10,
+            autoload: true,
+            controller: {
+                loadData: function () {
+                    var d = $.Deferred();
+                    var params = {
+                        ACTIONCODE: 'B',
+                        URN: $('#txtUrnNo').val(),
+                        HospitalCode: '@Session["HospitalCode"]'
+                    };
+                    params = JSON.stringify(params);
+                    return $.ajax({
+                        url: ServiceURL + "/api/BlockPackage/GetOverrideCodeList",
+                        type: "POST",
+                        data: params,
+                        dataType: "json",
+                        contentType: "application/json; charset=utf-8",
+                        error: function (error) {
+                            console.log(error.statusText);
+                        },
+                    }).done(function (result) {
+                        $('#DvOverrideView').show();
+                        if (result.length > 0) {
+                            d.resolve($.map(result, function (item, itemIndex) {
+                                return $.extend(item, { "Index": itemIndex + 1 });
+                            }));
+                        }
+                    });
+                }
+            },
+            fields: [
+                { name: "Index", title: "Sl No.", type: "number", width: "50", align: "center" },
+                { name: "memberID", title: "Id", type: "text", align: "center" },
+                { name: "memberName", title: "Name", type: "text", align: "center" },
+                { name: "urn", title: "Urn", type: "text", align: "center" },
+                { name: "memberAge", title: "Override Code", type: "text", align: "center" },
+                { name: "noofDays", title: "No. of days", type: "text", align: "center" },
+                { name: "description", title: "Description", type: "text", align: "center" },
+                { name: "memberName", title: "Status", type: "text", align: "center" }
+            ]
+        });
+    }
+
+    function validate() {
+        if ($('#txtUrnNo').val() == '') {
+            alert('Please enter NFSA/SFSS NO !!');
+            $('#txtUrnNo').focus();
+            return false;
+        }
+        return true;
+    }
+
+    function inputLimiter(e, allow) {
+        var AllowableCharacters = '';
+        if (allow == 'NameCharactersymbol') {
+            AllowableCharacters = ' ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz./&';
+        }
+        if (allow == 'NameCharacters') {
+            AllowableCharacters = ' ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-.\'';
+        }
+        if (allow == 'NameCharactersAndNumbers') {
+            AllowableCharacters = '1234567890 ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-,/.\'';
+        }
+        if (allow == 'Description') {
+            AllowableCharacters = '1234567890 ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-,./\&(){}[]#$:';
+        }
+        if (allow == 'Numbers') {
+            AllowableCharacters = '1234567890';
+        }
+        if (allow == 'Decimal') {
+            AllowableCharacters = '1234567890.';
+        }
+        var k;
+        k = document.all ? parseInt(e.keyCode) : parseInt(e.which);
+        if (k != 13 && k != 8 && k != 0) {
+            if ((e.ctrlKey == false) && (e.altKey == false)) {
+                return (AllowableCharacters.indexOf(String.fromCharCode(k)) != -1);
+            }
+            else {
+                return true;
+            }
+        }
+        else {
+            return true;
+        }
+    }
+</script>
+
+<!-- Dashboard Body content part starts -->
+<div class="container">
+    <div class="row">
+        <div class="col-12 pb-3">
+            <div class="card">
+                <div class="card-body">
+                    <div class="clearfix"></div>
+                    <!-- patient info -->
+                    <div class="form-box-bg mb-4">
+                        <ul class="nav nav-tabs custom-tab mb-4">
+                            <li class="nav-item">
+                                <a class="nav-link" href="@Url.Action("ViewBlockPackage","BlockPackage")">Add</a>
+                            </li>
+                            <li class="nav-item"> <a class="nav-link " href="@Url.Action("BlockPreApproval","BlockPackage")"> Pre-Approval Request </a> </li>
+                            <li class="nav-item"> <a class="nav-link" href="@Url.Action("BlockOverrideRequest","BlockPackage")"> Override Request </a> </li>
+                            <li class="nav-item"> <a class="nav-link active" href="@Url.Action("BlockOverrideView","BlockPackage")"> Override View </a> </li>
+                        </ul>
+                        <div class="pkg_grey">
+                            <div class="form-row">
+                                <div class="col-lg-10 col-md-12 col-sm-8 col-xs-12 form-row form-designsc">
+                                    <label for="packageHeader" class="col-lg-2 col-md-4 col-sm-4 col-xs-12 col-form-label">NFSA/SFSS NO<b><span style="color:red">*</span></b></label>
+                                    <div class="col-lg-3 col-md-4 col-sm-4 col-xs-12 mb-2 px-0">
+                                        <input id="txtUrnNo" type="text" class="form-control" autofocus placeholder="Enter here" maxlength="17" onkeypress="return inputLimiter(event,'Numbers')" />
+                                    </div>
+                                    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 px-0">
+                                        <input class="btn btn-outline-success my-2 my-sm-0" type="button" value="Search" id="btnSearch">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="DvOverrideView">
+                            <div class="row mb-1 heading-pkg border-bottom ">
+                                <h5>Override Details</h5>
+                            </div>
+                            <div class="clearfix"></div>
+                            <div class="col-md-12 col-sm-12 col-xs-12 px-0">
+                                <div class="table-responsive">
+                                    <table id="grdOverrideView" class="table table-striped jsgrid-table">
+                                        <thead>
+                                            <tr class="jsgrid-header-row">
+                                                <th scope="col" class="jsgrid-header-cell">Sl No.</th>
+                                                <th scope="col" class="jsgrid-header-cell">Id</th>
+                                                <th scope="col" class="jsgrid-header-cell">Name</th>
+                                                <th scope="col" class="jsgrid-header-cell">Urn</th>
+                                                <th scope="col" class="jsgrid-header-cell">Override Code</th>
+                                                <th scope="col" class="jsgrid-header-cell">No. of days</th>
+                                                <th scope="col" class="jsgrid-header-cell">Description</th>
+                                                <th scope="col" class="jsgrid-header-cell">Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        $('.secondary-menu li a').tooltip();
+    });
+</script>
+
+<script>
+    // breadcrumb active & menu active
+    $(document).ready(function () {
+        loadNavigation('BlockOverrideView', 'Mlblockpackage', 'pl', 'Block Package', 'Override view', '');
+    });
+</script>

@@ -1,0 +1,375 @@
+﻿
+@{
+    ViewBag.Title = "ViewMultipleBlockPackage";
+    Layout = "~/Views/Shared/_CommonLayout.cshtml";
+}
+
+<style type="text/css">
+    tr.highlight td.jsgrid-cell {
+        background-color: lightgoldenrodyellow;
+    }
+
+    .jsgrid-grid-header,
+    .jsgrid-grid-body {
+        overflow: auto;
+    }
+</style>
+<script type="text/javascript">
+    var arrRegData = [];
+    $(document).keydown(function (event) {
+        event = (event || window.event);
+        if ((event.keyCode == 49) && (event.shiftKey === true)) {
+             window.location.href = '@Url.Action("ViewBlockPackage", "BlockPackage")';
+        }
+        else if ((event.keyCode == 50) && (event.shiftKey === true)) {
+             window.location.href = '@Url.Action("ViewMultipleBlockPackage", "BlockPackage")';
+        }
+        else if ((event.keyCode == 51) && (event.shiftKey === true)) {
+           window.location.href = '@Url.Action("PreAuthorizationDetails", "PreAuthorization")';
+        }
+         else if ((event.keyCode == 52) && (event.shiftKey === true)) {
+            window.location.href = '@Url.Action("ViewExtensionOfStay", "ExtensionOfStay")';
+        }
+    });
+    $(document).ready(function () {
+        $('#path').html('Block Package List');
+        var arrBlockPackage = [];
+        fillgrid();
+        $('#ddlRows').change(function () {
+            if ($("option:selected", $("#ddlRows")).val() == '1') {
+                $("#jsGrid").jsGrid({ pageSize: 10});
+            }
+           else if ($("option:selected", $("#ddlRows")).val() == '2') {
+                $("#jsGrid").jsGrid({ pageSize: 20 });
+            }
+           else if ($("option:selected", $("#ddlRows")).val() == '3') {
+                $("#jsGrid").jsGrid({ pageSize: 50 });
+            }
+           else if ($("option:selected", $("#ddlRows")).val() == '4') {
+                $("#jsGrid").jsGrid({ pageSize: 100 });
+            }
+          else if ($("option:selected", $("#ddlRows")).val() == '5') {
+                $("#jsGrid").jsGrid({ pageSize: 200 });
+            }
+          else if ($("option:selected", $("#ddlRows")).val() == '6') {
+                $("#jsGrid").jsGrid({ pageSize: 500 });
+            }
+        });
+        $('#btnSearch').click(function () {
+            if (validate()) {
+                fillgrid();
+            }
+        });
+    });
+    function fillgrid() {
+        var arrBlockPackage = [];
+           $('#jsGrid').jsGrid({
+            width: "100%",
+            sorting: true,
+            paging: true,
+            autoload: true,
+            pageSize: 10,
+            pagerFormat: "Pages: {first} {prev} {pages} {next} {last} &nbsp;&nbsp; {pageIndex} of {pageCount} &nbsp;&nbsp; Total rows: {itemCount}",
+            pageButtonCount: 10,
+            rowClick: function (args) {
+                //console.log(args)
+                var $row = this.rowByItem(args.item),
+                    selectedRow = $("#jsGrid").find('table tr.highlight');
+                if (selectedRow.length) {
+                    selectedRow.toggleClass('highlight');
+                };
+                $row.toggleClass("highlight");
+            },
+            controller: {
+                loadData: function (filter) {
+                    var d = $.Deferred();
+                    var RegParams = {
+                        HospitalCode: '@Session["HospitalCode"]',
+                        Action: 'D',
+                        URN: $('#urnNo').val(),
+                        BlockingINVOICENO: null,
+                        TransactionID: '0'
+                    };
+                    return $.ajax({
+                        url: ServiceURL + "/api/Registration/GetRegistrationformation",
+                        type: "GET",
+                        data: RegParams,
+                        dataType: "json",
+                        contentType: "application/json; charset=utf-8",
+                        error: function (error) {
+                            console.log(error.statusText);
+                        },
+                    }).done(function (result) {
+                        // console.log(result);
+                        if (result.length > 0) {
+                            $('#divRowCount').show();
+                              d.resolve($.map(result, function (item, itemIndex) {
+                                  return $.extend(item, { "Index": itemIndex + 1 });
+                              }
+                            ));
+                        }
+                        else {
+                            $('#divRowCount').hide();
+                        }
+                    });
+                    return d.promise();
+                }
+            },
+            fields: [
+                { name: "Index", width: 30, type: "number", title: "#Sl", align: "center",filtering: false},
+                { name: "memberID", title: "memberID", type: "number", visible: false },
+                { name: "headMemberName", title: "HeadOfFamily", type: "text", visible: false },
+                { name: "schemeCode", title: "schemeCode", type: "text", visible: false },
+                { name: "headMemberID", title: "headMemberID", type: "text", visible: false },
+                { name: "amoutBlocked", title: "amoutBlocked", type: "text", visible: false },
+                { name: "memberDistrictCode", title: "MemberDistrictCode", type: "number", visible: false },
+                { name: "memberDistrictName", title: "MemberDistrictName", type: "text", visible: false },
+                { name: "memberStateName", title: "MemberStateName", type: "text", visible: false },
+                { name: "memberStateCode", title: "memberStateCode", type: "text", visible: false },
+                { name: "memberBlockCode", title: "memberBlockCode", type: "text", visible: false },
+                { name: "panchayatCode", title: "panchayatCode", type: "text", visible: false },
+                { name: "villageCode", title: "villageCode", type: "text", visible: false },
+                { name: "transactionID", title: "TransactionID", type: "text", visible: false },
+                { name: "urn", type: "text", title: "URN", align: "center" },
+                { name: "cardNo", type: "text", title: "Card No.", align: "center",visible: false },
+                { name: "memberName", type: "text", title: "Name", align: "center" },
+                { name: "invoiceNo", type: "text", title: "Invoice No.", align: "center"},
+                { name: "registrationDate", type: "number", title: "Registration Date", align: "center"},
+                { name: "patientContactNumber", type: "number", title: "Contact Number", align: "center" },
+
+                { name: "category", title: "category", type: "text", visible: false },
+                { name: "categoryCode", title: "categoryCode", type: "text", visible: false },
+                {
+                     type: "control", editButton: false, deleteButton: false, align: "center", width: "86",
+                     itemTemplate: function (value, item) {
+                         return $("<button>").attr({ type: "button", class: "btn btn-outline-primary focusedBtn btn-sm my-2 my-sm-0" }).text("Generate Admission Slip")
+                             .on("click", function () {
+                                 var windowName = "PrintPage";
+                                 var wOption = "width=1350,height=650,menubar=yes,scrollbars=yes,location=no,left=100,top=100";
+                                 var wWinPrint = window.open("", windowName, wOption);
+                                 var arrBlockPackage = [];
+                                 arrBlockPackage.push({
+                                     urn: item.urn,
+                                     invoiceNo: item.invoiceNo,
+                                     TransactionID: item.transactionID,
+                                     PageStatus:'A'
+                                 })
+                                 localStorage.setItem('PrevBlockPackageInfo', JSON.stringify(arrBlockPackage));
+                                 wWinPrint.location.href = '@Url.Action("TreatmentCompletionCertificate", "Discharge")';
+                                 wWinPrint.focus();
+                                 return wWinPrint;
+                             });
+                     },
+                     headerTemplate: function () {
+                         return $("<div>").prop("title", "Action").text("Admission Slip");
+                     }
+                 },
+                {
+                    type: "control", editButton: false, deleteButton: false, align: "center",
+                    itemTemplate: function (value, item) {
+                        return $("<button>").attr({ type: "button", class: "btn btn-outline-success focusedBtn btn-sm my-2 my-sm-0" }).text("Block")
+                            .on("click", function () {
+                                var arrBlockPackage = [];
+                                arrBlockPackage.push({
+                                    schemeCode: item.schemeCode,
+                                    urn: item.urn,
+                                    cardNo: item.cardNo,
+                                    memberName: item.memberName,
+                                    patientContactNumber: item.patientContactNumber,
+                                    memberID: item.memberID,
+                                    invoiceNo: item.invoiceNo,
+                                    registrationDate: item.registrationDate,
+                                    headMemberID: item.headMemberID,
+                                    headMemberName: item.headMemberName,
+                                    memberDistrictCode: item.memberDistrictCode,
+                                    memberDistrictName: item.memberDistrictName,
+                                    memberStateName: item.memberStateName,
+                                    memberStateCode: item.memberStateCode,
+                                    memberBlockCode: item.memberBlockCode,
+                                    panchayatCode: item.panchayatCode,
+                                    villageCode: item.villageCode,
+                                    amoutBlocked: item.amoutBlocked,
+                                    TransactionID: item.transactionID,
+                                    PageBackStatus: 'M'
+                                })
+                                localStorage.setItem('BlockPackageInfo', JSON.stringify(arrBlockPackage));
+                                window.location.href = '@Url.Action("AddBlockPackage", "BlockPackage")';
+                            });
+                    },
+                    headerTemplate: function () {
+                        return $("<div>").prop("title", "Action").text("Action");
+                    }
+                    //,filterTemplate: function () { return ""; }
+                },
+                {
+                    type: "control", editButton: false, deleteButton: false, align: "center",
+                    itemTemplate: function (value, item) {
+                        return $("<button>").attr({ type: "button", class: "btn btn-outline-danger focusedBtn btn-sm my-2 my-sm-0" }).text("Cancel")
+                            .on("click", function () {
+                                var arrCancellation = [];
+                                arrCancellation.push({
+                                    schemeCode: item.schemeCode,
+                                    urn: item.urn,
+                                    cardNo: item.cardNo,
+                                    memberName: item.memberName,
+                                    patientContactNumber: item.patientContactNumber,
+                                    memberID: item.memberID,
+                                    invoiceNo: item.invoiceNo,
+                                    registrationDate: item.registrationDate,
+                                    headMemberID: item.headMemberID,
+                                    headMemberName: item.headMemberName,
+                                    memberDistrictCode: item.memberDistrictCode,
+                                    memberDistrictName: item.memberDistrictName,
+                                    memberStateName: item.memberStateName,
+                                    memberStateCode: item.memberStateCode,
+                                    memberBlockCode: item.memberBlockCode,
+                                    panchayatCode: item.panchayatCode,
+                                    villageCode: item.villageCode,
+                                    amoutBlocked: item.amoutBlocked,
+                                     PageBackStatus: 'M'
+                                })
+                                localStorage.setItem('CancellationInfo', JSON.stringify(arrCancellation));
+                                window.location.href = '@Url.Action("AddCancellation", "BlockPackage")';
+                            });
+                    },
+                    headerTemplate: function () {
+                        return $("<div>").prop("title", "Action").text("Cancel");
+                    }
+                }
+            ]
+        });
+    }
+    function validate() {
+        if ($('#urnNo').val() == '') {
+            alert('Please Enter URN !!');
+            $('#urnNo').focus();
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+    function inputLimiter(e, allow) {
+        var AllowableCharacters = '';
+        if (allow == 'NameCharactersymbol') {
+            AllowableCharacters = ' ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz./&';
+        }
+        if (allow == 'NameCharacters') {
+            AllowableCharacters = ' ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-.\'';
+        }
+        if (allow == 'NameCharactersAndNumbers') {
+            AllowableCharacters = '1234567890 ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-,/.\'';
+        }
+        if (allow == 'Description') {
+            AllowableCharacters = '1234567890 ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-,./\&(){}[]#$:';
+        }
+        if (allow == 'Numbers') {
+            AllowableCharacters = '1234567890';
+        }
+        if (allow == 'Decimal') {
+            AllowableCharacters = '1234567890.';
+        }
+        var k;
+        k = document.all ? parseInt(e.keyCode) : parseInt(e.which);
+        if (k != 13 && k != 8 && k != 0) {
+            if ((e.ctrlKey == false) && (e.altKey == false)) {
+                return (AllowableCharacters.indexOf(String.fromCharCode(k)) != -1);
+            }
+            else {
+                return true;
+            }
+        }
+        else {
+            return true;
+        }
+    }
+</script>
+<!-- Dashboard Body content part starts -->
+<div class="container-fluid">
+    <ul class="nav nav-tabs custom-tab pl-4">
+        <li class="nav-item">
+            <a class="nav-link" href="@Url.Action("ViewBlockPackage", "BlockPackage")">New Registration</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link active" href="@Url.Action("ViewMultipleBlockPackage", "BlockPackage")">Blocked Package</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link " href="@Url.Action("PreAuthorizationDetails", "PreAuthorization")">PreApproval Request</a>
+        </li>
+        @*<li class="nav-item">
+                <a class="nav-link" href="@Url.Action("ViewExtensionOfStay", "ExtensionOfStay")">Extension Of Stay</a>
+            </li>*@
+    </ul>
+    <div class="row">
+        <div class="col-12 pb-3">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col">
+                            <form class="filter-wrapper">
+                                <div class="form-group row">
+                                    <label for="packageHeader" class="col-sm-1 col-form-label">URN</label>
+                                    <div class="col-sm-2">
+                                        <input type="text" class="form-control" autofocus id="urnNo" placeholder="Enter here" maxlength="17" onkeypress="return inputLimiter(event,'Numbers')" />
+                                    </div>
+                                    @*<label for="packageHeader" class="col-sm-2 col-form-label">From Date</label>
+                                        <div class="col-sm-2">
+                                            <div class="input-group mb-3">
+                                                <input type="text" id="FrmDt" class="form-control datepicker" placeholder="dd mmm yyyy" aria-label="Username" aria-describedby="basic-addon1" maxlength="11">
+                                                <div class="input-group-prepend">
+                                                    <label for="blockingDt" class="input-group-text"><i class="icon-calendar"></i></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <label for="packageHeader" class="col-sm-2 col-form-label">To Date</label>
+                                        <div class="col-sm-2">
+                                            <div class="input-group mb-3">
+                                                <input type="text" id="ToDt" class="form-control datepicker" placeholder="dd mmm yyyy" aria-label="Username" aria-describedby="basic-addon1" maxlength="11">
+                                                <div class="input-group-prepend">
+                                                    <label for="blockingDt" class="input-group-text"><i class="icon-calendar"></i></label>
+                                                </div>
+                                            </div>
+                                        </div>*@
+                                    <div class="col-sm-1">
+                                        <input class="btn btn-outline-success my-2 my-sm-0" type="button" value="Search" id="btnSearch">
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="row" id="divRowCount">
+                        <label for="Rows">&nbsp;&nbsp;&nbsp;Row count</label>
+                        <div class="col-sm-1">
+                            <select id="ddlRows" autofocus>
+                                <option value="1">10</option>
+                                <option value="2">20</option>
+                                <option value="3">50</option>
+                                <option value="4">100</option>
+                                <option value="5">200</option>
+                                <option value="6">500</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-10"></div>
+                    </div>
+                    <div class="table table-striped table-bordered" id="jsGrid">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<script type="text/javascript">
+    $(function () {
+        $('.secondary-menu li a').tooltip();
+    });
+</script>
+
+<script>
+    // breadcrumb active & menu active
+    $(document).ready(function () {
+        loadNavigation('ViewMultipleBlockPackage', 'Mlblockpackage', 'pl', 'Block Package', 'View Multiple Block Package', '');
+    });
+</script>
+
+

@@ -1,0 +1,122 @@
+﻿@using System.Configuration
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>HPSBYS:: Dashboard</title>
+    <link rel="stylesheet" href="~/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/style.css" />
+    <link rel="stylesheet" href="~/css/icon.css" />
+    <script src="~/js/jquery.min.js" type="text/javascript"></script>
+    <script src="~/js/popper.min.js" type="text/javascript"></script>
+    <script src="~/js/bootstrap.min.js" type="text/javascript"></script>
+    <script src="~/js/moment.min.js"></script>
+    <script src="~/js/moment-parseformat.js"></script>
+    <script type="text/javascript">
+        ServiceURL = "@ConfigurationManager.AppSettings["ServiceURL"]"
+        ShortcutKeyURL = "@ConfigurationManager.AppSettings["ShortcutKeyURL"]"
+    </script>
+    <script type="text/javascript">
+    function gettoken() {
+    var token = '@Html.AntiForgeryToken()';
+    token = $(token).val();
+    return token;
+    }
+    </script>
+    <script type="text/javascript">
+          $(document).ready(function () {
+            if ('@Session["UserName"]'== 'MIS_020demotest') {
+                $('#logTools').show();
+                $('#Tools').hide();
+            }
+            else {
+                $('#logTools').hide();
+                $('#Tools').show();
+            }
+        });
+    </script>
+    <script src="~/js/ShortcutKey.js"></script>
+</head>
+<body>
+    <!-- Code for header part -->
+    <div class="pos-f-t">
+        <nav class="navbar">
+            <div class="container-fluid pr-0">
+                <div class="row align-items-center">
+                    <div class="col-sm-5">
+                        <ul class="header-logo">
+                            <li>
+                                <img src="~/imgs/hpsbys-logo.png" alt="">
+                                <div>
+                                    <h2>Himachal Pradesh Swasthya Bima Yojna Society</h2>
+                                    <p>Department of Health & Family Welfare<br />Government of Himachal Pradesh</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-sm-7 text-right action-area">
+                        <ul class="nav header-menu justify-content-end">
+                            @*<li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="javascript: void(0);">Master</a>
+            <div class="dropdown-menu">
+                <a class="dropdown-item" href="view-hospital-info.html">Hospital Information</a>
+                <a class="dropdown-item" href="reports.html">Reports</a>
+            </div>
+        </li>*@
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="javascript: void(0);">In-Patient</a>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" href="@Url.Action("PreAuthorizationDetails", "PreAuthorization")">Pre-authorization Request</a>
+                                    <a class="dropdown-item" href="@Url.Action("ViewExtensionOfStay", "ExtensionOfStay")">Extension of Stay</a>
+                                </div>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="javascript: void(0);">IP Reports</a>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" href="@Url.Action("ViewPatientStatus", "IPReports")">Patient Status</a>
+                                </div>
+                            </li>
+                            <li class="nav-item dropdown" id="logTools">
+                                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="javascript: void(0);">Tools</a>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" href="@Url.Action("ViewLog", "Dashboard")">View Log</a>
+                                    <a class="dropdown-item" href="@Url.Action("AddNotice", "Dashboard")">Notice</a>
+                                </div>
+                            </li>
+                            <li class="nav-item" id="Tools">
+                                <a class="nav-link" href="#">Tools</a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="javascript: void(0);">Help</a>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" href="~/UserManual/UserManualDoc.docx">User Manual</a>
+                                </div>
+                            </li>
+                            <li class="nav-item dropdown logedUser">
+                                <button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="icon-user-o"></i>
+                                </button>
+                                <div class="dropdown-menu text-center" aria-labelledby="dropdownMenuButton">
+                                    <h3>@Session["HospitalName"]</h3>
+                                    <p class="mb-3">@Session["HospitalDistName"]</p>
+                                    <a class="btn btn-outline-dark btn-sm btn-block" href="@Url.Action("ChangePassword", "Dashboard")">Change Password</a>
+                                    <a class="btn btn-outline-dark btn-sm btn-block" href="@Url.Action("Logout", "Dashboard")">Logout</a>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <div class="collapse" id="navbarToggleExternalContent">
+
+        </div>
+    </div>
+    <!-- Header code Ends here -->
+    <div>
+        @RenderBody()
+    </div>
+</body>
+</html>

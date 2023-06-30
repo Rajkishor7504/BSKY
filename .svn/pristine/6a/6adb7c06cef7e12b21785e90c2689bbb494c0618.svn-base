@@ -1,0 +1,291 @@
+﻿
+@{
+    ViewBag.Title = "AddNotice";
+    Layout = "~/Views/Shared/_CommonLayout.cshtml";
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#path').html('Notice');
+        $('#StartDt').datepicker({
+            format: 'dd M yyyy',
+            startDate: '-0d',
+            endDate: '+60d',
+            autoclose: true
+        }); //code for datepicker
+        $('#EndDt').datepicker({
+            format: 'dd M yyyy',
+            startDate: '-0d',
+            endDate: '+60d',
+            autoclose: true
+        }); //code for datepicker
+        $(".datepicker").datepicker("setDate", (new Date().toDateString()));
+        var ml = 200;
+        $('#Desc').text("(Maximum " + ml + " characters are allowed.)");
+        $('#mSummery').keydown(function () {
+            var text = $(this).val();
+            var textLength = text.length;
+            if (textLength > ml) {
+                $(this).val(text.substring(0, (ml)));
+                var charactersLeft = ml - textLength + 1;
+            }
+            else {
+                var charactersLeft = ml - textLength;
+            }
+            $('#Desc').text("(Maximum " + (charactersLeft) + " characters are allowed.)");
+        });
+        $('#btnSave').click(function () {
+            if (validate()) {
+                if (checkconfirmReq()) {
+                var document = $("#document").get(0);
+                var documentfiles = document.files;
+                var fileData = new FormData();
+                fileData.append("__RequestVerificationToken", gettoken());
+                fileData.append("StartDate", $('#StartDt').val());
+                fileData.append("EndDate", $('#EndDt').val());
+                fileData.append("Notice", $('#mSummery').val());
+                fileData.append("Document", documentfiles[0]);
+                           $.ajax({
+                            url: '@Url.Action("AddNotice", "Dashboard")',
+                            type: "POST",
+                               data: fileData,
+                            processData: false,
+                            contentType: false,
+                               success: function (result) {
+                                   if (result == "sucess") {
+                                       alert('Notice Submit Successfully!!');
+                                        window.location.href = '@Url.Action("ViewNotice", "Dashboard")';
+                                   }
+                               },
+                               error: function (error) {
+                               console.log(error.statusText);
+                               }
+                           });
+                }
+            }
+        });
+        $('#document').on('change', function (e) {
+            if (!ValidateFile('document', 'Valid Document')) {
+                return false;
+            };
+            if (!CheckFileType('document', '1')) {
+                return false;
+            };
+        });
+    });
+    function ValidateFile(cntr, strText) {
+
+        var strValue = $('#' + cntr).get(0).files.length;
+        if (strValue == "0") {
+            alert("Please upload " + strText);
+            return false;
+        }
+        else
+            return true;
+    }
+    function CheckFileType(cntr, ftype) {
+         var userImg = '@Url.Content("~/imgs/no_user.png")';
+        // Get the file upload control file extension
+        var extn = $('#' + cntr).val().split('.').pop().toLowerCase();
+        if (extn != '') {
+
+            // Create array with the files extensions to upload
+            var fileListToUpload;
+            if (parseInt(ftype) == 1)
+                fileListToUpload = new Array('pdf', 'jpg', 'jpeg');
+            else if (parseInt(ftype) == 2)
+                fileListToUpload = new Array('jpg', 'jpeg');
+            else
+                fileListToUpload = new Array('pdf');
+
+            //Check the file extension is in the array.
+            var isValidFile = $.inArray(extn, fileListToUpload);
+
+            // isValidFile gets the value -1 if the file extension is not in the list.
+            if (isValidFile == -1) {
+                if (parseInt(ftype) == 1) {
+                    alert('Please upload a valid document of type pdf/jpg/jpeg.!!!');
+                    $('#' + cntr).replaceWith($('#' + cntr).val('').clone(true));
+                    $('#' + cntr).focus();
+                }
+                else if (parseInt(ftype) == 2) {
+                    alert('Please upload a valid document of type jpg/jpeg.!!!');
+                    $('#showPhoto').attr('src', userImg);
+                    $('#' + cntr).replaceWith($('#' + cntr).val('').clone(true));
+                    $('#' + cntr).focus()
+                }
+                else {
+                    alert('Please Upload a valid document !!!');
+                    $('#' + cntr).replaceWith($('#' + cntr).val('').clone(true));
+                    $('#' + cntr).focus();
+
+                }
+            }
+            else {
+                // Restrict the file size to 2MB(1024 * 2048;)
+                if ($('#' + cntr).get(0).files[0].size > (200000))  {
+                    alert('Document size should not exceed 200KB.!!!');
+                    $('#' + cntr).replaceWith($('#' + cntr).val('').clone(true));
+                    $('#' + cntr).focus();
+                }
+                if ($('#' + cntr).get(0).files[0].name.length > 100) {
+                    alert('Document Name should be maximum 100 Characters !!!');
+                    $('#' + cntr).replaceWith($('#' + cntr).val('').clone(true));
+                    $('#' + cntr).focus();
+                }
+                else
+                    return true;
+            }
+        }
+        else
+            return true;
+    }
+    function inputLimiter(e, allow) {
+        var AllowableCharacters = '';
+        if (allow == 'NameCharactersymbol') {
+            AllowableCharacters = ' ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz./&';
+        }
+        if (allow == 'NameCharacters') {
+            AllowableCharacters = ' ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-.\'';
+        }
+        if (allow == 'NameCharactersAndNumbers') {
+            AllowableCharacters = '1234567890 ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-,/.\'';
+        }
+        if (allow == 'Description') {
+            AllowableCharacters = '1234567890 ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-,./\&(){}[]#$:';
+        }
+        if (allow == 'Numbers') {
+            AllowableCharacters = '1234567890';
+        }
+        if (allow == 'Decimal') {
+            AllowableCharacters = '1234567890.';
+        }
+        var k;
+        k = document.all ? parseInt(e.keyCode) : parseInt(e.which);
+        if (k != 13 && k != 8 && k != 0) {
+            if ((e.ctrlKey == false) && (e.altKey == false)) {
+                return (AllowableCharacters.indexOf(String.fromCharCode(k)) != -1);
+            }
+            else {
+                return true;
+            }
+        }
+        else {
+            return true;
+        }
+    }
+    function validate() {
+        if ($('#StartDt').val() == "") {
+            alert('Please Enter Start Date!!');
+            $('#StartDt').focus();
+            return false;
+        }
+        else if ($('#EndDt').val() == "") {
+            alert('Please Enter End Date!!');
+            $('#EndDt').focus();
+            return false;
+        }
+        else if ($('#mSummery').val() == "") {
+            alert('Please Enter Notice!!');
+            $('#mSummery').focus();
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+    function checkconfirmReq() {
+        if (window.confirm("Are you sure to Submit?")) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+</script>
+<div class="container-fluid">
+    <ul class="nav nav-tabs custom-tab pl-4">
+        <li class="nav-item">
+            <a class="nav-link active" href="@Url.Action("AddNotice", "Dashboard")">Add Notice</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="@Url.Action("ViewNotice", "Dashboard")">View Notice</a>
+        </li>
+    </ul>
+    <div class="row">
+        <div class="col-12 pb-3">
+            <div class="card">
+                <div class="card-body">
+                    <div class="card m-auto w-25">
+                        <div class="card-body p-6">
+                            <div class="form-group">
+                                <div class="row">
+                                    <label for="lblPwd" class="col-sm-4 col-form-label" id="web"><b>Start Date :</b></label>
+                                    <div class="col-sm-8" style="display: inline-flex;">
+                                        <input type="text" id="StartDt" class="form-control datepicker" placeholder="dd mmm yyyy" aria-label="Username" aria-describedby="basic-addon1" maxlength="11" autofocus>
+                                        <div class="input-group-prepend">
+                                            <label for="blockingDt" class="input-group-text"><i class="icon-calendar"></i></label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    &nbsp;
+                                </div>
+                                <div class="row">
+                                    <label for="lblPwd" class="col-sm-4 col-form-label" id="web"><b>End Date :</b></label>
+                                    <div class="col-sm-8" style="display: inline-flex;">
+                                        <input type="text" id="EndDt" class="form-control datepicker" placeholder="dd mmm yyyy" aria-label="Username" aria-describedby="basic-addon1" maxlength="11" autofocus>
+                                        <div class="input-group-prepend">
+                                            <label for="blockingDt" class="input-group-text"><i class="icon-calendar"></i></label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    &nbsp;
+                                </div>
+                                <div class="row">
+                                    <label for="lblPwd" class="col-sm-4 col-form-label" id="web"><b>Notice :</b></label>
+                                    <div class="col-sm-8">
+                                        <textarea id="mSummery" class="form-control" style="height:100px" placeholder="Enter here" onkeypress="return inputLimiter(event,'NameCharactersAndNumbers')"></textarea>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-2">
+                                        &nbsp;
+                                    </div>
+                                    <div class="col-sm-2">
+                                        &nbsp;
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <span id="Desc" class="max_char" style="color: Red; position: initial !important;">
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    &nbsp;
+                                </div>
+                                <div class="row">
+                                    <label for="lblPwd" class="col-sm-4 col-form-label" id="web"><b>Document :</b></label>
+                                    <div class="col-sm-8">
+                                        <input type="file" id="document" class="" />
+                                        <span style="font-weight: bold; color: Green">Max file size is 200KB</span>
+                                        <br />
+                                        <span style="font-weight: bold; color: Green">Only pdf,jpg,jpeg document allowed</span>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    &nbsp;
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-12" align="right">
+                                        <input type="button" value="Clear" class="btn btn-outline-danger" id="btnClear" />
+                                        <input type="button" value="Submit" class="btn btn-outline-success" id="btnSave" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

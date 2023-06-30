@@ -1,0 +1,69 @@
+﻿
+@{
+    ViewBag.Title = "Error";
+    Layout = null;
+}
+
+@model System.Web.Mvc.HandleErrorInfo
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title> 500 Internal Server Error </title>
+    <link rel="icon" type="image/png" href="~/imgs/favicon.png" />
+    <link rel="stylesheet" href="~/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/style.css" />
+    <link rel="stylesheet" href="~/css/animate.min.css" />
+    <style>
+
+        .error-section {
+            margin: 0px auto;
+            text-align: center;
+            position: relative;
+            padding: 1rem;
+        }
+
+            .error-section img {
+                max-width: 40%;
+            }
+
+        .error-section__content h1 {
+            font-size: 2rem;
+            color: #dc3545;
+            padding: 0;
+            font-weight: 600;
+            margin: 12px 5px 12px;
+        }
+
+
+        @@media screen and (max-width: 768px) {
+
+            .error-section img {
+                width: 40%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="d-flex align-items-center justify-content-center h-100 wow animated fadeInUp">
+        <div class="error-section">
+            <img src="~/imgs/500.jpg" alt="Not Found">
+            <div class="error-section__content">
+                <h1><span> 500 </span> Internal Server Error </h1>
+                <p class="mb-0">Sorry, but we can't find what you were looking for right now.</p>
+                <p class="s_bigtxt">  Please, click and sign in again.</p>
+                <div class="session-btn session_inner">
+                    <div id="slide"></div>
+                    <a href="@Url.Action("Logout", "Dashboard")"> Log In &nbsp; <i class="fa fa-sign-in"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
+
+

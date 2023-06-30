@@ -1,0 +1,1425 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_DashboardLayout1.cshtml";
+}
+
+<script src="../js/jquery.vticker.min.js"></script>
+<script src="../js/highcharts.js"></script>
+<script src="../js/exporting.js"></script>
+<script src="../js/export-data.js"></script>
+<script src="../js/accessibility.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        getNotices();
+        getPatientStatistics();
+
+        function getNotices() {
+            var NoticeParams = {
+                Action: 'A'
+            };
+            $.ajax({
+                url: ServiceURL + "/api/Common/getNotices",
+                type: "GET",
+                data: NoticeParams,
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                beforeSend: function () {
+                    $("#loader").show();
+                },
+                success: function (data) {
+                    if (data.length > 0) {
+                        console.log(data);
+                        /*var noticeList = document.getElementById("NoticeSection");
+                        for (var i = 0; i < data.length; i++) {
+                            noticeList.innerHTML += '<li class="row section-content"> <div class="pt-1"> <div class="schemes-count-area">'
+                                + '<div class="count-box d-flex justify-content-center align-items-center"> <h2>' + (i + 1) + '</h2> </div>'
+                                + '<a href="#"> <p>' + data[i].notices + '</p> <div class="pk_dt"> <i class="fa fa-calendar"></i><span>'
+                                + data[i].startDate + '</span> </div> </a> </div> </div> </li>';
+                        }
+                        tictic();
+                        $('#sp1').html(data[0].startDate);
+                        $('#sp2').html(data[1].startDate);
+                        $('#sp3').html(data[2].startDate);
+                        $('#sp4').html(data[3].startDate);
+                        $('#sp5').html(data[4].startDate);
+                        $('#p1').html(data[0].notices);
+                        $('#p2').html(data[1].notices);
+                        $('#p3').html(data[2].notices);
+                        $('#p4').html(data[3].notices);
+                        $('#p5').html(data[4].notices); */
+                    }
+                },
+                complete: function () {
+                    $("#loader").hide();
+                },
+                error: function (error) {
+                    console.log(error.responseText);
+                }
+            });
+        }
+
+        function getPatientStatistics() {
+            //debugger;
+            var PatientStatsParams = {
+                ACTION: 'B',
+                HospitalCode:@Session["HospitalCode"]
+            };
+            $.ajax({
+                url: ServiceURL + "/api/Common/getPatientStats",
+                type: "GET",
+                data: PatientStatsParams,
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                beforeSend: function () {
+                    $("#loader").show();
+                },
+                success: function (result) {
+                    //console.log(result);
+                    $('#BlockPackagePS').html(result.block);
+                    $('#UnblockPackagePS').html(result.unblock);
+                    $('#PreAuthPendingPS').html(result.pedingpre_auth);
+                    $('#DischargePS').html(result.discharge);
+                },
+                complete: function () {
+                    $("#loader").hide();
+                },
+                error: function (error) {
+                    console.log(error.responseText);
+                }
+            });
+        }
+
+        function tictic() {
+            $('.tictic').vTicker({
+                showItems: 3,
+                speed: 1000,
+                pause: 1000,
+                animate: true,
+                //autoplay:false;
+                margin: 0,
+                padding: 0
+            });
+        }
+    });
+</script>
+
+
+<!-- Dashboard Body content part starts -->
+<section class="dashboard_bg" oncontextmenu="return false;">
+    @*oncontextmenu="return false;"*@
+    <div class="container">
+        <!-- sticky icon start -->
+        <div class="sticky-icon">
+
+            <div class="sticky-inner">
+                <i class="fa fa-phone"> </i>
+                <div>
+                    <div class="nums font-28">  104 </div>
+                    <p>  BSKY Helpline No </p>
+                </div>
+            </div>
+            <div class="sticky-inner">
+                <i class="fa fa-file-pdf-o">  </i>
+                <div>
+                    <div class="nums"> Download User Mannual</div>
+                    <div>
+                        <a href="~/UserManual/UserMannual.pdf" class=" bg-stbtn btn-sm" target="_blank" title="Downlaod PDF">
+                            Download
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="sticky-inner">
+                <i class="fi-rr-download">  </i>
+                <div>
+                    <div class="nums"> Download Packages</div>
+                    <div>
+                        <a href="~/UserManual/PackageDetails.xlsx" class=" bg-stbtn btn-sm" target="_blank" title="Downlaod Excel">
+                            Download
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- sticky icon end -->
+
+        <h1 class="text-center hospital-name"> Welcome To! <span class="color-lt"> @Session["HospitalName"] </span> </h1>
+        <div class="text-center text-white font_20">
+            <p>
+                State Government bear the full cost of all healthcare services delivered to all patients  <br>in all State Government health care facilitie starting from Sub Centre level to District Head Quarters and Government Medical College Hospital level  <br>and State Government bear the cost of healthcare services provided in the empaneled private hospitals for BSKY card holder families in the State.<br> for an annual health coverage of Rs. 5 lakh per family and additional Rs. 5 lakh for the women members of the family.
+            </p>
+        </div>
+        <div class="form-row dashboard-menu justify-content-center">
+            <div class="col-lg-2 col-md-4 col-sm-4 col-xs-6  wow fadeInUp animated anm-remov" data-wow-delay="0.3s">
+                <a href="@Url.Action("ViewBlockPackage", "BlockPackage")" class="col2">
+                    <div class="dash_sec card" id="zoom_1">
+                        <div class="card-icon">  <img src="../imgs/svg/block-package.svg"></div>
+                        <h5>Block Package</h5>
+                        <p>Blocking of package against patient URN.</p>
+                        <div class="dash_ic"> <i class="fi-rr-chevron-right"></i></div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-xs-6  wow fadeInRight animated anm-remov" data-wow-delay="0.3s">
+                <a class="col2">
+                    @*href="@Url.Action("ViewPackageChange", "BlockPackage")"*@
+                    <div class="dash_sec card" id="zoom_2">
+                        <div class="card-icon"> <img src="../imgs/svg/package-change.svg"></div>
+                        <h5>Package Change</h5>
+                        <p>Change the package through URN.</p>
+                        <div class="dash_ic"> <i class="fi-rr-chevron-right"></i></div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-xs-6 wow fadeInLeft animated anm-remov" data-wow-delay="0.3s">
+                <a class="col2">
+                    @*href="@Url.Action("ViewBlockRoomTypeChange", "BlockPackage")"*@
+                    <div class="dash_sec card" id="zoom_3">
+                        <div class="card-icon"><img src="../imgs/svg/change-ward-type.svg"></div>
+                        <h5>Change Ward Type</h5>
+                        <p>Change the ward through URN.</p>
+                        <div class="dash_ic"> <i class="fi-rr-chevron-right"></i></div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-xs-6 wow fadeInDown animated anm-remov" data-wow-delay="0.3s">
+                <a href="@Url.Action("ViewUnblockPackage", "UnblockPackage")" class="col3">
+                    <div class="dash_sec card" id="zoom_4">
+                        <div class="card-icon"> <img src="../imgs/svg/unblock-package.svg"></div>
+                        <h5>Unblock Package</h5>
+                        <p>Unblocking of package against patient URN.</p>
+                        <div class="dash_ic"> <i class="fi-rr-chevron-right"></i></div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-4 col-xs-6 wow fadeInRight animated anm-remov" data-wow-delay="0.3s">
+                <a href="@Url.Action("AddDischarge", "Discharge")" class="col4">
+                    <div class="dash_sec card" id="zoom_5">
+                        <div class="card-icon"> <img src="../imgs/svg/discharge.svg"></div>
+                        <h5>Discharge</h5>
+                        <p>Discharge patient through URN.</p>
+                        <div class="dash_ic"> <i class="fi-rr-chevron-right"></i></div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--<section oncontextmenu="return false;">-->
+@*oncontextmenu="return false;"*@
+<!--<div class="container">
+    <div class="form-row col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="col-lg-7 col-md-12 col-sm-12 col-xs-12 wow animated fadeInLeft">
+            <div class="conta_tx d-flex">
+                <div class="d-flex justified-center align-items-center mr-2"> <img src="~/imgs/hospital.png" alt="" width="40" height="40"> </div>
+                <div class="font-new">
+                    <h4 class="font-weight-normal"> Patient Statistics </h4>
+                </div>
+            </div>-->
+@*<p class="mb-5"> Lorem Ipsum Dolar Sit Amet, consectetur adipiscing elit.in nec<br> consectetur augue sed faucibus mi.</p>*@
+<!--<div class="form-row dsh_icon mb-4 mt-4">
+                    <div class="col-lg-5 col-md-4 col-sm-6 col-xs-12 mb-5 form-row align-items-center">
+                        <div class="d-flex">
+                            <div class="icon_dash"> <span class="icon-hospital-bed"></span> </div>
+                        </div>
+                        <div>
+                            <div id="BlockPackagePS" class="dash_tx_num"></div>
+                            <div class="dash_tx"> Blocked Package </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-5 col-md-4 col-sm-6 col-xs-12 mb-5 form-row align-items-center">
+                        <div class="d-flex">
+                            <div class="icon_dash"> <span class="icon-citizen-info-icon3"></span> </div>
+                        </div>
+                        <div>
+                            <div id="UnblockPackagePS" class="dash_tx_num"></div>
+                            <div class="dash_tx"> Unblocked Package </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-5 col-md-4 col-sm-6 col-xs-12 mb-5 form-row align-items-center">
+                        <div class="d-flex">
+                            <div class="icon_dash"> <span class="icon-outline"></span> </div>
+                        </div>
+                        <div>
+                            <div id="PreAuthPendingPS" class="dash_tx_num"></div>
+                            <div class="dash_tx"> Pre-auth Pending </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-5 col-md-4 col-sm-6 col-xs-12 mb-5 form-row align-items-center">
+                        <div class="d-flex">
+                            <div class="icon_dash"> <span class="icon-medical-report"></span> </div>
+                        </div>
+                        <div>
+                            <div id="DischargePS" class="dash_tx_num"></div>
+                            <div class="dash_tx"> Discharged</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5 col-md-12 col-sm-12 col-xs-12 mt-4">
+                <div class="row ulticker wow animated fadeInRight">
+                    <div class="col">
+                        <div class="jumbotron">
+                            <h1>Notice</h1>
+                            <div class="tictic">
+                                <ul id="NoticeSection" class="data-list" data-autoscroll>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>-->
+
+<div class="container">
+    @*marquee section*@
+
+    <div class="notice" id="NoticeDiv">
+        <div class="order-title">
+            <span class="icon-office-order pe-1"></span>
+            <span> Notice</span>
+        </div>
+        <marquee class="mrq-notice" behavior="scroll" direction="left" onmouseover="this.stop();" onmouseout="this.start();">
+            <div class="px-2 m-0 nt-list">
+                <div id="diplayNotic" class="dt-cirle">
+                    <a href="#!" class="mr-4">
+                        @Session["HospitalName"] MOU will  be expired on dated:
+                        <span class="text-danger"> @Session["mou_enddate"] </span>.
+                    </a>
+                </div>
+                <div id="diplayExpiredNotic" class="dt-cirle">
+                    <a href="#!" class="mr-4">
+                        @Session["HospitalName"] MOU has been expired you can not block packages.
+                    </a>
+                </div>
+                <div id="diplayEmpanelmentNotic" class="dt-cirle">
+                    <a href="#!" class="mr-4">
+                        @Session["HospitalName"] Empanelment has been expired you can not block packages.
+                    </a>
+                </div>
+            </div>
+        </marquee>
+    </div>
+
+    @*marquee section*@
+
+    <div class="dashboard-sts">
+        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-xs-12 mb-2">
+            <div class="d-block d-xl-flex d-lg-flex d-md-flex d-sm-flex pb-1 justify-content-end form-row">
+                <div class="pr-3 text-secondary d-flex align-items-center">Show Data</div>
+                <div class="col-xl-2 col-md-2 pb-1 pb-xl-0 pb-lg-0 pb-md-2 pb-sm-2">
+                    <input type="text" class="form-control" id="chartFromdt" onchange="searchDashboardStats();" placeholder="From">
+                </div>
+                <div class="col-xl-2 col-md-2 pb-1 pb-xl-0 pb-lg-0 pb-md-2 pb-sm-2">
+                    <input type="text" class="form-control" id="chartTodt" onchange="searchDashboardStats();" placeholder="To">
+                </div>
+            </div>
+        </div>
+
+        <!-- pie chart-auth Details -->
+        <div class="form-row">
+            <div class="col-xl-8 col-lg-7 col-md-12 col-sm-12 col-xs-12 ">
+                <div class="card d-flex h-100">
+                    <div class="border mb-4 h-100">
+                        <div class="new-dash pb-4">
+                            <h3> Patient Details </h3>
+                        </div>
+                        <div class="card-body">
+                            <figure class="highcharts-figure">
+                                <div id="coloumn-bar" class="highchart_sec"></div>
+                            </figure>
+                            <div class="d-flex align-items-center justify-content-center">
+                                <div class="row chart-toll">
+                                    <div class="flex-fill">
+                                        <div class="preauthdash-bl d-flex flex-row align-items-center">
+                                            <div class="color-t bg-default"></div>
+                                            <div class="flex-grow-1 bd-highlight ml-2">  Total Patient Blocked </div>
+                                        </div>
+                                        <div id="divPatBlocked" class="d_bigprice"></div>
+                                    </div>
+                                    <div class="flex-fill">
+                                        <div class="preauthdash-bl d-flex flex-row align-items-center">
+                                            <div class="color-t bg-success"></div>
+                                            <div class="flex-grow-1 bd-highlight ml-2">  Ongoint Treatment </div>
+                                        </div>
+                                        <div id="divPatOngoing" class="d_bigprice text-successnew">  80,365 </div>
+                                    </div>
+                                    <div class="flex-fill">
+                                        <div class="preauthdash-bl d-flex flex-row align-items-center">
+                                            <div class="color-t bg-warning"></div>
+                                            <div class="flex-grow-1 bd-highlight ml-2">  Discharge </div>
+                                        </div>
+                                        <div id="divPatDischarge" class="d_bigprice text-warningnew"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-4 col-lg-5 col-md-12 col-sm-12 col-xs-12">
+                <div class="card d-flex h-100">
+                    <div class="border mb-4 h-100">
+                        <div class="new-dash pb-4">
+                            <h3> Procedure Details </h3>
+                        </div>
+                        <div class="card-body">
+                            <figure class="highcharts-figure d-flex justify-content-center">
+                                <div id="pie"></div>
+                            </figure>
+                            <div class="row chart-toll">
+                                <div class="flex-fill">
+                                    <div class="preauthdash-bl d-flex flex-row align-items-center">
+                                        <div class="color-t bg-primary"></div>
+                                        <div class="flex-grow-1 bd-highlight ml-2">  Blocked </div>
+                                    </div>
+                                    <div id="divProcBlocked" class="d_bigprice"></div>
+                                </div>
+                                <div class="flex-fill">
+                                    <div class="preauthdash-bl d-flex flex-row align-items-center">
+                                        <div class="color-t bg-success"></div>
+                                        <div class="flex-grow-1 bd-highlight ml-2">  Unblocked </div>
+                                    </div>
+                                    <div id="divProcUnblocked" class="d_bigprice text-successnew"></div>
+                                </div>
+                                <div class="flex-fill">
+                                    <div class="preauthdash-bl d-flex flex-row align-items-center">
+                                        <div class="color-t bg-warning"></div>
+                                        <div class="flex-grow-1 bd-highlight ml-2">  Discharge </div>
+                                    </div>
+                                    <div id="divProcDischarge" class="d_bigprice text-warningnew"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- pie chart Details -->
+        <!-- Pre-auth Details -->
+        <div class="form-row">
+            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+                <div class="card d-flex h-100">
+                    <div class="border mb-4 h-100">
+                        <div class="row">
+                            <div class="col-xl-12 col-lg-12">
+                                <div class="new-dash pb-4">
+                                    <h3> Pre-Auth Details</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row dast_width">
+                                <div class="col-xl-8 col-lg-8 col-md-12 col-sm-12 col-xs-12 border-right">
+                                    <div class="row mb-4">
+                                        <div class="col-xl-8 col-lg-8 col-md-8 col-sm-6 col-xs-12">
+                                            <label id="lblPreAuthResponse" class="card-complhead"></label>
+                                            <div class="text-secondary d_pricesmall"> Response received by Nodal Doctors </div>
+                                        </div>
+                                        <div class="col-xl-4 col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                            <label id="lblPreAuthApprovedAmt" class="card-complhead text-successnew"></label>
+                                            <div class="text-secondary d_pricesmall"> Approved Amount </div>
+                                        </div>
+                                    </div>
+                                    <div class="border-bottom mb-2"></div>
+                                    <div class="row d-flex align-items-center flex-fill">
+                                        <div class="col-xl-8 col-lg-8 col-md-12 col-sm-12 col-xs-12">
+                                            <div class="row">
+                                                <div class="col-xl-4 col-lg-4 col-md-4 col-sm-4 col-xs-6 border-right">
+                                                    <div id="divPreAuthRejectCase" class="d_bigprice"></div>
+                                                    <div class="text-secondary d_pricesmall"> Rejected Cases </div>
+                                                </div>
+                                                <div class="col-xl-4 col-lg-4 col-md-4 col-sm-4 col-xs-6 text-center">
+                                                    <div id="divPreAuthApproved" class="d_bigprice"></div>
+                                                    <div class="text-secondary d_pricesmall"> Approved </div>
+                                                </div>
+                                                <div class="col-xl-4 col-lg-4 col-md-4 col-sm-4 col-xs-12 text-center">
+                                                    <div id="divPreAuthAutoApproved" class="d_bigprice"></div>
+                                                    <div class="text-secondary d_pricesmall"> Auto Approved </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12">
+                                            <div class="mb-2">
+                                                <div class="preauthdash-bl"> <span class="mr-2">Blocked</span> <span id="spnPreAuthBlocked"></span></div>
+                                                <div class="progress progress-preauth rounded-0 bg-white">
+                                                    <div id="divPreAuthBlockedProgress" class="progress-bar bg-success rounded-0" role="progressbar" style="width: 85%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                                                </div>
+                                            </div>
+                                            <div class="mb-2">
+                                                <div class="preauthdash-bl"> <span class="mr-2">Pending</span> <span id="spnPreAuthPending"></span></div>
+                                                <div class="progress progress-preauth rounded-0 bg-white">
+                                                    <div id="divPreAuthPendingProgress" class="progress-bar bg-warning rounded-0" role="progressbar" style="width: 40%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                                                </div>
+                                            </div>
+                                            <div class="mb-2">
+                                                <div class="preauthdash-bl"> <span class="mr-2">Expired&nbsp;</span> <span id="spnPreAuthExpired"></span> </div>
+                                                <div class="progress progress-preauth rounded-0 bg-white">
+                                                    <div id="divPreAuthExpiredProgress" class="progress-bar bg-danger rounded-0" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12 ">
+                                    <div class="row mb-4">
+                                        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                            <label id="lblPreAuthResponseAwaited" class="card-complhead"></label>
+                                            <div class="text-secondary d_pricesmall"> Response Awaited </div>
+                                        </div>
+                                        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                            <label id="lblPreAuthPendingAmount" class="card-complhead"> <span class="text-warningnew"></span> </label>
+                                            <div class="text-secondary d_pricesmall"> Pending Amount </div>
+                                        </div>
+                                    </div>
+                                    <div class="border-bottom mb-2"></div>
+                                    <div class="row">
+                                        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                            <div class="row">
+                                                <div class="mb-4 col-xl-12 col-lg-12 col-md-6 col-sm-6 col-xs-6">
+                                                    <div id="divPreAuthFreshCase" class="d_bigprice"></div>
+                                                    <div class="text-secondary d_pricesmall"> Fresh Cases </div>
+                                                </div>
+                                                <div class="mb-2 col-xl-12 col-lg-12 col-md-6 col-sm-6 col-xs-6">
+                                                    <div id="divPreAuthRevertCase" class="d_bigprice"></div>
+                                                    <div class="text-secondary d_pricesmall"> Reverted Cases </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                            <div class="highcharts-figure">
+                                                <div id="donut-circle"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Pre-auth Details -->
+        <!-- 104 Outbound Call -->
+        @*<div class="form-row">
+            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+                <div class="card d-flex h-100">
+                    <div class="border mb-4 h-100">
+                        <div class="row">
+                            <div class="col-xl-12 col-lg-12">
+                                <div class="new-dash pb-4">
+                                    <h3> 104 Outbound Call  </h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 col-xs-12 border-right">
+                                    <div class="outbound-gap">
+                                        <label id="lblObcTotCallConn" class="card-complhead"></label>
+                                        <div class="text-secondary d_pricesmall"> Total Call Connected </div>
+                                    </div>
+                                    <div class="grid-outbound">
+                                        <div class="row">
+                                            <div class="d-flex justify-content-start flex-fill">
+                                                <div class="flex-fill pl-3">
+                                                    <div class="bd-highlight mb-2">
+                                                        <div id="divObcYes" class="d_bigprice text-successnew"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="flex-fill text-right pr-3">
+                                                    <div class="ml-auto bd-highlight mb-2">
+                                                        <div id="divObcNo" class="d_bigprice text-dangernew"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="progress">
+                                            <div id="divObcYesProgress" class="progress-bar rounded-0 bg-success" role="progressbar" style="width: 25%" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100"></div>
+                                            <div id="divObcNoProgress" class="progress-bar rounded-0 bg-danger" role="progressbar" style="width: 75%" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="d-flex justify-content-start flex-fill">
+                                                <div class="flex-fill pl-3">
+                                                    <div class="small-dashfnt"> <span class="text-successnew">Yes </span>| <span id="spnObcYesPerc"></span></div>
+                                                </div>
+                                                <div class="flex-fill text-right pr-3">
+                                                    <div class="small-dashfnt"> <span class="text-dangernew">No </span>| <span id="spnObcNoPerc"></span></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 col-xs-12 border-right">
+                                    <div class="outbound-gap">
+                                        <div class="row">
+                                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                <label id="lblObcPositiveRes" class="card-complhead text-successnew"> 71.46%</label>
+                                                <div class="text-secondary d_pricesmall"> Positive Response </div>
+                                            </div>
+                                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                <label id="lblObcNegetiveRes" class="card-complhead text-successnew"> 52.36%</label>
+                                                <div class="text-secondary d_pricesmall"> Negetive Response </div>
+                                            </div>
+                                        </div>
+                                        <div class="row mt-3">
+                                            <div class="col-xl-5 col-lg-5 col-md-5 col-sm-6 col-xs-12 d-flex justify-content-center">
+                                                <div class="highcharts-figure">
+                                                    <div id="pie2"></div>
+                                                </div>
+                                            </div>
+                                            <div class="col-xl-7 col-lg-7 col-md-7 col-sm-6 col-xs-12 mt-3">
+                                                <div class="preauthdash-bl d-flex flex-row align-items-center mb-2">
+                                                    <div class="color-t bg-warning"></div>
+                                                    <div class="flex-grow-1 bd-highlight ml-2 w-50">  Support </div>
+                                                    <div id="divObcSupport" class="bd-highlight flex-fill text-left w-50"></div>
+                                                </div>
+                                                <div class="preauthdash-bl d-flex flex-row align-items-center mb-2">
+                                                    <div class="color-t bg-primary"></div>
+                                                    <div class="flex-grow-1 bd-highlight ml-2 w-50">  Behaviour </div>
+                                                    <div id="divObcBehaviour" class="bd-highlight flex-fill text-left w-50"></div>
+                                                </div>
+                                                <div class="preauthdash-bl d-flex flex-row align-items-center mb-2">
+                                                    <div class="color-t bg-success"></div>
+                                                    <div class="flex-grow-1 bd-highlight ml-2 w-50">  Bribe </div>
+                                                    <div id="divObcBribe" class="bd-highlight flex-fill text-left w-50"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="outbound-gap">
+                                        <label id="lblObcTotCallNotCon" class="card-complhead"></label>
+                                        <div class="text-secondary d_pricesmall"> Total Call Not Connected </div>
+                                    </div>
+                                    <div class="grid-outbound">
+                                        <div class="row">
+                                            <div class="d-flex justify-content-start flex-fill">
+                                                <div class="flex-fill pl-3">
+                                                    <div class="bd-highlight mb-2">
+                                                        <div id="divObcFreshCase" class="d_bigprice text-warningnew"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="flex-fill text-right pr-3">
+                                                    <div class="ml-auto bd-highlight mb-2">
+                                                        <div id="divObcNotConnected" class="d_bigprice text-dangernew"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="progress">
+                                            <div id="divObcFreshCaseProgress" class="progress-bar rounded-0 bg-warning" role="progressbar" style="width: 60%" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
+                                            <div id="divObcNotConnectedProgress" class="progress-bar rounded-0 bg-danger" role="progressbar" style="width: 100%" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="d-flex justify-content-start flex-fill">
+                                                <div class="flex-fill pl-3">
+                                                    <div class="small-dashfnt"> <span class="text-warningnew"> Fresh Case </span>| <span id="spnObcFreshCasePerc"></span></div>
+                                                </div>
+                                                <div class="flex-fill text-right pr-3">
+                                                    <div class="small-dashfnt "> <span class="text-dangernew"> Not Connected </span>| <span id="spnObcNotConnectedPerc"></span></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>*@
+        <!-- 104 Outbound Call -->
+        <!-- Referral Authentication -->
+        <!--<div class="form-row referal-gap">
+            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+                <div class="card d-flex h-100">
+                    <div class="border mb-4 h-100">
+                        <div class="row">
+                            <div class="col-xl-6 col-lg-6 col-md-5 col-sm-12 col-xs-12">
+                                <div class="new-dash pb-4">
+                                    <h3> Referral Authentication </h3>
+                                </div>
+                            </div>-->
+                            @*<div class="col-xl-6 col-lg-6 col-md-7 col-sm-12 col-xs-12 mb-2">
+                                    <div class="d-block d-xl-flex d-lg-flex d-md-flex d-sm-flex pb-1 justify-content-end form-row">
+                                        <div class="pr-3 text-secondary d-flex align-items-center">
+                                            Show Data
+                                        </div>
+                                        <div class="col-xl-3 col-md-4 pb-1 pb-xl-0 pb-lg-0 pb-md-2 pb-sm-2">
+                                            <select class="form-control form-control-sm" id="exampleFormControlSelect2">
+                                                <option selected=""> District </option>
+                                                <option>Angul</option>
+                                                <option>Balangir</option>
+                                                <option>Bargarh</option>
+                                                <option>Bhadrak</option>
+                                                <option>Deogarh</option>
+                                                <option>Cuttack</option>
+                                                <option>Khordha</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-xl-4 col-md-5">
+                                            <select class="form-control form-control-sm" id="exampleFormControlSelect2">
+                                                <option selected="">Hospital</option>
+                                                <option>SUM Hospital</option>
+                                                <option>Kalinga Hospital</option>
+                                                <option> Apollo Hospital</option>
+                                                <option>Kalinga Hospital</option>
+                                                <option> Apollo Hospital</option>
+                                                <option>Kalinga Hospital</option>
+                                                <option> Apollo Hospital</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>*@
+                        <!--</div>
+                        <div class="card-body">
+                            <div class="row dast_width">
+                                <div class="col-xl-12 col-lg-12 col-md-6 col-sm-12 col-xs-12">
+                                    <div class="row bottom-gap">
+                                        <div class="col-xl-8 col-lg-8 col-md-6 col-sm-6 col-xs-12">
+                                            <label id="lblRefAuthActionByDc" class="card-complhead"></label>
+                                            <div class="text-secondary d_pricesmall"> Action Taken By DC </div>
+                                        </div>
+                                        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 col-xs-12">
+                                            <div id="divRefAuthPerc" class="progress-success"></div>
+                                            <div class="progress">
+                                                <div id="divRefAuthProgress" class="progress-bar bg-success" role="progressbar" aria-label="Success example" style="width: 55.27%" aria-valuenow="55" aria-valuemin="0" aria-valuemax="100"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-4 col-xs-12">
+                                            <div id="divRefAuthAuthenticate" class="d_bigprice"></div>
+                                            <div class="d_pricesmall"> Authenticate </div>
+                                        </div>
+                                        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-4 col-xs-12">
+                                            <div id="divRefAuthNotAuthenticate" class="d_bigprice"></div>
+                                            <div class="d_pricesmall"> Not Authenticate </div>
+                                        </div>
+                                        <div class="col-xl-4 col-lg-4 col-md-12 col-sm-4 col-xs-12">
+                                            <div id="divRefAuthAutoAuthenticate" class="d_bigprice"></div>
+                                            <div class="d_pricesmall"> Auto Authenticate </div>
+                                        </div>
+                                    </div>
+                                </div>-->
+                                @*<div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 col-xs-12 ">
+                                        <div class="row bottom-gap">
+                                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                <label class="card-complhead"> 1,04,657</label>
+                                                <div class="text-secondary d_pricesmall"> Request Pending </div>
+                                            </div>
+                                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                <div class="progress-warning"> 55.27%</div>
+                                                <div class="progress">
+                                                    <div class="progress-bar bg-warning" role="progressbar" aria-label="Success example" style="width: 55.27%" aria-valuenow="55" aria-valuemin="0" aria-valuemax="100"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                                <div class="d_bigprice"> 45678 </div>
+                                                <div class="d_pricesmall"> Fresh Cases </div>
+                                            </div>
+                                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                                <div class="d_bigprice"> 45678 </div>
+                                                <div class="d_pricesmall"> Reverted Cases </div>
+                                            </div>
+                                        </div>
+                                    </div>*@
+                            <!--</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>-->
+        <!-- Referral Authentication -->
+        <!-- authentication mode -->
+        <div class="form-row">
+            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-xs-12 ">
+                <div class="card d-flex h-100">
+                    <div class="border mb-4 h-100">
+                        <div class="new-dash pb-4">
+                            <h3> Authentication Mode </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-row dast_width">
+                                <div class="col-xl-3 col-lg-3 col-md-3 col-sm-3 col-xs-6">
+                                    <div id="divAuthModePos" class="d_bigprice"></div>
+                                    <div class="d_pricesmall mt-1"> POS </div>
+                                </div>
+                                <div class="col-xl-3 col-lg-3 col-md-3 col-sm-3 col-xs-6">
+                                    <div id="divAuthModeIris" class="d_bigprice"></div>
+                                    <div class="d_pricesmall mt-1"> IRIS </div>
+                                </div>
+                                <div class="col-xl-3 col-lg-3 col-md-3 col-sm-3 col-xs-6">
+                                    <div id="divAuthModeOtp" class="d_bigprice"></div>
+                                    <div class="d_pricesmall mt-1"> OTP </div>
+                                </div>
+                                <div class="col-xl-3 col-lg-3 col-md-3 col-sm-3 col-xs-6">
+                                    <div id="divAuthModeOverride" class="d_bigprice"></div>
+                                    <div class="d_pricesmall mt-1"> Override </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-xs-12 ">
+                <div class="card d-flex h-100">
+                    <div class="border mb-4 h-100">
+                        <div class="new-dash pb-4">
+                            <h3> Override Code Details </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-row dast_width">
+                                <div class="col-xl-3 col-lg-3 col-md-3 col-sm-3 col-xs-6">
+                                    <div class="border-right">
+                                        <div id="divOvdTotalRequest" class="d_bigprice text-dark"></div>
+                                        <div class="d_pricesmall mt-1"> Total Request </div>
+                                    </div>
+                                </div>
+                                <div class="col-xl-3 col-lg-3 col-md-3 col-sm-3 col-xs-6">
+                                    <div id="divOvdTotalApprove" class="d_bigprice text-successnew"></div>
+                                    <div class="d_pricesmall mt-1"> Approved </div>
+                                </div>
+                                <div class="col-xl-3 col-lg-3 col-md-3 col-sm-3 col-xs-6 ">
+                                    <div id="divOvdTotalReject" class="d_bigprice text-dangernew"></div>
+                                    <div class="d_pricesmall mt-1"> Rejected </div>
+                                </div>
+                                <div class="col-xl-3 col-lg-3 col-md-3 col-sm-3 col-xs-6 ">
+                                    <div id="divOvdTotalPending" class="d_bigprice text-warningnew"></div>
+                                    <div class="d_pricesmall mt-1"> Pending </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- authentication mode -->
+    </div>
+</div>
+
+<!--  chart datepicker -->
+<script>
+    $(document).ready(function () {
+        var d = new Date();
+        var currentDate = d.getDate();
+        var currMonth = d.getMonth();
+        var currYear = d.getFullYear();
+        var startDate = new Date(currYear, (currMonth - 6), 1);
+        var endDate = new Date(currYear, currMonth, currentDate);
+        $("#chartFromdt").val(moment(startDate).format("DD-MMM-YY"));
+        $("#chartTodt").val(moment(endDate).format("DD-MMM-YY"));
+
+        $("#chartFromdt").datepicker({
+            showOn: "focus",
+            rangeSeparator: " to ",
+            dateFormat: "dd-M-y",
+            useHiddenAltFields: true,
+            changeMonth: true,
+            changeYear: true,
+            constrainInput: true
+        });
+
+        $("#chartTodt").datepicker({
+            showOn: "focus",
+            rangeSeparator: " to ",
+            dateFormat: "dd-M-y",
+            useHiddenAltFields: true,
+            changeMonth: true,
+            changeYear: true,
+            constrainInput: true
+        });
+
+        searchDashboardStats();
+        $('#diplayExpiredNotic').hide();
+        $('#diplayEmpanelmentNotic').hide();
+
+        if ('@Session["moustatus"]' == 'true' && '@Session["empanelmentstatus_flag"]' == '1' && '@Session["is_block_active"]' == '0') {
+            $('#diplayExpiredNotic').show();
+            $('#diplayEmpanelmentNotic').show();
+            $('#diplayNotic').hide();
+        }
+        else if ('@Session["moustatus"]' == 'true' && '@Session["empanelmentstatus_flag"]' == '0' && '@Session["is_block_active"]' == '0' ) {
+            $('#diplayExpiredNotic').show();
+            $('#diplayEmpanelmentNotic').hide();
+            $('#diplayNotic').hide();
+        }
+        else if ('@Session["moustatus"]' == 'false' && '@Session["empanelmentstatus_flag"]' == '1' && '@Session["is_block_active"]' == '0') {
+            $('#diplayExpiredNotic').hide();
+            $('#diplayEmpanelmentNotic').show();
+            $('#diplayNotic').hide();
+        }
+        else if ('@Session["mounoticeflag"]' == '1' && '@Session["moustatus"]' == 'false' && @Session["mou_enddate"] != null) {
+            $('#diplayNotic').show();
+        }
+        else {
+            $('#diplayNotic').hide();
+            $('#NoticeDiv').hide();
+        }
+
+        @*if ('@Session["empanelmentstatus_flag"]' == '1') {
+            $('#diplayNotic').hide();
+            $('#diplayEmpanelmentNotic').show();
+        }
+        else {
+            $('#diplayEmpanelmentNotic').hide();
+        }*@
+    });
+
+    function searchDashboardStats() {
+        var fromDate = new Date($('#chartFromdt').val());
+        var toDate = new Date($('#chartTodt').val());
+        if (fromDate > toDate) {
+            swal({
+                text: "From date should not be greater than To date",
+                confirmButtonColor: "#36A865",
+                type: "error",
+                confirmButtonText: "OK",
+                closeOnConfirm: false
+            }).then(function () {
+                $("#chartFromdt").focus();
+            });
+        }
+        else {
+            getDashboardStats();
+        }
+    }
+
+    function getDashboardStats() {
+        var param = { HospitalCode: @Session["HospitalCode"], "FromDate": $('#chartFromdt').val(), "ToDate": $('#chartTodt').val() };
+        param = JSON.stringify(param);
+        $.ajax({
+            url: ServiceURL + "/api/Report/DashboardStats",
+            type: "POST",
+            data: param,
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $("#loader").show();
+            },
+            success: function (response) {
+                bindPatientStats(response.patientStats);
+                bindProcedureStats(response.procedureStats);
+                bindPreAuthStats(response.preAuthStats);
+                //bindOutboundcallStats(response.outboundCallStats);
+                //bindRefAuthStats(response.referralAuthStats);
+                bindAuthModeStats(response.authModeStats);
+                bindOverrideCodeStats(response.overrideCodeStats)
+            },
+            complete: function () {
+                $("#loader").hide();
+            },
+            error: function (error) {
+                console.log(error.responseText);
+            }
+        });
+    }
+
+    function bindPatientStats(data) {
+        console.log(data);
+        $("#divPatBlocked").html(data.total_Admission);
+        $("#divPatOngoing").html(data.total_Ongoing);
+        $("#divPatDischarge").html(data.total_Discharge);
+
+        var graphData = constructGraphData(data.patientStatsMonthwise);
+        var patBlockedMonthwise = graphData[0];
+        var patOngoingTreatmentMonthwise = graphData[1];
+        var patDischargeMonthwise = graphData[2];
+
+        Highcharts.chart('coloumn-bar', {
+            colors: [ '#3D5656', '#68B984', '#FED049' ],
+            chart: { type: 'column' },
+            legend: { enabled: false },
+            credits: { enabled: false },
+            title: { text: '' },
+            xAxis: {
+                categories: [ 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec' ],
+                crosshair: true
+            },
+            yAxis: {
+                min: 0,
+                title: { text: '' }
+            },
+            tooltip: {
+                headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                    '<td style="padding:0"><b>{point.y} </b></td></tr>',
+                footerFormat: '</table>',
+                shared: true,
+                useHTML: true
+            },
+            plotOptions: {
+                column: { pointPadding: 0.2, borderWidth: 0 }
+            },
+            series: [{
+                name: 'Total Patient Blocked',
+                data: patBlockedMonthwise //[25, 35, 45, 55, 65, 75, 30, 40, 50, 60, 70, 80 ]
+            },
+            {
+                name: 'Ongoing Treatment',
+                data: patOngoingTreatmentMonthwise //[83.6, 78.8, 98.5, 93.4, 106.0, 84.5, 105.0, 104.3, 91.2, 83.5, 106.6, 92.3]
+            },
+            {
+                name: 'Discharge',
+                data: patDischargeMonthwise //[42.4, 33.2, 34.5, 39.7, 52.6, 75.5, 57.4, 60.4, 47.6, 39.1, 46.8, 51.1]
+            }]
+        });
+    }
+
+    function constructGraphData(data) {
+        var mJan = data.find(o => $.trim(o.month).toUpperCase() == 'JANUARY');
+        var mFeb = data.find(o => $.trim(o.month).toUpperCase() == 'FEBRUARY');
+        var mMar = data.find(o => $.trim(o.month).toUpperCase() == 'MARCH');
+        var mApr = data.find(o => $.trim(o.month).toUpperCase() == 'APRIL');
+        var mMay = data.find(o => $.trim(o.month).toUpperCase() == 'MAY');
+        var mJun = data.find(o => $.trim(o.month).toUpperCase() == 'JUNE');
+        var mJul = data.find(o => $.trim(o.month).toUpperCase() == 'JULY');
+        var mAug = data.find(o => $.trim(o.month).toUpperCase() == 'AUGUST');
+        var mSep = data.find(o => $.trim(o.month).toUpperCase() == 'SEPTEMBER');
+        var mOct = data.find(o => $.trim(o.month).toUpperCase() == 'OCTOBER');
+        var mNov = data.find(o => $.trim(o.month).toUpperCase() == 'NOVEMBER');
+        var mDec = data.find(o => $.trim(o.month).toUpperCase() == 'DECEMBER');
+
+        var patBlockedArr = [
+            mJan == null ? 0 : parseInt(mJan.total_Admission_Monthwise), mFeb == null ? 0 : parseInt(mFeb.total_Admission_Monthwise),
+            mMar == null ? 0 : parseInt(mMar.total_Admission_Monthwise), mApr == null ? 0 : parseInt(mApr.total_Admission_Monthwise),
+            mMay == null ? 0 : parseInt(mMay.total_Admission_Monthwise), mJun == null ? 0 : parseInt(mJun.total_Admission_Monthwise),
+            mJul == null ? 0 : parseInt(mJul.total_Admission_Monthwise), mAug == null ? 0 : parseInt(mAug.total_Admission_Monthwise),
+            mSep == null ? 0 : parseInt(mSep.total_Admission_Monthwise), mOct == null ? 0 : parseInt(mOct.total_Admission_Monthwise),
+            mNov == null ? 0 : parseInt(mNov.total_Admission_Monthwise), mDec == null ? 0 : parseInt(mDec.total_Admission_Monthwise),
+        ];
+        var patOngoingArr = [
+            mJan == null ? 0 : parseInt(mJan.total_Ongoing_Monthwise), mFeb == null ? 0 : parseInt(mFeb.total_Ongoing_Monthwise),
+            mMar == null ? 0 : parseInt(mMar.total_Ongoing_Monthwise), mApr == null ? 0 : parseInt(mApr.total_Ongoing_Monthwise),
+            mMay == null ? 0 : parseInt(mMay.total_Ongoing_Monthwise), mJun == null ? 0 : parseInt(mJun.total_Ongoing_Monthwise),
+            mJul == null ? 0 : parseInt(mJul.total_Ongoing_Monthwise), mAug == null ? 0 : parseInt(mAug.total_Ongoing_Monthwise),
+            mSep == null ? 0 : parseInt(mSep.total_Ongoing_Monthwise), mOct == null ? 0 : parseInt(mOct.total_Ongoing_Monthwise),
+            mNov == null ? 0 : parseInt(mNov.total_Ongoing_Monthwise), mDec == null ? 0 : parseInt(mDec.total_Ongoing_Monthwise),
+        ];
+        var patDischargeArr = [
+            mJan == null ? 0 : parseInt(mJan.total_Discharge_Monthwise), mFeb == null ? 0 : parseInt(mFeb.total_Discharge_Monthwise),
+            mMar == null ? 0 : parseInt(mMar.total_Discharge_Monthwise), mApr == null ? 0 : parseInt(mApr.total_Discharge_Monthwise),
+            mMay == null ? 0 : parseInt(mMay.total_Discharge_Monthwise), mJun == null ? 0 : parseInt(mJun.total_Discharge_Monthwise),
+            mJul == null ? 0 : parseInt(mJul.total_Discharge_Monthwise), mAug == null ? 0 : parseInt(mAug.total_Discharge_Monthwise),
+            mSep == null ? 0 : parseInt(mSep.total_Discharge_Monthwise), mOct == null ? 0 : parseInt(mOct.total_Discharge_Monthwise),
+            mNov == null ? 0 : parseInt(mNov.total_Discharge_Monthwise), mDec == null ? 0 : parseInt(mDec.total_Discharge_Monthwise),
+        ];
+
+        var patGraphArr = [patBlockedArr, patOngoingArr, patDischargeArr];
+        return patGraphArr;
+    }
+
+    function bindProcedureStats(data) {
+        $("#divProcBlocked").html(data.total_Block);
+        $("#divProcUnblocked").html(data.total_Unblock);
+        $("#divProcDischarge").html(data.total_Discharge);
+
+        var ProcTotal = parseInt(data.total_Block) + parseInt(data.total_Unblock)
+            + parseInt(data.total_Discharge);
+        var ProcBlockedPerc = (parseInt(data.total_Block) / ProcTotal) * 100;
+        var ProcUnblockedPerc = (parseInt(data.total_Unblock) / ProcTotal) * 100;
+        var ProcDischargePerc = (parseInt(data.total_Discharge) / ProcTotal) * 100;
+
+        Highcharts.chart('pie', {
+            colors: ['#f2bd56 ', '#6084b0', '#68B984'],
+            chart: {
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false,
+                type: 'pie',
+                margin: 0,
+                width: 250,
+                height: 200
+            },
+            credits: {
+                enabled: false,
+            },
+            title: {
+                text: '',
+                align: 'center',
+                verticalAlign: 'middle'
+            },
+            tooltip: {
+                pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        enabled: true,
+                        format: '<b>{point.name}</b>{point.percentage:.1f} %',
+                        distance: -50,
+                        color: '#fff',
+                        filter: {
+                            property: 'percentage',
+                            operator: '>',
+                            value: 3
+                        }
+                    }
+                }
+            },
+            series: [{
+                name: '',
+                data: [
+                    { name: '', y: ProcDischargePerc },
+                    { name: '', y: ProcBlockedPerc },
+                    { name: '', y: ProcUnblockedPerc }
+                ]
+            }]
+        });
+    }
+
+    function bindPreAuthStats(data) {
+        $("#lblPreAuthResponse").html(data.total_Response);
+        $("#lblPreAuthApprovedAmt").html('&#8377;' + data.total_Approved_Amount);
+        $("#divPreAuthRejectCase").html(data.total_Reject);
+        $("#divPreAuthApproved").html(data.total_Approve);
+        $("#divPreAuthAutoApproved").html(data.total_AutoApprove);
+        $("#spnPreAuthBlocked").html("<b>" + data.total_Blocked + '</b>');
+        $("#spnPreAuthPending").html("<b>" + data.total_Pending + '</b>');
+        $("#spnPreAuthExpired").html("<b>" + data.total_Expired + '</b>');
+        $("#lblPreAuthResponseAwaited").html(data.response_Awaited);
+        $("#lblPreAuthPendingAmount > span").html('&#8377;' + data.pending_Amount);
+        $("#divPreAuthFreshCase").html(data.fresh_Cases);
+        $("#divPreAuthRevertCase").html(data.reverted_Cases);
+
+        var preAuthTotal = parseInt(data.total_Blocked) + parseInt(data.total_Pending)
+            + parseInt(data.total_Expired);
+        var preAuthBlockedPerc = (parseInt(data.total_Blocked) / preAuthTotal) * 100;
+        var preAuthPendingPerc = (parseInt(data.total_Pending) / preAuthTotal) * 100;
+        var preAuthExpiredPerc = (parseInt(data.total_Expired) / preAuthTotal) * 100;
+        $("#divPreAuthBlockedProgress").css("width", (preAuthBlockedPerc + "%"));
+        $("#divPreAuthPendingProgress").css("width", (preAuthPendingPerc + "%"));
+        $("#divPreAuthExpiredProgress").css("width", (preAuthExpiredPerc + "%"));
+
+        var preAuthCaseTotal = parseInt(data.fresh_Cases) + parseInt(data.reverted_Cases);
+        var preAuthFreshCasePerc = (parseInt(data.fresh_Cases) / preAuthCaseTotal) * 100;
+        var preAuthRevertedCasePerc = (parseInt(data.reverted_Cases) / preAuthCaseTotal) * 100;
+
+        //donut circle chart
+        // Create the chart
+        chart = new Highcharts.Chart({
+            colors: [
+                '#FF7070', '#FED049'
+            ],
+            chart: {
+                renderTo: 'donut-circle',
+                type: 'pie',
+                width: 150,
+                height: 130
+            },
+            legend: { enabled: false },
+            credits: {
+                enabled: false,
+            },
+            title: {
+                text: ''
+            },
+            yAxis: {
+                title: {
+                    text: ''
+                }
+            },
+            plotOptions: {
+                pie: {
+                    shadow: false,
+                    point: {
+                        events: {
+                            distance: 0,
+                            mouseOver: function (e) {
+                                this.originalRadius = this.graphic.r;
+                                this.graphic.animate({
+                                    r: this.originalRadius * 1.07
+                                }, 200);
+                            },
+                            mouseOut: function (e) {
+                                this.graphic.animate({
+                                    r: this.originalRadius
+                                }, 200);
+                            }
+                        }
+                    }
+                }
+            },
+            tooltip: {
+                formatter: function () {
+                    return '<b>' + this.point.name + '</b>: ' + this.y + ' %';
+                }
+            },
+            series: [{
+                name: 'Data',
+                data: [
+                    ["Reverted", preAuthRevertedCasePerc],
+                    ["Fresh", preAuthFreshCasePerc]
+                ],
+                size: '100%',
+                innerSize: '80%',
+                showInLegend: true,
+                dataLabels: {
+                    enabled: false
+                },
+                states: {
+                    hover: {
+                        halo: false
+                    }
+                },
+            }]
+        });
+        var circleradius = chart;
+        //console.log(chart);
+        var test = chart.options.series[0].innerSize * chart.Height
+        //console.log(test);
+        // Render the circle
+        //donut circle chart -->
+    }
+
+    function bindRefAuthStats(data) {
+        $("#lblRefAuthActionByDc").html(data.dc_Action);
+        $("#divRefAuthPerc").html(data.auth_Percent + '%');
+        $("#divRefAuthAuthenticate").html(data.authenticate);
+        $("#divRefAuthNotAuthenticate").html(data.not_Authenticate);
+        $("#divRefAuthAutoAuthenticate").html(data.auto_Authenticate);
+        $("#divRefAuthProgress").css("width", (data.auth_Percent + "%"));
+    }
+
+    function bindAuthModeStats(data) {
+        $("#divAuthModePos").html(data.pos == null ? 0 : data.pos);
+        $("#divAuthModeIris").html(data.iris == null ? 0 : data.iris);
+        $("#divAuthModeOtp").html(data.otp == null ? 0 : data.otp);
+        $("#divAuthModeOverride").html(data.override == null ? 0 : data.override);
+    }
+
+    function bindOverrideCodeStats(data) {
+        $("#divOvdTotalRequest").html(data.total_Request == null ? 0 : data.total_Request);
+        $("#divOvdTotalApprove").html(data.total_Approve == null ? 0 : data.total_Approve);
+        $("#divOvdTotalReject").html(data.total_Reject == null ? 0 : data.total_Reject);
+        $("#divOvdTotalPending").html(data.total_Pending == null ? 0 : data.total_Pending);
+    }
+
+    function bindOutboundcallStats(data) {
+        $("#lblObcTotCallConn").html(data.totalCallConnected == null ? 0 : data.totalCallConnected);
+        $("#divObcYes").html(data.yes == null ? 0 : data.yes);
+        $("#divObcNo").html(data.no == null ? 0 : data.no);
+        $("#spnObcYesPerc").html((data.per_Yes == null ? 0 : data.per_Yes) + '%');
+        $("#spnObcNoPerc").html((data.per_Yes == null ? 0 : data.per_No) + '%');
+        $("#lblObcPositiveRes").html((data.per_Yes == null ? 0 : data.per_Positive) + '%');
+        $("#lblObcNegetiveRes").html((data.per_Yes == null ? 0 : data.per_Negetive) + '%');
+        $("#divObcSupport").html('<b>' + (data.support == null ? 0 : data.support) + '</b>');
+        $("#divObcBehaviour").html('<b>' + (data.behaviour == null ? 0 : data.behaviour) + '</b>');
+        $("#divObcBribe").html('<b>' + (data.bribe == null ? 0 : data.bribe) + '</b>');
+        $("#lblObcTotCallNotCon").html(data.totalCallNotConnected == null ? 0 : data.totalCallNotConnected);
+        $("#divObcFreshCase").html(data.freshCase == null ? 0 : data.freshCase);
+        $("#divObcNotConnected").html(data.notConnected == null ? 0 : data.notConnected);
+        $("#spnObcFreshCasePerc").html((data.per_FreshCase == null ? 0 : data.per_FreshCase) + '%');
+        $("#spnObcNotConnectedPerc").html((data.per_NotConnected == null ? 0 : data.per_NotConnected) + '%');
+
+        $("#divObcYesProgress").css("width", (data.per_Yes + "%"));
+        $("#divObcNoProgress").css("width", (data.per_No + "%"));
+        $("#divObcFreshCaseProgress").css("width", (data.per_FreshCase + "%"));
+        $("#divObcNotConnectedProgress").css("width", (data.per_NotConnected + "%"));
+
+        var obcResponeTotal = parseInt(data.support) + parseInt(data.behaviour) + parseInt(data.bribe);
+        var obcSupport = (parseInt(data.support) / obcResponeTotal) * 100;
+        var obcBehaviour = (parseInt(data.behaviour) / obcResponeTotal) * 100;
+        var obcBribe = (parseInt(data.bribe) / obcResponeTotal) * 100;
+
+        // Build the chart
+        Highcharts.chart('pie2', {
+            colors: ['#f2bd56', '#1c4f8e', '#36a865'],
+            chart: {
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false,
+                type: 'pie',
+                margin: 0,
+                width: 140,
+                height: 120
+            },
+            credits: {
+                enabled: false,
+            },
+            title: {
+                text: '',
+                align: 'center',
+                verticalAlign: 'middle'
+            },
+            tooltip: {
+                pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        enabled: false,
+                        format: '<b>{point.name}</b>{point.percentage:.1f} %',
+                        distance: -50,
+                        filter: {
+                            property: 'percentage',
+                            operator: '>',
+                            value: 3
+                        }
+                    }
+                }
+            },
+            series: [{
+                name: '',
+                data: [
+                    { name: 'Support', y: obcSupport },
+                    { name: 'Behaviour', y: obcBehaviour },
+                    { name: 'Bribe', y: obcBribe }
+                ]
+            }]
+        });
+    }
+</script>
+
+<!--  chart datepicker -->
+<!-- column chart -->
+<!-- pie chart -->
+<script>
+    var pieColors = (function () {
+        var colors = [],
+            base = Highcharts.getOptions().colors[0],
+            i;
+
+        for (i = 0; i < 10; i += 1) {
+            // Start out with a darkened base color (negative brighten), and end
+            // up with a much brighter color
+            colors.push(Highcharts.color(base).brighten((i - 3) / 7).get());
+        }
+        return colors;
+    }());
+</script>
+
+<script>
+    var pieColors = (function () {
+        var colors = [],
+            base = Highcharts.getOptions().colors[0], i;
+        for (i = 0; i < 10; i += 1) {
+            // Start out with a darkened base color (negative brighten), and end
+            // up with a much brighter color
+            colors.push(Highcharts.color(base).brighten((i - 3) / 7).get());
+        }
+        return colors;
+    }());
+</script>
+<!-- pie chart -->
+
+<script>
+    /*auto marquee Start*/
+    (function ($) {
+        $.fn.autoscroll = function (options) {
+            var settings = $.extend({}, $.fn.autoscroll.defaults, options);
+            return this.each(function () {
+                var $this = $(this);
+                if ($this.length > 0 &&
+                    $this[0].scrollHeight > $this[0].clientHeight) {
+                    var scrollTimer,
+                        scrollTop = 0;
+
+                    function scrollList() {
+                        var itemHeight = $this.children().eq(1).outerHeight(true);
+                        scrollTop++;
+                        if (scrollTop >= itemHeight) {
+                            $this.scrollTop(0).children().eq(0).appendTo($this);
+                            scrollTop = 0;
+                        } else {
+                            $this.scrollTop(scrollTop);
+                        }
+                    }
+
+                    $this.hover(function () {
+                        clearInterval(scrollTimer);
+                        $this.css("overflow-y", "auto");
+                        if (settings.hideScrollbar) {
+                            $this.addClass("hide-scrollbar");
+                        }
+                        if ($.type(settings.handlerIn) === "function") {
+                            settings.handlerIn();
+                        }
+                    }, function () {
+                        $this.css("overflow-y", "hidden");
+                        scrollTimer = setInterval(function () {
+                            scrollList();
+                        }, settings.interval);
+                        if ($.type(settings.handlerOut) === "function") {
+                            settings.handlerOut();
+                        }
+                    }).trigger("mouseleave");
+                }
+            });
+        }
+        $.fn.autoscroll.defaults = {
+            interval: 25,
+            hideScrollbar: true,
+            handlerIn: null,
+            handlerOut: null
+
+        };
+        $(function () {
+            $("[data-autoscroll]").autoscroll();
+        });
+    })(jQuery);
+
+</script>
+<!-- Body content Ends here -->
+<!-- dashboard animate script -->
+<script>
+    $(document).ready(function () {
+
+        var i = 1;
+        var class_length = $(".dash_sec").length;
+        setInterval(function () {
+            if (i <= class_length) {
+                $(".dash_sec").removeClass("zoombox");
+                $("#zoom_" + i).addClass("zoombox");
+            } else {
+                $(".dash_sec").removeClass("zoombox");
+                $("#zoom_" + i).addClass("zoombox");
+                i = 0;
+            }
+            //  $("#zoom_"+i).addClass("  ");
+            i++;
+
+        }, 2200);
+    })
+</script>
+
+<!-- sticky icon hover set -->
+<script>
+    $(".sticky-icon a").mouseenter(function () {
+        $(".sticky-icon").css("z-index", "2");
+    }).mouseleave(function () {
+        $(".sticky-icon").css("z-index", "inherit");
+    });
+</script>
+
+<script>
+    // Disable right-click with f12 click
+    document.addEventListener('contextmenu', (e) => e.preventDefault());
+    function ctrlShiftKey(e, keyCode) {
+        return e.ctrlKey && e.shiftKey && e.keyCode === keyCode.charCodeAt(0);
+    }
+    document.onkeydown = (e) => {
+        // Disable F12, Ctrl + Shift + I, Ctrl + Shift + J, Ctrl + U
+        if (
+            event.keyCode === 123 ||
+            ctrlShiftKey(e, 'I') ||
+            ctrlShiftKey(e, 'J') ||
+            ctrlShiftKey(e, 'C') ||
+            (e.ctrlKey && e.keyCode === 'U'.charCodeAt(0))
+        )
+            return false;
+    };
+</script>
+<!-- sticky icon hover set -->

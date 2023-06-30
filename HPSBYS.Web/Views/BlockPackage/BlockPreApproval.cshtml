@@ -1,0 +1,1313 @@
+﻿
+@{
+    ViewBag.Title = "BlockPreApproval";
+    Layout = "~/Views/Shared/_CommonLayout.cshtml";
+}
+
+<div class="container">
+    <div class="row">
+        <input type="hidden" value="abc" />
+        <div class="col-12 pb-3">
+            <div class="card">
+                <div class="card-body">
+                    <div class="clearfix"></div>
+                    <div class="form-box-bg mb-4">
+                        <ul class="nav nav-tabs custom-tab mb-4">
+                            <li class="nav-item">
+                                <a class="nav-link" href="@Url.Action("BlockPreApprovalAdd","BlockPackage")">Query</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link active" href="@Url.Action("BlockPreApproval","BlockPackage")">View</a>
+                            </li>
+                        </ul>
+                        <div class="col-md-12 col-sm-12 col-xs-12 px-0">
+                            <div class="form-row">
+                                <div class="col-lg-2">
+                                    <div class="mb-4">
+                                        <label class="pkg-label mb-1"> From Date :</label>
+                                        <input type="text" id="txtFromDate" class="form-control dateFormat" />
+                                    </div>
+                                </div>
+                                <div class="col-lg-2">
+                                    <div class="mb-4">
+                                        <label class="pkg-label mb-1"> To Date :</label>
+                                        <input type="text" id="txtToDate" class="form-control dateFormat" />
+                                    </div>
+                                </div>
+                                <div class="col-lg-2">
+                                    <div class="mb-4">
+                                        <label class="pkg-label mb-1">Status :</label>
+                                        <select id="ddlpreauthstatus" class="form-control form-group">
+                                            <option value="A">ALL</option>
+                                            <option value="N">PENDING</option>
+                                            <option value="Y">APPROVED</option>
+                                            <option value="R">REJECTED</option>
+                                            <option value="E">EXPIRED</option>
+                                        </select>
+                                        @*<input type="text" id="txtToDate" class="form-control dateFormat" />*@
+                                    </div>
+                                </div>
+                                <div class="col-lg-2 d-flex justify-content-start align-items-center">
+                                    <input class="btn btn-outline-success" type="button" value="Search" id="btnSearch">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pkg_grey">
+                            <div class="form-row"></div>
+                            <div class="table-responsive mt-2">
+                                <table id="grdPreApprvPackage" class="table table-striped border preauth-tbl" cellspacing="0" width="100%">
+                                    <thead>
+                                        <tr>
+                                            <th>Sl No</th>
+                                            <th>URN</th>
+                                            <th> <div class="prehed-bold"> Member Details </div> <div class="prehed-small" id="patientname"> Name | Contact </div> </th>
+                                            <th>Case No</th>
+                                            <th>Request Date</th>
+                                            <th>Package Details <div class="prehed-small"> Amount | Code | Status </div> </th>
+                                            <th>Approved Amount <div class="prehed-small"> Action Taken By </div> </th>
+                                            <th>View Details</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="body_packagelist"></tbody>
+                                </table>
+
+
+                                <!-- Pre-auth view Report -->
+
+                              @*  <div class="table-responsive mt-2">
+                                    <table id="data-new5" class="table table-striped border preauth-tbl" cellspacing="0" width="100%">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 5% !important;">Sl No</th>
+                                                <th style="width: 10% !important;">URN</th>
+                                                <th style="width: 13% !important;"> <div class="prehed-bold"> Member Details </div> <div class="prehed-small"> Name | Contact </div> </th>
+                                                <th style="width: 15% !important;">Case No</th>
+                                                <th style="width: 12% !important;"> Registration Date </th>
+                                                <th style="width: 14% !important;">Package Details   <div class="prehed-small"> Amount | Code | Status </div> </th>
+                                                <th style="width: 14% !important;"> Approved Amount <div class="prehed-small"> Action Taken By </div> </th>
+                                                <th style="width: 5% !important;"> View </th>
+                                                <th style="width: 19% !important;"> Action </th>
+
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>1</td>
+                                                <td>02120610257</td>
+                                                <td> <b class="text-success"> #59776523 </b> <div class="pre-bold"> Bibhu Jena </div> <div class="prehed-small"> 9525878584 </div> </td>
+                                                <td> CASE/27237006/16052023/005 </td>
+                                                <td> 16-May-23 </td>
+                                                <td> <div class="pre-bold"> &#8377; 1,25,000 </div>  <div class="pre-small"> MC011A </div> <div class="badge badge-warning badge-font mt-1"> Pending  </div> </td>
+                                                <td> <div class="pre-bold"> &#8377; 25,000 </div> <div class="pre-small"> Priyaranjan Jena </div> </td>
+                                                <td> <button type="button" tooltip="View Details" toggle="modal" class="btn btn-outline-success focusedBtn btn-sm my-2 mr-2 my-sm-0"> <i class="fa fa-eye"></i></button> </td>
+
+                                                <td>
+                                                    <input type="button" id="btnCancelPack" data-id="1" value="Cancal" class="btn btn-sm btn-outline-danger btnSelect">
+                                                    <input type="button" id="btnCancelPack" data-id="1" value="Block" class="btn btn-sm btn-outline-success btnSelect">
+
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <td>2</td>
+                                                <td>02120610257</td>
+                                                <td> <b class="text-success"> #59776523 </b> <div class="pre-bold"> Bibhu Jena </div> <div class="prehed-small"> 9525878584 </div> </td>
+                                                <td> CASE/27237006/16052023/005 </td>
+                                                <td> 16-May-23 </td>
+                                                <td> <div class="pre-bold"> &#8377; 1,25,000 </div>  <div class="pre-small"> MC011A </div> <div class="badge badge-success badge-font mt-1"> Approved  </div> </td>
+                                                <td> <div class="pre-bold"> &#8377; 25,000 </div> <div class="pre-small"> Priyaranjan Jena </div>  </td>
+                                                <td> <button type="button" tooltip="View Details" toggle="modal" class="btn btn-outline-success focusedBtn btn-sm my-2 mr-2 my-sm-0"> <i class="fa fa-eye"></i></button> </td>
+
+                                                <td>
+                                                    <input type="button" id="btnCancelPack" data-id="1" value="Cancal" class="btn btn-sm btn-outline-danger btnSelect">
+                                                    <input type="button" id="btnCancelPack" data-id="1" value="Block" class="btn btn-sm btn-outline-success btnSelect">
+
+                                                </td>
+
+                                            </tr>
+
+
+                                            <tr>
+                                                <td>3</td>
+                                                <td>02120610257</td>
+                                                <td> <b class="text-success"> #59776523 </b> <div class="pre-bold"> Bibhu Jena </div> <div class="prehed-small"> 9525878584 </div> </td>
+                                                <td> CASE/27237006/16052023/005 </td>
+                                                <td> 16-May-23 </td>
+                                                <td> <div class="pre-bold"> &#8377; 1,25,000 </div>  <div class="pre-small"> MC011A </div> <div class="badge badge-danger badge-font mt-1"> Expiried  </div> </td>
+                                                <td> <div class="pre-bold"> &#8377; 25,000 </div> <div class="pre-small"> Priyaranjan Jena </div> </td>
+                                                <td> <button type="button" tooltip="View Details" toggle="modal" class="btn btn-outline-success focusedBtn btn-sm my-2 mr-2 my-sm-0"> <i class="fa fa-eye"></i></button> </td>
+
+                                                <td>
+                                                    <input type="button" id="btnCancelPack" data-id="1" value="Cancal" class="btn btn-sm btn-outline-danger btnSelect">
+                                                    <input type="button" id="btnCancelPack" data-id="1" value="Block" class="btn btn-sm btn-outline-success btnSelect">
+
+                                                </td>
+
+                                            </tr>
+
+
+                                            <tr>
+                                                <td>4</td>
+                                                <td>02120610257</td>
+                                                <td> <b class="text-success"> #59776523 </b> <div class="pre-bold"> Bibhu Jena </div> <div class="prehed-small"> 9525878584 </div> </td>
+                                                <td> CASE/27237006/16052023/005 </td>
+                                                <td> 16-May-23 </td>
+                                                <td> <div class="pre-bold"> &#8377; 1,25,000 </div>  <div class="pre-small"> MC011A </div> <div class="badge badge-danger badge-font mt-1"> Rejected  </div> </td>
+                                                <td> <div class="pre-bold"> &#8377; 25,000 </div> <div class="pre-small"> Priyaranjan Jena </div> </td>
+                                                <td> <button type="button" tooltip="View Details" toggle="modal" class="btn btn-outline-success focusedBtn btn-sm my-2 mr-2 my-sm-0"> <i class="fa fa-eye"></i></button> </td>
+
+                                                <td>
+                                                    <input type="button" id="btnCancelPack" data-id="1" value="Cancal" class="btn btn-sm btn-outline-danger btnSelect">
+                                                    <input type="button" id="btnCancelPack" data-id="1" value="Block" class="btn btn-sm btn-outline-success btnSelect">
+
+                                                </td>
+
+                                            </tr>
+
+                                        </tbody>
+                                    </table>
+*@
+                                </div>
+
+                                <!-- Pre-auth view Report -->
+
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="MyPopup" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <h4 class="modal-title">
+                                Package Cancellation
+                            </h4>
+                        </div>
+                    </div>
+                    <button type="button" class="close" data-dismiss="modal">
+                        &times;
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-2">
+                            <label class="pkg-label font-weight-normal"> URN Number : </label>
+                            <div class="pkghead-txt" id="lblPatientMemberId">
+                                <label id="lblUrnNo"></label>
+                                <input type="hidden" id="hdnPackageDetailsId" />
+                                <input type="hidden" id="hdnMemid" />
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <label class="pkg-label font-weight-normal"> Patient Name : </label>
+                            <div class="pkghead-txt">
+                                <label id="lblPatientName"></label>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <label class="pkg-label font-weight-normal">  Contact Number : </label>
+                            <div class="pkghead-txt">
+                                <label id="lblContactNum"></label>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <label class="pkg-label font-weight-normal">  Hospital Code : </label>
+                            <div class="pkghead-txt">
+                                <label id="lblHospitalCode"></label>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <label class="pkg-label font-weight-normal">   Package Amount : </label>
+                            <div class="pkghead-txt">
+                                <label id="lblPackAmt"></label>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <label class="pkg-label font-weight-normal">   Approve Amount : </label>
+                            <div class="pkghead-txt">
+                                <label id="lblapproveAmt"></label>
+                            </div>
+                        </div>
+                        <div class="col-md-12 mb-2">
+                            <label class="pkg-label font-weight-normal">  Package Details : </label>
+                            <div class="pkghead-txt">
+                                <label id="lblPackageDtls" title="Package Details"></label>
+                            </div>
+                        </div>
+                        <div class="col-md-12 mb-2">
+                            <label class="pkg-label mb-1">Reason for Cancellation :<b><span style="color:red">*</span></b> </label>
+                            <div class="pkghead-txt">
+                                <textarea id="txtcancelReason" oninput="this.value = this.value.toUpperCase()" maxlength="200" class="form-control" placeholder="Reason for Cancellation" style="width:100%"></textarea>
+                                <div class="chrtr_lmt red-text">
+                                    <small>
+                                        <b>
+                                            Maximum&nbsp;
+                                            <input size="2" style="color:green" value="200" id="txtCharslimit1" name="txtCharslimit1" readonly="readonly" class="remaining border-0 font-weight-bold" tabindex="-1">&nbsp;Characters
+                                        </b>
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button type="button" id="btnPackConfirmSmt" class="btn btn-sm btn-success">Submit</button>
+                            <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="MyPopupBlock" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <h4 class="modal-title"> Package Block </h4>
+                    </div>
+                </div>
+                <button type="button" class="close" data-dismiss="modal"> &times; </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-4 mb-2">
+                        <label class="pkg-label font-weight-normal"> URN Number : </label>
+                        <div class="pkghead-txt" id="lblPatientMemberId">
+                            <label id="lblUrnNoBlk"></label>
+                            <input type="hidden" id="hdnPackageDetailsIdBlk" />
+                            <input type="hidden" id="hdnMemidBlk" />
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-2">
+                        <label class="pkg-label font-weight-normal"> Patient Name : </label>
+                        <div class="pkghead-txt" id="lblPatientNameBlk"></div>
+                    </div>
+                    <div class="col-md-4 mb-2">
+                        <label class="pkg-label font-weight-normal"> Contact Number : </label>
+                        <div class="pkghead-txt" id="lblContactNumBlk"></div>
+                    </div>
+                    <div class="col-md-4 mb-2">
+                        <label class="pkg-label font-weight-normal"> Package Amount : </label>
+                        <div class="pkghead-txt" id="lblPackAmtBlk"></div>
+                    </div>
+                    <div class="col-md-4 mb-2">
+                        <label class="pkg-label font-weight-normal"> Approve Amount : </label>
+                        <div class="pkghead-txt" id="lblapproveAmtBlk"></div>
+                    </div>
+                    <div class="col-md-12 mb-2">
+                        <label class="pkg-label font-weight-normal"> Package Details : </label>
+                        <div class="pkghead-txt">
+                            <label id="lblPackageDtlsBlk" title="Package Details"></label>
+                        </div>
+                    </div>
+                    <div class="col-md-12 mb-2">
+                        <label class="pkg-label mb-1"> Remarks : </label>
+                        <div class="pkghead-txt">
+                            <textarea id="txtRemarks" oninput="this.value = this.value.toUpperCase()" maxlength="200" autocomplete="off" class="form-control" placeholder="Remarks" style="width:100%"></textarea>
+                            <div class="chrtr_lmt red-text">
+                                <small>
+                                    <b>
+                                        Maximum&nbsp;
+                                        <input size="2" style="color:green" value="200" id="txtCharslimit2" name="txtCharslimit2" readonly="readonly" class="remaining border-0 font-weight-bold" tabindex="-1">&nbsp;Characters
+                                    </b>
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" id="btnPackConfirmBlk" class="btn btn-sm btn-success">Submit</button>
+                        <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- View details modal start -->
+<div class="modal fade wow fadeInUp animated" id="ViewDetails" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="col-lg-10 px-0">
+                    <div class="form-row">
+                        <div class="col-md-6">
+                            <div class="heading-pkg px-0"><h5 class="mb-0"> View Details </h5> </div>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row heading-pkg border-bottom mb-3">
+                    <h5> Patient Details </h5>
+                    <input type="hidden" id="invoiceno" />
+                    <input type="hidden" id="urnid" />
+                </div>
+                <div class="row">
+                    <div class="col-lg-3 mb-2">
+                        <label class="pkg-label font-weight-normal">Name :</label>
+                        <div class="pkghead-txt">
+                            <span id="membernameid"></span>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 mb-2">
+                        <label class="pkg-label font-weight-normal">Member ID :</label>
+                        <div class="pkghead-txt">
+                            <span id="memberid"></span>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 mb-2">
+                        <label class="pkg-label font-weight-normal">Gender : </label>
+                        <div class="pkghead-txt">
+                            <span id="genderid"></span>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 mb-2">
+                        <label class="pkg-label font-weight-normal">Age :</label>
+                        <div class="pkghead-txt">
+                            <span id="age"></span>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 mb-2">
+                        <label class="pkg-label font-weight-normal">Aadhaar Card :</label>
+                        <div class="pkghead-txt">
+                            <span id="adharno"></span>
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <label class="pkg-label font-weight-normal">Treatment Type :</label>
+                        <div class="pkghead-txt">
+                            <span id="surgicaltype"></span>
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <label class="pkg-label font-weight-normal">Patient Phone No :</label>
+                        <div class="pkghead-txt">
+                            <span id="patientphonenoid"></span>
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <label class="pkg-label font-weight-normal">Case No :</label>
+                        <div class="pkghead-txt">
+                            <span id="casenoid"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row heading-pkg mt-4 border-bottom mb-3">
+                    <h5> Verified Details </h5>
+                </div>
+                @*<div class="row mx-0 mb-4">
+                        <div class="table-responsive border">
+                            <table class="table table-striped" id="tblverifieddetails">
+                            </table>
+                        </div>
+                    </div>*@
+                <div class="row">
+                    <div class="col-lg-3 mb-2">
+                        <label class="pkg-label font-weight-normal">Verifier Name :</label>
+                        <div class="pkghead-txt">
+                            <span id="verifymembernameid"></span>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 mb-2">
+                        <label class="pkg-label font-weight-normal">Verifier Member ID :</label>
+                        <div class="pkghead-txt">
+                            <span id="verifymemberid"></span>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 mb-2">
+                        <label class="pkg-label font-weight-normal">Verified Through </label>
+                        <div class="pkghead-txt">
+                            <span id="verifythroughid"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row heading-pkg border-bottom mb-3">
+                    <h5> Package Details </h5>
+                </div>
+                @*<div class="row mx-0 mb-4">
+                        <div class="table-responsive border">
+                            <table class="table" id="tblpackagedetails">
+                            </table>
+                        </div>
+                    </div>*@
+                <div class="row mx-0 mb-4">
+                    <div class="table-responsive border">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Sl#</th>
+                                    <th>Package Header</th>
+                                    <th>Package Code</th>
+                                    <th>Package Details</th>
+                                    <th>Request Amount</th>
+                                    <th>Approved Amount</th>
+                                    <th>Treatment Days</th>
+                                    <th>Request Date</th>
+                                    @*<th>Block Package Date</th>*@
+                                    <th colspan="2"> Action </th>
+                                </tr>
+                            </thead>
+                            <tbody id="bodypackagedetails">
+                                <tr>
+                                    <td> 1 </td>
+                                    <td>Burns Management</td>
+                                    <td>Electrical Contact Burns</td>
+                                    <td>BM004A</td>
+                                    <td>51187</td>
+                                    <td>0</td>
+                                    <td>NO</td>
+                                    <td>23-Feb-23</td>
+                                    <td> <button type="button" class="btn btn-outline-success focusedBtn btn-sm my-2 my-sm-0" data-toggle="collapse" data-target="#pkgmodalcls"><i class="fa fa-eye"></i></button> </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="12" class="m-0 p-0 border-0">
+                                        <div class="accordian-body collapse" id="pkgmodalcls">
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 mt-3">
+                                                <div class="headingpkg-bg"> Package Details </div>
+                                                <div class="row d-flex align-items-center">
+                                                    <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                                                        <div class="impl_head"> Implant Details </div>
+                                                    </div>
+                                                    <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                                                        <div class="row d-flex align-items-center">
+                                                            <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12">
+                                                                <div class="impl_head"> HighEndDrugs Details </div>
+                                                            </div>
+                                                            <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-lg-6" id="table-scroll">
+                                                        <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12 mt-3"></div>
+                                                        <table class="table table-striped tblImplView" id="tblImplantView1">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th scope="bg-white text-align-left" style="background-color:#fff !important;"> Implant Name</th>
+                                                                    <th scope="bg-white text-align-center" style="background-color:#fff !important;"> Unit </th>
+                                                                    <th scope="bg-white text-align-right" style="background-color:#fff !important;"> Price </th>
+                                                                    <th scope="bg-white text-align-right" style="background-color:#fff !important;"> Total Price </th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody></tbody>
+                                                            <tfoot>
+                                                                <tr>
+                                                                    <td class="font-weight-5">Total </td>
+                                                                    <td class="font-weight-5"></td>
+                                                                    <td></td>
+                                                                    <td colspan="2" class="font-weight-5 clsImplTotalInner1"></td>
+                                                                </tr>
+                                                            </tfoot>
+                                                        </table>
+                                                    </div>
+                                                    <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12 mt-3">
+                                                        <div id="table-scroll" class="table-scroll table-responsive mb-3">
+                                                            <table id="tblHgDrugsInnerList1" class="main-table table table-striped">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th scope=" bg-white  text-align-left" style="background-color:#fff !important;"> HighEndDrugs Name </th>
+                                                                        <th scope=" bg-white text-align-center" style="background-color:#fff !important;"> Unit </th>
+                                                                        <th scope=" bg-white text-align-right" style="background-color:#fff !important;"> Price </th>
+                                                                        <th scope=" bg-white text-align-right" style="background-color:#fff !important;"> Total Price </th>
+                                                                        <th scope=" bg-white text-align-right" style="background-color:#fff !important;"> Pre-Auth Required </th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <td>IV immunoglobins</td>
+                                                                        <td>1<input type="hidden" id="hdnTabname" name="hdHedltabName" value="tblHgDrugsInnerList1"></td>
+                                                                        <td>250000.00</td>
+                                                                        <td>250000.00</td>
+                                                                        <td class="hedPreAuth"><input type="hidden" name="hedPreAuthcls" value="isPackAuthReq1">Yes<input type="hidden" id="hdnParentIsPreAuth" name="hdnnmParentIsPreAuth" value="YES"></td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>Erythropoeitin</td>
+                                                                        <td>1<input type="hidden" id="hdnTabname" name="hdHedltabName" value="tblHgDrugsInnerList1"></td>
+                                                                        <td>700.00</td>
+                                                                        <td>700.00</td>
+                                                                        <td class="hedPreAuth"><input type="hidden" name="hedPreAuthcls" value="isPackAuthReq1">Yes<input type="hidden" id="hdnParentIsPreAuth" name="hdnnmParentIsPreAuth" value="YES"></td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>Erythropoeitin</td>
+                                                                        <td>1<input type="hidden" id="hdnTabname" name="hdHedltabName" value="tblHgDrugsInnerList1"></td>
+                                                                        <td>1000.00</td>
+                                                                        <td>1000.00</td>
+                                                                        <td class="hedPreAuth"><input type="hidden" name="hedPreAuthcls" value="isPackAuthReq1">Yes<input type="hidden" id="hdnParentIsPreAuth" name="hdnnmParentIsPreAuth" value="YES"></td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>Human Albumin 20%</td>
+                                                                        <td>1<input type="hidden" id="hdnTabname" name="hdHedltabName" value="tblHgDrugsInnerList1"></td>
+                                                                        <td>0.00</td>
+                                                                        <td>0.00</td>
+                                                                        <td class="hedPreAuth"><input type="hidden" name="hedPreAuthcls" value="isPackAuthReq1">Yes<input type="hidden" id="hdnParentIsPreAuth" name="hdnnmParentIsPreAuth" value="YES"></td>
+                                                                    </tr>
+                                                                </tbody>
+                                                                <tfoot>
+                                                                    <tr>
+                                                                        <td colspan="1">Total </td>
+                                                                        <td class="font-weight-5">&nbsp;</td>
+                                                                        <td>&nbsp;</td>
+                                                                        <td class="font-weight-5" colspan="3">₹2,51,700.00</td>
+                                                                    </tr>
+                                                                </tfoot>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <tfoot></tfoot>
+                        </table>
+                    </div>
+                </div>
+                <div class="row heading-pkg border-bottom mb-3">
+                    <h5> Admission Details </h5>
+                </div>
+                <div class="table-responsive border">
+                    <table class="table" id="tbladmissiondetails">
+                    </table>
+                </div>
+                <div class="row mt-5">
+                    <label class="pkg-label font-weight-normal col-lg-2">SNA Remark :</label>
+                    <div class="pkghead-txt col-lg-10">
+                        <span id="idremarks"></span>
+                    </div>
+                </div>
+                <div class="row mt-5">
+                    <label class="pkg-label font-weight-normal col-lg-2">SNA Description :</label>
+                    <div class="pkghead-txt col-lg-10">
+                        <span id="idsnadescription"></span>
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <div id="1stpreauthdiv" class="col-lg-3 mb-2">
+                        <label class="pkg-label mb-2"> First PreAuth Doc </label>
+                        <div class="pkghead-txt">
+                            <input type="hidden" id="preauthdocid1" />
+                            <input type="hidden" id="preauthdocid2" />
+                            <input type="hidden" id="preauthdocid3" />
+                            <input type="hidden" id="urnid" />
+                            <input type="hidden" id="admissiondateid" />
+                            <button id="1stdwnldpreauthdoc" class="btn btn-outline-success btn-sm" onclick="downloadfile1()"> <i class="fa fa-image"></i> Download </button>
+                        </div>
+                    </div>
+                    <div id="2ndpreauthdiv" class="col-lg-6 mb-2 border-right">
+                        <label class="pkg-label mb-2">Second PreAuth Doc</label>
+                        <div class="pkghead-txt">
+                            <button id="2nddwnldpreauthdoc" class="btn btn-outline-success btn-sm" onclick="downloadfile2()"> <i class="fa fa-image"></i> Download </button>
+                        </div>
+                    </div>
+                    <div id="3rdpreauthdiv" class="col-lg-6 mb-2 border-right">
+                        <label class="pkg-label mb-2">Third PreAuth Doc</label>
+                        <div class="pkghead-txt">
+                            <button id="3rddwnldpreauthdoc" class="btn btn-outline-success btn-sm" onclick="downloadfile3()"> <i class="fa fa-image"></i> Download </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- View details modal end -->
+
+<script typeof="javascript">
+    $(document).ready(function () {
+        $('#1stpreauthdiv').hide();
+        $('#2ndpreauthdiv').hide();
+        $('#3rdpreauthdiv ').hide();
+        $('#path').html('Block Pre-Approval List');
+        //bindPreApprovalList();
+
+        $('#txtcancelReason').keyup(function () {
+            var txtCharCountLength = $(this).val().length;
+            if (txtCharCountLength <= 200) {
+                var remainingChar = 200 - txtCharCountLength;
+                $("#txtCharslimit1").val(remainingChar);
+            }
+        });
+
+        $('#txtRemarks').keyup(function () {
+            var txtCharCountLength = $(this).val().length;
+            if (txtCharCountLength <= 200) {
+                var remainingChar = 200 - txtCharCountLength;
+                $("#txtCharslimit2").val(remainingChar);
+            }
+        });
+
+        $("#grdPreApprvPackage").on('click', '.btnSelect', function () {
+            // get the current row
+            var currentRow = $(this).closest("tr");
+            var urnno = currentRow.find("td:eq(1)").text();
+            var patientname = currentRow.find(".wrapperDivHidden").val();               /*currentRow.find("td:eq(2)").text();*/
+            var contactnumber = currentRow.find(".wrapperDivHidden1").val();              /*currentRow.find("td:eq(6)").text();*/
+            var packagedtls = currentRow.find("td:eq(5)").text();
+            var pacamount = currentRow.find(".wrapperDivHidden2").val();                 /*currentRow.find("td:eq(5)").text();*/
+            var approveamount = currentRow.find(".wrapperDivHidden3").val();             /* currentRow.find("td:eq(6)").text();*/
+            var packageid = $(this).parents('tr').find('.clsPakcode').val();
+            var procedurename = $(this).parents('tr').find('.clsProcName').val();
+            var memid = $(this).parents('tr').find('.clsmemid').val();
+            var hospcode = $(this).parents('tr').find('.clshopcode').val();
+            $("#hdnPackageDetailsId").val(packageid);
+            $("#hdnMemid").val(memid);
+            //alert($("#hdnPackageDetailsId").val());
+            //alert($("#hdnMemid").val());
+            $("#lblUrnNo").html(urnno);
+            $("#lblPatientName").html(patientname);
+            $("#lblContactNum").html(contactnumber);
+           // $("#lblPackageDtls").html(packagedtls);
+            $("#lblPackAmt").html(pacamount);
+            $('#lblapproveAmt').html(approveamount);
+            $("#lblPackageDtls").html(procedurename);
+            $("#lblHospitalCode").html(hospcode);
+        });
+
+        $("#grdPreApprvPackage").on('click', '.btnblock', function () {
+            // get the current row
+            var currentRow = $(this).closest("tr");
+            var urnno = currentRow.find("td:eq(1)").text();
+            var patientname =   currentRow.find(".wrapperDivHidden").val();
+            var contactnumber =  currentRow.find(".wrapperDivHidden1").val();
+            var packagedtls = currentRow.find("td:eq(5)").text();
+            var pacamount = currentRow.find(".wrapperDivHidden2").val();
+            var approveamount = currentRow.find(".wrapperDivHidden3").val();
+            var packageid = $(this).parents('tr').find('.clsPakcode').val();
+            var procedurename = $(this).parents('tr').find('.clsProcName').val();
+            var memid = $(this).parents('tr').find('.clsmemid').val();
+            var hospcode = $(this).parents('tr').find('.clshopcode').val();
+            $("#hdnPackageDetailsIdBlk").val(packageid);
+            $("#hdnMemidBlk").val(memid);
+            $("#lblUrnNoBlk").html(urnno);
+            $("#lblPatientNameBlk").html(patientname);
+            $("#lblContactNumBlk").html(contactnumber);
+            $("#lblPackAmtBlk").html(pacamount);
+            $('#lblapproveAmtBlk').html(approveamount);
+            $("#lblPackageDtlsBlk").html(procedurename);
+            $("#lblHospitalCodeBlk").html(hospcode);
+        });
+
+        var d = new Date();
+        var currentDate = d.getDate();
+        var currMonth = d.getMonth();
+        var currYear = d.getFullYear();
+        var startDate = new Date(currYear, currMonth, 1);
+        var endDate = new Date(currYear, currMonth, currentDate);
+        $("#txtFromDate").val(moment(startDate).format("DD-MMM-YY"));
+        $("#txtToDate").val(moment(endDate).format("DD-MMM-YY"));
+        var from_date = $("#txtFromDate").val();
+        var to_date = $("#txtToDate").val();
+        bindPreApprovalList(from_date, to_date);
+
+        $('#btnPackConfirmSmt').click(function () {
+            $('#divLoader').show();
+            var mainData = new Object();
+            //debugger;
+                if ($("#txtcancelReason").val() != "") {
+                    $('#btnPackConfirmSmt').prop('disabled', true);
+                    mainData.ActionCode = "B";
+                    //mainData.p_transactionid = $("#ddlSup").val();
+                    mainData.urn = $("#lblUrnNo").text();
+                    mainData.p_txnpackagedetailid =$("#hdnPackageDetailsId").val();
+                    mainData.p_memberid =$("#hdnMemid").val();
+                    mainData.p_preauthstatus ="C";
+                    mainData.p_remark =$("#txtcancelReason").val();
+                    mainData.p_hospitalcode = $("#lblHospitalCode").text();
+                    mainData.p_amounttobeblocked = $("#lblapproveAmt").text();
+                    //mainData.p_amounttobeblocked = $("#lblapproveAmtBlk").text();
+                    console.log(mainData);
+                    $.ajax({
+                        url: '@Url.Content("~/")' + 'BlockPackage/UpdateBlockPackage',
+                        data: mainData,
+                        type: "POST",
+                        dataType: "json",
+                        success: function (data) {
+                            $('#divLoader').hide();
+                            console.log(data);
+                            if (data == "2") {
+                                swal({
+                                    title: "Package Cancelled Successfully!!",
+                                    icon: "success",
+                                    type: "success",
+                                    confirmButtonColor: "#36A865",
+                                    confirmButtonText: "Ok"
+                                }).then((result) => {
+
+                                    //$("#txtcancelReason").val("");
+                                    //$('#btnPackConfirmSmt').prop('disabled', false);
+                                    $("#MyPopup").modal("hide");
+                                    window.location.reload();
+                                   // bindPreApprovalList(from_date, to_date);
+
+                                    //$('#btnPackConfirmSmt').prop('disabled', true);
+                                });
+                            }
+                            if (data == "1") {
+                                swal({
+                                    text: "Package Already Approved,Cannot Cancell!!",
+                                    confirmButtonColor: "#36A865",
+                                    type: "error",
+                                    confirmButtonText: "OK",
+                                    closeOnConfirm: false
+                                }).then((result) => {
+                                    //$("#txtcancelReason").val("");
+                                    //$('#btnPackConfirmSmt').prop('disabled', false);
+                                    $("#MyPopup").modal("hide");
+                                    window.location.reload();
+                                    //bindPreApprovalList(from_date, to_date);
+
+                                });
+                            }
+                        }
+                    });
+                }
+                else {
+                    swal({
+                        text: "Please Enter Reason for Cancellation",
+                        confirmButtonColor: "#36A865",
+                        type: "error",
+                        confirmButtonText: "OK",
+                        closeOnConfirm: false
+                    })
+                }
+           // }
+        });
+
+        $('#btnPackConfirmBlk').click(function () {
+            $('#divLoader').show();
+            var mainData = new Object();
+            //debugger;
+            $('#btnPackConfirmBlk').prop('disabled', true);
+            mainData.ActionCode = "B";
+            //mainData.p_transactionid = $("#ddlSup").val();
+            mainData.urn = $("#lblUrnNoBlk").text();
+            mainData.p_txnpackagedetailid =$("#hdnPackageDetailsIdBlk").val();
+            mainData.p_memberid = $("#hdnMemidBlk").val();
+            mainData.p_preauthstatus ="B";
+            mainData.p_remark = $("#txtRemarks").val();
+            mainData.p_hospitalcode = $("#lblHospitalCodeBlk").text();
+            mainData.p_amounttobeblocked = $("#lblapproveAmtBlk").text();
+
+            console.log(mainData);
+            $.ajax({
+                url: '@Url.Content("~/")' + 'BlockPackage/UpdateBlockPackage',
+                data: mainData,
+                type: "POST",
+                dataType: "json",
+                success: function (data) {
+                    $('#divLoader').hide();
+                    if (data == "4") {
+                        swal({
+                            title: "Package Blocked Successfully!!",
+                            icon: "success",
+                            type: "success",
+                            confirmButtonColor: "#36A865",
+                            confirmButtonText: "Ok"
+                        }).then((result) => {
+
+                            $("#MyPopupBlock").modal("hide");
+                            window.location.reload();
+                        });
+                    }
+                    if (data == "6") {
+                        swal({
+                            text: "Patient Already Admitted in Another Hospital!!",
+                            confirmButtonColor: "#36A865",
+                            type: "error",
+                            confirmButtonText: "OK",
+                            closeOnConfirm: false
+                        }).then((result) => {
+                            $("#MyPopupBlock").modal("hide");
+                            window.location.reload();
+                            //$("#txtRemarks").val("");
+                            //$('#btnPackConfirmBlk').prop('disabled', false);
+                            //bindPreApprovalList(from_date, to_date);
+                        });
+                    }
+                    if (data == "99") {
+                        swal({
+                            text: "Cannot block due to insufficient balance!!",
+                            confirmButtonColor: "#36A865",
+                            type: "error",
+                            confirmButtonText: "OK",
+                            closeOnConfirm: false
+                        }).then((result) => {
+                            $("#MyPopupBlock").modal("hide");
+                            window.location.reload();
+                        });
+                    }
+                }
+            });
+        });
+    });
+
+    $("#btnSearch").click(function () {
+        var fromDt = $("#txtFromDate").val();
+        var toDt = $("#txtToDate").val();
+        var from = "";
+        var to = "";
+        if (fromDt != "")
+            from = new Date($("#txtFromDate").val());
+        if (toDt != "")
+            to = new Date($("#txtToDate").val());
+        if (to != "" && from === "") {
+            swal({
+                text: "Please Select From Date",
+                confirmButtonColor: "#36A865",
+                type: "error",
+                confirmButtonText: "OK",
+                closeOnConfirm: false
+            }).then((result) => {
+            /*swal('Please Select From Date').then(() => {*/
+                $('#txtFromDate').focus();
+            });
+        }
+        else if (from != "" && to === "") {
+            swal({
+                text: "Please Select To Date",
+                confirmButtonColor: "#36A865",
+                type: "error",
+                confirmButtonText: "OK",
+                closeOnConfirm: false
+            }).then((result) => {
+          /*  swal('Please Select To Date').then(() => {*/
+                $('#txtToDate').focus();
+            });
+        }
+        else if (from > to) {
+            swal({
+                text: "From date should not be greater than To date",
+                confirmButtonColor: "#36A865",
+                type: "error",
+                confirmButtonText: "OK",
+                closeOnConfirm: false
+            }).then((result) => {
+            //swal('From date should not be greater than To date')
+            //    .then(() => {
+                    $('#txtFromDate').focus();
+                });
+        }
+        else {
+            bindPreApprovalList(fromDt, toDt);
+        }
+    });
+
+    $(function () {
+        $(".dateFormat").datepicker({
+            numberOfMonths: 1,
+            changeMonth: true,
+            dateFormat: "dd-M-y",
+            changeYear: true
+        });
+    });
+
+    var SchemeParams = {
+        urnno: '',
+        action:'A',
+    };
+
+    function CancelPackage(obj)
+    {
+         var idValue = $(obj).data('id');
+         swal({
+             title: "Are you sure?",
+             text: " to cancel this package!",
+             type: "warning",
+             showCancelButton: true,
+             cancelButtonColor: '#d33',
+             confirmButtonColor: "#36A865",
+             confirmButtonText: 'Yes'
+         }).then(function (isConfirm) {
+             if (isConfirm.value) {
+                 $("#MyPopup").modal("show");
+                 $("#txtcancelReason").val('');
+                 $("#txtCharslimit1").val('200');
+             }
+         });
+    }
+
+    function BlockPackage(obj) {
+        var idValue = $(obj).data('id');
+        swal({
+            title: "Are you sure?",
+            text: "to block this package!",
+            type: "warning",
+            showCancelButton: true,
+            cancelButtonColor: '#d33',
+            confirmButtonColor: "#36A865",
+            confirmButtonText: 'Yes'
+        }).then(function (isConfirm) {
+            if (isConfirm.value) {
+                $("#MyPopupBlock").modal("show");
+                $("#txtRemarks").val('');
+                $("#txtCharslimit2").val('200');
+            }
+        });
+        //if (window.confirm('Are you sure to block this package？')) {
+        //    $("#MyPopupBlock").modal("show");
+        //}
+    }
+
+    function bindPreApprovalList(fromDt, toDt) {
+        var preauthstatus = $("#ddlpreauthstatus").val() != "" ? $("#ddlpreauthstatus").val():'';
+        var act = "A";
+        var hospitalcode = '@Session["HospitalCode"]';
+        $.ajax({
+            url: '@Url.Content("~/")' + "BlockPackage/GetPreApprovalRequest",
+            type: "GET",
+            /* data: SchemeParams,*/
+            data: { preauthstatus: preauthstatus, actioncode: act, hospitalcode: hospitalcode, FromDate: fromDt, ToDate: toDt },
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $("#loader").show();
+            },
+            success: function (data) {
+                var result = data.data;
+                var defaultmessage = "No Record(s) Found!";
+                console.log(result);
+                // var thisHtml = "";
+                var oTable = $('#grdPreApprvPackage').DataTable({
+                    "language": {
+                        "emptyTable": defaultmessage
+                    },
+                    destroy: true,
+                    //responsive: true,
+                    //autoWidth: false,
+                    lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                    buttons: [{  //for excel
+                        extend: 'excel',
+                        title: 'Enumerator Registration Details',
+                        customize: function (xlsx) {
+                            var sheet = xlsx.xl.worksheets['sheet1.xml'];
+                            var style = xlsx.xl['styles.xml'];
+                            $('xf', style).find("alignment[horizontal='center']").attr("wrapText", "1");
+                            $('row', sheet).first().attr('ht', '20').attr('customHeight', "1").attr('s', '2');
+                        },
+                        className: 'buttons-excel btn-cs d-none',
+                        text: '<i class="icon-excel"></i> Excel'
+                    }, 'pdf'],
+                });
+                //oTable.buttons().container().appendTo('.indicatorslist');
+
+                oTable.row().clear().draw();
+                var result = data.data;
+                console.log(result);
+                for (var i = 0; i < result.length; i++) {
+                    //debugger;
+                    var badgeClass = '';
+                    if (result[i].statustext == "PENDING") {
+                        badgeClass = 'badge-warning'; //
+                    }
+                    else if (result[i].statustext == "APPROVED") {
+                        badgeClass = 'badge-success';
+                    }
+                    else if (result[i].statustext == "REJECTED") {
+                        badgeClass = 'badge-danger';
+                    }
+                    else if (result[i].statustext == "EXPIRED") {
+                        badgeClass = 'badge-danger';
+                    }
+                    else {
+                        badgeClass = 'badge-primary';
+                    }
+                    oTable.row.add([(i + 1),
+                        '' + result[i].urnno + '<input type="hidden" class="wrapperDivHidden" value="' + result[i].patientname + '" /> <input type="hidden" class="wrapperDivHidden1" value="' + result[i].contactno + '" /><input type="hidden" class="wrapperDivHidden2" value="' + result[i].AMOUNTTOBEAPPROVED + '" /><input type="hidden" class="wrapperDivHidden3" value="' + result[i].ACTUALAMOUNTAPPROVED + '" /><input type="hidden" class="wrapperDivHidden" value="' + result[i].memberid + '" /><input type="hidden" class="clsPakcode" value="' + result[i].packagedetailid + '" /><input type="hidden" class="clsProcName" value="' + result[i].procedurename + '" /><input type="hidden" class="clshopcode" value="' + result[i].hospitalcode + '" /><input type="hidden" class="clsmemid" value="' + result[i].memberid + '" />', '<b class="text-success"> ' + result[i].memberid + ' </b> <div class="pre-bold"> ' + result[i].patientname + ' </div> <div class="prehed-small" >' + result[i].contactno + ' </div>', result[i].caseno, result[i].registrationdate, '<div class="pre-bold"> &#8377;' + result[i].AMOUNTTOBEAPPROVED + '</div> <div class="pre-small">' + result[i].procedurecode + '</div><div class="badge ' + badgeClass + '  badge-font mt-1">' + result[i].statustext + '</div>', '<div class= "pre-bold" > &#8377; ' + result[i].ACTUALAMOUNTAPPROVED + '</div > <div class="pre-small">' + result[i].actiontakenby + '</div>',
+                        //'' + result[i].urnno +
+                        //'<input type="hidden" class="wrapperDivHidden" value="' + result[i].patientname + '" />' +
+                        //'<input type = "hidden" class= "wrapperDivHidden" value = "' + result[i].memberid + '" />' +
+                        //'<input type = "hidden" class= "clsPakcode" value = "' + result[i].packagedetailid + '" />'+
+                        //'<input type = "hidden" class= "clsProcName" value = "' + result[i].procedurename + '" />' +
+                        //'<input type="hidden" class="clshopcode" value="' + result[i].hospitalcode + '" />' +
+                        //'<input type="hidden" class="clsmemid" value="' + result[i].memberid + '" />',
+                        //result[i].patientname,
+                        //result[i].memberid,
+                        //result[i].caseno,
+                        //result[i].registrationdate,
+                        //result[i].contactno,
+                        //result[i].procedurecode,
+                        //result[i].AMOUNTTOBEAPPROVED,
+                        //result[i].ACTUALAMOUNTAPPROVED,
+                        /*result[i].remarks == null ? "--" : result[i].remarks,*/
+                        '<button type = "button" tooltip ="View Details" onclick = "Viewdetails(' + result[i].packagedetailid + ')" data-toggle="modal" class= "btn btn-outline-success focusedBtn btn-sm my-2 mr-2 my-sm-0" > <i class="fa fa-eye"></i></button>',
+                        //result[i].status == "N" ? '@Session["moustatus"]' == 'true' ? '<input type="button" disabled value="Cancel" class="btn btn-sm btn-outline-danger"/>' : '<input type="button" id="btnCancelPack" data-id="1" value="Cancel" onclick="CancelPackage(this)" class="btn btn-sm btn-outline-danger btnSelect"/> ' :
+                        result[i].statustext == "PENDING" ? ('@Session["moustatus"]' == 'true' || '@Session["empanelmentstatus_flag"]' == '1'  ||  '@Session["is_block_active"]' == '1' ) ? '<input type="button" disabled value="Cancel" class="btn btn-sm btn-outline-danger"/>' : '<input type="button" id="btnCancelPack" data-id="1" value="Cancel" onclick="CancelPackage(this)" class="btn btn-sm btn-outline-danger btnSelect"/>' :
+                        //result[i].status == "Y" ? '<input type="button" id="btnBlockPack" data-id="1" cursor="pointer" value="Block" onclick="BlockPackage(this)" class="btn btn-sm btn-outline-success btnblock" />' : ''
+                        result[i].statustext == "APPROVED" ? ('@Session["moustatus"]' == 'true' || '@Session["empanelmentstatus_flag"]' == '1' || '@Session["is_block_active"]' == '1' ) ? '<input type="button" disabled value="Block" class="btn btn-sm btn-outline-success" />' :'<input type="button" id="btnBlockPack" data-id="1" cursor="pointer" value="Block" onclick="BlockPackage(this)" class="btn btn-sm btn-outline-success btnblock" /> <input type="button" id="btnCancelPack" data-id="1" value="Cancel" onclick="CancelPackage(this)" class="btn btn-sm btn-outline-danger btnSelect"/>' : ''
+                    ]).draw();
+                }
+            },
+            complete: function () {
+                $("#loader").hide();
+            },
+            error: function (error) {
+                console.log(error.responseText);
+               // $('#DvPatientInfo').hide();
+            }
+        });
+    }
+
+    function downloadfile1() {
+        var hospitalcode = '@Session["HospitalCode"]';
+        var PREAUTHDOC = $('#preauthdocid1').val();
+        // var PATIENTPHOTO= $('#patientpicid').val();
+        var URN= $('#urnid').val();
+        var ADMISSIONDATE= $('#admissiondateid').val();
+        window.location.href = "@Url.Action("Downloaddocfile", "BlockPackage")?hospitalcode=" + hospitalcode + "&filename=" + PREAUTHDOC + "&urn=" + URN + "&dateofadmision=" + ADMISSIONDATE;
+    }
+
+    function downloadfile2() {
+        var hospitalcode = '@Session["HospitalCode"]';
+        var PREAUTHDOC = $('#preauthdocid2').val();
+       // var PATIENTPHOTO= $('#patientpicid').val();
+        var URN= $('#urnid').val();
+        var ADMISSIONDATE= $('#admissiondateid').val();
+        window.location.href = "@Url.Action("Downloaddocfile", "BlockPackage")?hospitalcode=" + hospitalcode + "&filename=" + PREAUTHDOC + "&urn=" + URN + "&dateofadmision=" + ADMISSIONDATE;
+
+
+    }
+
+    function downloadfile3() {
+        var hospitalcode = '@Session["HospitalCode"]';
+        var PREAUTHDOC = $('#preauthdocid3').val();
+       // var PATIENTPHOTO= $('#patientpicid').val();
+        var URN= $('#urnid').val();
+        var ADMISSIONDATE= $('#admissiondateid').val();
+        window.location.href = "@Url.Action("Downloaddocfile", "BlockPackage")?hospitalcode=" + hospitalcode + "&filename=" + PREAUTHDOC + "&urn=" + URN + "&dateofadmision=" + ADMISSIONDATE;
+    }
+
+    function Viewdetails(packid) {
+        //$("#ViewDetails").modal("show");
+         console.log(packid);
+         var param = {
+            //hospitalcode: '@Session["HospitalCode"]',
+            packagedetailsid: packid
+        };
+        $.ajax({
+            url: ServiceURL + "/api/BlockPackage/GetPreAuthDetailsListByID",
+            type: "POST",
+            data: param,
+            dataType: "json",
+            //beforeSend: function () {
+            //    $("#loader").show();
+            //},
+            success: function (resultBal) {
+                console.log(resultBal);
+                $('#membernameid').html(resultBal.packagedetails[0].patientname);
+                $('#memberid').html(resultBal.packagedetails[0].memberid);
+                $('#genderid').html(resultBal.packagedetails[0].patientgender);
+                $('#age').html(resultBal.packagedetails[0].age);
+                $('#adharno').html(resultBal.packagedetails[0].uidnumber);
+                $('#surgicaltype').html(resultBal.packagedetails[0].treatmenttype);
+                $('#patientphonenoid').html(resultBal.packagedetails[0].patientcontactnumber);
+                $('#casenoid').html(resultBal.packagedetails[0].caseno);
+                $('#verifymembernameid').html(resultBal.packagedetails[0].verifiedmembername);
+                $('#verifymemberid').html(resultBal.packagedetails[0].verifiedmemberid);
+                $('#verifythroughid').html(resultBal.packagedetails[0].verificationmode);
+                $('#idremarks').html(resultBal.packagedetails[0].remarks);
+                $('#idsnadescription').html(resultBal.packagedetails[0].sndescription);
+                $('#urnid').val(resultBal.packagedetails[0].urn);
+                $('#admissiondateid').val(resultBal.packagedetails[0].requestdate);
+                if (resultBal.packagedetails[0].addtionaL_DOC1 != null) {
+                    $('#1stpreauthdiv').show();
+                    $('#preauthdocid1').val(resultBal.packagedetails[0].addtionaL_DOC1);
+                }
+                if (resultBal.packagedetails[0].addtionaL_DOC2 != null) {
+                    $('#preauthdocid2').val(resultBal.packagedetails[0].addtionaL_DOC2);
+                }
+                if (resultBal.packagedetails[0].addtionaL_DOC3 != null) {
+                    $('#preauthdocid3').val(resultBal.packagedetails[0].addtionaL_DOC3);
+                }
+                $("#bodypackagedetails").empty();
+                for (var i = 0; i < resultBal.packagedetails.length; i++) {
+                    var slno = i + 1;
+                    console.log("tr", resultBal.packagedetails[i]);
+                    var AddParameter = "<tr class='parent'>" +
+                        "<td>" + slno + "</td>" +
+                        "<td>" + resultBal.packagedetails[i].packageheader + "</td>" +
+                        "<td>" + resultBal.packagedetails[i].procedurecode + "</td>" +
+                        "<td>" + resultBal.packagedetails[i].procedurename + "</td>" +
+                        "<td>" + resultBal.packagedetails[i].amount + "</td>" +
+                        "<td>" + resultBal.packagedetails[i].approvedamount + "</td>" +
+                        "<td>" + resultBal.packagedetails[i].noofdays + "</td>" +
+                        "<td>" + resultBal.packagedetails[i].requestdate + "</td>" +
+                        //"<td>" + response.packagedetails[i].blockinguserdate + "</td>" +
+                        "<td><button type='button' class='btn btn-outline-success focusedBtn btn-sm my-2 my-sm-0 detailsPanal' data-toggle='collapse' data-target='#pkgmodalcls_" + slno + "'> View Details <i class='fa fa-eye'></i></button></td></tr>";
+                    AddParameter += " </tr>";
+                    AddParameter += "<tr class ='child'>";
+                    AddParameter += "<td colspan='12' class='m-0 p-0 border-0'>";
+                    AddParameter += "<div class='accordian-body collapse' id='pkgmodalcls_" + slno + "'>";
+                    AddParameter += "<div class='col-lg-12 col-md-12 col-sm-12 col-xs-12 mt-3'>";
+                    AddParameter += "<div class='headingpkg-bg'> Package Details </div>";
+                    AddParameter += "<div class='row d-flex align-items-center'>";
+                    AddParameter += "<div class='col-lg-6 col-md-12 col-sm-12 col-xs-12'>";
+                    AddParameter += "<div class='impl_head'> Implant Details </div>";
+                    AddParameter += "</div>";
+                    AddParameter += "<div class='col-lg-6 col-md-12 col-sm-12 col-xs-12'>";
+                    AddParameter += "<div class='row d-flex align-items-center'>";
+                    AddParameter += "<div class='col-lg-7 col-md-7 col-sm-12 col-xs-12'>";
+                    AddParameter += "<div class='impl_head'> HighEndDrugs Details </div>";
+                    AddParameter += "</div>";
+                    AddParameter += "<div class='col-lg-5 col-md-5 col-sm-12 col-xs-12'></div>";
+                    AddParameter += "</div>";
+                    AddParameter += "</div>";
+                    AddParameter += "</div>";
+                    AddParameter += "<div class='row'>";
+                    AddParameter += "<div class='col-lg-6' id='table-scroll'>";
+                    AddParameter += "<div class='col-lg-6 col-md-12 col-sm-12 col-xs-12 mt-3'></div>";
+                    AddParameter += "<table class='table table-striped tblImplView' id='tblImplantView1'>";
+                    AddParameter += "<thead>";
+                    AddParameter += "<tr>";
+                    AddParameter += "<th scope='bg-white text-align-left' style='background-color:#fff !important;'> Implant Name</th>";
+                    AddParameter += "<th scope='bg-white text-align-center' style='background-color:#fff !important;'> Unit </th>";
+                    AddParameter += "<th scope='bg-white text-align-right' style='background-color:#fff !important;'> Price </th>";
+                    AddParameter += "<th scope='bg-white text-align-right' style='background-color:#fff !important;'> Total Price </th>";
+                    AddParameter += "</tr>";
+                    AddParameter += "</thead>";
+                    AddParameter += "<tbody id=Implant_" + slno + ">";
+                    var implantTotalamount = 0;
+                    for (var j = 0; j < resultBal.implantdetails.length; j++) {
+                        if (resultBal.implantdetails[j].txnpackagedetailid == resultBal.packagedetails[i].txnpackagedetailid) {
+                            if (j == 0) {
+                                implantTotalamount = resultBal.implantdetails[0].totalamount
+                            }
+                            AddParameter += "<tr>";
+                            AddParameter += "<td>" + resultBal.implantdetails[j].implantname + "</td>";
+                            AddParameter += "<td>" + resultBal.implantdetails[j].unit + "</td>";
+                            AddParameter += "<td>" + resultBal.implantdetails[j].unitcycleprice + "</td>";
+                            AddParameter += "<td>" + resultBal.implantdetails[j].amount + "</td>";
+                            AddParameter += "</tr>";
+                        }
+                    }
+                    AddParameter += "</tbody>";
+                    AddParameter += "<tfoot>";
+                    AddParameter += "<tr>";
+                    AddParameter += "<td class='font-weight-5'>Total </td>";
+                    AddParameter += "<td class='font-weight-5'></td>";
+                    AddParameter += "<td></td>";
+                    AddParameter += "<td colspan='2' class='font-weight-5 clsImplTotalInner1'>" + implantTotalamount + "</td>";
+                    AddParameter += "</tr>";
+                    AddParameter += "</tfoot>";
+                    AddParameter += "</table>";
+                    AddParameter += "</div>";
+                    AddParameter += "<div class='col-lg-6 col-md-12 col-sm-12 col-xs-12 mt-3'>";
+                    AddParameter += "<div id='table-scroll' class='table-scroll table-responsive mb-3'>";
+                    AddParameter += "<table id='tblHgDrugsInnerList1' class='main-table table table-striped'>";
+                    AddParameter += "<thead>";
+                    AddParameter += " <tr>";
+                    AddParameter += " <th scope='bg-white text-align-left' style='background-color:#fff !important;'> HighEndDrugs Name </th>";
+                    AddParameter += "<th scope='bg-white text-align-center' style='background-color:#fff !important;'> Unit </th>";
+                    AddParameter += "<th scope='bg-white text-align-right' style='background-color:#fff !important;'> Price </th>";
+                    AddParameter += "<th scope='bg-white text-align-right' style='background-color:#fff !important;'> Total Price </th>";
+                    // AddParameter += "<th scope='bg-white text-align-right' style='background-color:#fff !important;'> Pre-Auth Required </th>";
+                    AddParameter += "</tr>";
+                    AddParameter += "</thead>";
+                    AddParameter += "<tbody id='HgDrugs_" + slno + "'>";
+                    var highAndDrugTotalamount = 0;
+                    for (var k = 0; k < resultBal.highenddrugsdetails.length; k++) {
+                        if (resultBal.highenddrugsdetails[k].txnpackagedetailid == resultBal.packagedetails[i].txnpackagedetailid) {
+                            if (k == 0) {
+                                highAndDrugTotalamount = resultBal.highenddrugsdetails[0].totalhedprice
+                            }
+                            AddParameter += "<tr>";
+                            AddParameter += "<td>" + resultBal.highenddrugsdetails[k].hedname + "</td>";
+                            AddParameter += "<td>" + resultBal.highenddrugsdetails[k].hedunit + "</td>";
+                            AddParameter += "<td>" + resultBal.highenddrugsdetails[k].hedpriceperunit + "</td>";
+                            AddParameter += "<td>" + resultBal.highenddrugsdetails[k].hedprice + "</td>";
+                            // AddParameter += /*"<td>" + resultBal.highenddrugsdetails[k].preauth + "</td>";*/
+                            AddParameter += "</tr>";
+                        }
+                    }
+                    AddParameter += "</tbody>";
+                    AddParameter += "<tfoot>";
+                    AddParameter += "<tr>";
+                    AddParameter += "<td colspan='1'>Total </td>";
+                    AddParameter += "<td class='font-weight-5'>&nbsp;</td>";
+                    AddParameter += "<td>&nbsp;</td>";
+                    AddParameter += "<td class='font-weight-5' colspan='3'>" + highAndDrugTotalamount + "</td>";
+                    AddParameter += "</tfoot>";
+                    AddParameter += "</table>";
+                    AddParameter += "<tr><td colspan='8' class='font-weight-5 clsImplTotalInner1'>" + "Package Cost" + "</td>";
+                    AddParameter += "<td colspan='2' class='font-weight-5 clsImplTotalInner1'>" + resultBal.packagedetails[i].packagecost + "</td></tr>";
+                    AddParameter += "<tr><td colspan='8' class='font-weight-5 clsImplTotalInner1'>" + "Total Cost (Total Package Cost +Implant Cost +Highend Drugs Cost)" + "</td>";
+                    AddParameter += "<td colspan='2' class='font-weight-5 clsImplTotalInner1'>" + resultBal.packagedetails[i].amount + "</td></tr>";
+                    AddParameter += "</div>";
+                    AddParameter += "</div>";
+                    AddParameter += "</div>";
+                    AddParameter += "</div>";
+                    AddParameter += "</div>";
+                    AddParameter += "</td>";
+                    AddParameter += "</tr>";
+                    $("#bodypackagedetails").append(AddParameter);
+                    $("#tbladmissiondetails").empty()
+                    var htm = '';
+                    if ($('#tbladmissiondetails tr').length == 0) {
+                        htm += '<thead><tr> <th>Sl#</th><th>Doctor Name</th><th>Doctor Phone No</th><th>Patient Phone No Verified</th><th>Override Code</th><th>Referal Code</th><th>Description</th></tr></thead>'
+                        htm += '<tr> <td> 1 </td><td>' + resultBal.packagedetails[i].doctorname + '</td>'
+                        htm += '<td>' + resultBal.packagedetails[i].doctorphno + '</td>'
+                        //htm += '<td>' + resultBal.packagedetails[i].doctorphno + '</td>'
+                        htm += '<td>' + resultBal.packagedetails[i].ispatientotpverified + '</td>'
+                        htm += '<td>' + resultBal.packagedetails[i].overridecode + '</td>'
+                        htm += '<td>' + resultBal.packagedetails[i].referalcode + '</td>'
+                        htm += '<td>' + resultBal.packagedetails[i].description + '</td></tr>'
+                    }
+                    else {
+                        htm += '<tr> <td> ' + $('#tbladmissiondetails tr').length.toString() + '<td>' + resultBal[i].doctorname + '</td>'
+                        htm += '<td>' + resultBal[i].doctorphno + '</td>'
+                        //htm += '<td>' + resultBal[i].doctorphno + '</td>'
+                        htm += '<td>' + resultBal[i].ispatientotpverified + '</td>'
+                        htm += '<td>' + resultBal[i].overridecode + '</td>'
+                        htm += '<td>' + resultBal[i].referalcode + '</td>'
+                        htm += '<td>' + resultBal[i].description + '</td></tr>'
+                    }
+                    $("#tbladmissiondetails").append(htm);
+                }
+                //$("#tbladmissiondetails").empty();
+                //for (var i = 0; i < resultBal.packagedetails[i].length; i++) {
+                //    debugger;
+                //}
+                $("#ViewDetails").modal("show");
+            }
+        });
+    }
+</script>
+
+<script>
+    // breadcrumb active & menu active
+    $(document).ready(function () {
+        loadNavigation('BlockPreApproval', 'MtPreauth', 'pl', 'Block Package', 'Block Pre Approval', '');
+    });
+</script>
+
+<!-- tooltip script -->
+@*<script>
+        $(document).ready(function () {
+            $('[data-toggle="tooltip-details"]').tooltip();
+        });
+    </script>*@

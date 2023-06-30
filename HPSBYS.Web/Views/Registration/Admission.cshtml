@@ -1,0 +1,608 @@
+﻿
+@{
+    ViewBag.Title = "Admission";
+    Layout = "~/Views/Shared/_CommonLayout.cshtml";
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#path').html('<a href="@Url.Action("AdmissionList", "Registration")">Registration</a> / Admission');
+        var Month='@Convert.ToInt32(Session["RegBackMonth"].ToString())';
+        var BackMonth = '' + 30 *@Convert.ToInt32(Session["RegBackMonth"].ToString())+'';
+       
+        if (Month =='0' || Month=='1') {
+            $('.datepicker').datepicker({
+                format: 'dd-M-yy',
+                startDate: '-30d',
+                endDate: 'today',
+                autoclose: true
+            });
+            $(".datepicker").datepicker("setDate", (new Date().toDateString()));
+        }
+        else {
+             $('.datepicker').datepicker({
+             format: 'dd-M-yy',
+            startDate: '-'+BackMonth+'d',
+            endDate: 'today',
+            autoclose: true
+        });
+        $(".datepicker").datepicker("setDate", (new Date().toDateString()));
+        }
+        //debugger;
+        //$('.datepicker').datepicker('remove');
+        //$('#txtRDate').attr('readonly', true);
+        if (localStorage.getItem('RegisterInfo') != null) {
+            var RegInfo = JSON.parse(localStorage.getItem('RegisterInfo'));
+            $('#txtContactNo').val(RegInfo[0].Mobile);
+        }
+        if (localStorage.getItem('MembInfo') != null) {
+            var MembInfo = JSON.parse(localStorage.getItem('MembInfo'));
+            $('#memberID').html(MembInfo[0].memberID);
+            $('#memberGender').html(MembInfo[0].memberGender);
+            $('#memberAge').html(MembInfo[0].memberAge);
+            $('#txtAge').val(MembInfo[0].memberAge);
+            $('#urnNo').html(MembInfo[0].urn);
+            $('#familyID').html(MembInfo[0].familyID);
+            $('#headOfFam').html(MembInfo[0].hoh);
+            $('#headOfFamID').html(MembInfo[0].headMemberID);
+            $('#state').html(MembInfo[0].memberState);
+            $('#stateCode').html(MembInfo[0].memberStateCode);
+            $('#district').html(MembInfo[0].memberDistrict);
+            $('#PName').html(MembInfo[0].memberName);
+            $('#schemeCode').html(MembInfo[0].schemeCode);
+            $('#districtCode').html(MembInfo[0].memberDistrictCode);
+            $('#BlockCode').html(MembInfo[0].memberBlockCode);
+            $('#PanchayatCode').html(MembInfo[0].memberPanchayatCode);
+            $('#VillageCode').html(MembInfo[0].memberVillageCode);
+            $('#SchName').html(MembInfo[0].schemeName);
+            $('#divSchCode').html(MembInfo[0].schemeCode);
+            if (MembInfo[0].urn != "") {
+                var BalanceParams = {
+                    Action: 'R',
+                    URN: MembInfo[0].urn,
+                    FamilyId: $('#familyID').text()
+                };
+                $.ajax({
+                    url: ServiceURL + "/api/Common/GetAvailBalance",
+                    type: "GET",
+                    data: BalanceParams,
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    success: function (result) {
+                        if (result != null) {
+                            $('#AvlCover').html(result.availableBalance);
+
+                        }
+                        else {
+                            $('#AvlCover').html('NA');
+                        }
+
+                        //if (result.length > 0) {
+                        //    // console.log(data);
+                        //    //$('#IPNumber').html(data[0].policynumber)
+                        //    //$('#StartDt').html(data[0].policyStartDate)
+                        //    //$('#EndDt').html(data[0].policyEnddate)
+                        //}
+                    },
+                    error: function (error) {
+                        console.log(error.responseText);
+                    }
+                });
+            }
+            if (MembInfo[0].memberDistrictCode != "") {
+                var PolicyParams = {
+                    URN:$('#urnNo').text()
+                    //MemberDistrictCode: MembInfo[0].memberDistrictCode,
+                    //SchemeCode: MembInfo[0].schemeCode
+                };
+                $.ajax({
+                    url: ServiceURL + "/api/Common/GetPolicy",
+                    type: "GET",
+                    data: PolicyParams,
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    success: function (data) {
+                        if (data.length > 0) {
+                             console.log(data);
+                            $('#PolicyNum').html(data[0].policynumber)
+                            $('#startDate').html(data[0].policyStartDate)
+                            $('#endDate').html(data[0].policyEnddate)
+                        }
+                    },
+                    error: function (error) {
+                        console.log(error.responseText);
+                    }
+                });
+            }
+            if (MembInfo[0].memberGender == 'Male') {
+                $('#male').prop("checked", true);
+            }
+            else if (MembInfo[0].memberGender == 'Female') {
+                $('#female').prop("checked", true);
+            }
+            else if (MembInfo[0].memberGender == 'Other') {
+                $('#other').prop("checked", true);
+            }
+        }
+        var params = {
+            HospitalCode: '@Session["HospitalCode"]'
+        };
+        $.ajax({
+            url: ServiceURL + "/api/Hospital/GetHospitalInformation",
+            type: "GET",
+            data: params,
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            success: function (data) {
+                $("#HdState").html(data.hospitalState);
+                $("#HdDistrict").html(data.hospitalDistrict);
+                $("#HdCode").html(data.hospitalCode);
+                $("#HdName").html(data.hospitalname);
+               // console.log(data);
+            },
+            error: function (error) {
+                console.log(error.statusText);
+            }
+        });
+        $('#btnSubmit').click(function () {
+            if (checkValidationSubmit()) {
+                if (checkconfirm()) {
+                    if ($('#startDate').text()==''|| $('#endDate').text()=='') {
+                      alert('Please ckeck Insurance Policy Details');
+                    }
+                   else {
+                       $('#divLoader').show();
+                       var fileUpload = $("#fuUploadDocument").get(0);
+                       var files = fileUpload.files;
+                       var Gender;
+                       if ($('#male').prop("checked")) {
+                        Gender = 'M';
+                       }
+                       else if ($('#female').prop("checked")) {
+                        Gender = 'F';
+                       }
+                       else if ($('#other').prop("checked")) {
+                        Gender = 'O';
+                       }
+                       if (files.length > 0) {
+                             var data = new FormData();
+                             data.append("__RequestVerificationToken", gettoken());
+                             data.append("file", files[0]);
+                             data.append("HdState", $('#HdState').text());
+                             data.append("HdDistrict", $('#HdDistrict').text());
+                             data.append("HdCode", $('#HdCode').text());
+                             data.append("HdName", $('#HdName').text());
+                             data.append("urnNo", $('#urnNo').text());
+                             data.append("familyID", $('#familyID').text());
+                             data.append("headOfFam", $('#headOfFam').text());
+                             data.append("headOfFamID", $('#headOfFamID').text());
+                             data.append("state", $('#state').text());
+                             data.append("stateCode", $('#stateCode').text());
+                             data.append("district", $('#district').text());
+                             data.append("districtCode", $('#districtCode').text());
+                             data.append("memberBlockCode", $('#BlockCode').text());
+                             data.append("memberPanchayatCode", $('#PanchayatCode').text());
+                             data.append("memberVillageCode", $('#VillageCode').text());
+                             data.append("PolicyNum", $('#PolicyNum').text());
+                             data.append("startDate", $('#startDate').text());
+                             data.append("endDate", $('#endDate').text());
+                             data.append("CurTraBlockAmnt", $('#CurTraBlockAmnt').text());
+                             data.append("memberID", $('#memberID').text());
+                             data.append("CardGender", $('#memberGender').text());
+                             data.append("CardAge", $('#memberAge').text());
+                             data.append("PName", $('#PName').text());
+                             data.append("txtRDate", $('#txtRDate').val());
+                             data.append("Gender", Gender);
+                             data.append("txtAge", $('#txtAge').val());
+                             data.append("txtContactNo", $('#txtContactNo').val());
+                             data.append("SchemeCode", $('#schemeCode').text());
+                             data.append("AuthMode", RegInfo[0].AuthMode);
+                             data.append("DocType", RegInfo[0].DocType);
+                             data.append("Doc", RegInfo[0].Doc);
+                             data.append("Photo", RegInfo[0].Photo);
+                             data.append("VerifiedMemberName", RegInfo[0].VerMembName);
+                             data.append("VerMembID", RegInfo[0].VerMembID);
+                             //console.log(data);
+                             $.ajax({
+                                 url: '@Url.Action("addPatientRegistration", "Registration")',
+                                 type: "POST",
+                                 data: data,
+                                 processData: false,
+                                 contentType: false,
+                                 success: function (data) {
+                                     $('#divLoader').hide();
+                                     if (data == "sucess") {
+                                         alert('Patient Admitted Successfully!!')
+                                         window.location.href = '@Url.Action("ViewBlockPackage", "BlockPackage")';
+                                     }
+                                     else if (data == "duplicate") {
+                                         alert('Patient Already Admitted!!');
+                                         //window.location.href = '@Url.Action("ViewBlockPackage", "BlockPackage")';
+                                     }
+                                 },
+                                 error: function (error) {
+                                     $('#divLoader').hide();
+                                     console.log(error.statusText);
+                                 }
+                             });
+                       }
+                   }
+
+                }
+            }
+        });
+        $('#btnBack').click(function () {
+            arrSchemeURN = [];
+            arrSchemeURN.push({
+                Scheme: $('#schemeCode').text(),
+                URN: $('#urnNo').text()
+            })
+            localStorage.removeItem('schemeURN');
+            localStorage.setItem('schemeURN', JSON.stringify(arrSchemeURN));
+            window.location.href = '@Url.Action("AdmissionList","Registration")';
+        });
+        $('#fuUploadDocument').on('change', function (e) {
+            if (!ValidateFile('fuUploadDocument', 'Valid Document')) {
+                return false;
+            };
+            if (!CheckFileType('fuUploadDocument', '1')) {
+                return false;
+            };
+        });
+        $('#txtAge').keyup(function () {
+            if ($(this).val() > 150) {
+                alert("Maximum Age limit 150 !!");
+                $(this).val('150');
+            }
+            if ($(this).val() == 0) {
+                $(this).val('');
+            }
+        });
+    });
+</script>
+<script type="text/javascript">
+    function checkValidationSubmit() {
+        if ($('#txtRDate').val() == "") {
+            alert('Please Enter Registration Date !!');
+            $('#txtRDate').focus();
+            return false;
+        }
+        else if ($('#txtAge').val() == "") {
+            alert('Please Enter Age !!');
+            $('#txtAge').focus();
+            return false;
+        }
+        else if ($('#txtContactNo').val() == "") {
+            alert('Please Enter Contact Number !!');
+            $('#txtContactNo').focus();
+            return false;
+        }
+        else if ($('#txtContactNo').val().length != 10) {
+            alert('Please Enter 10 digits Contact Number !!');
+            $('#txtContactNo').focus();
+            return false;
+        }
+        else if ($('#fuUploadDocument').val() == "") {
+            alert('Please Upload Admission Slip !!');
+            $('#fuUploadDocument').focus();
+            return false;
+        }
+        else if (new Date($('#txtRDate').val()) < new Date($('#startDate').text())) {
+            alert('Registration Date must be greater than or equal from Policy Start Date!!');
+            $('#txtRDate').focus();
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+    function checkconfirm() {
+        if (window.confirm("Are you sure to Admit the Patient ?")) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    function isNumber(evt) {
+        if ($('#txtContactNo').val() == '0') {
+            $('#txtContactNo').val('');
+        }
+        evt = (evt) ? evt : window.event;
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+            return false;
+        }
+        return true;
+    }
+    function clearField() {
+
+        // $('#txtRDate').val('');
+        // $('#txtAge').val('');
+        $('#txtContactNo').val('');
+        $('#fuUploadDocument').val('');
+        return false;
+    }
+    function ValidateFile(cntr, strText) {
+
+        var strValue = $('#' + cntr).get(0).files.length;
+        if (strValue == "0") {
+            alert("Please upload " + strText);
+            return false;
+        }
+        else
+            return true;
+    }
+    function CheckFileType(cntr, ftype) {
+
+        // Get the file upload control file extension
+        var extn = $('#' + cntr).val().split('.').pop().toLowerCase();
+        if (extn != '') {
+
+            // Create array with the files extensions to upload
+            var fileListToUpload;
+            if (parseInt(ftype) == 1)
+                fileListToUpload = new Array('pdf', 'jpg', 'jpeg');
+            else if (parseInt(ftype) == 2)
+                fileListToUpload = new Array('gif', 'jpg', 'jpeg');
+            else
+                fileListToUpload = new Array('pdf');
+
+            //Check the file extension is in the array.
+            var isValidFile = $.inArray(extn, fileListToUpload);
+
+            // isValidFile gets the value -1 if the file extension is not in the list.
+            if (isValidFile == -1) {
+                if (parseInt(ftype) == 1) {
+                    alert('Please upload a valid document of type pdf/jpg/jpeg.!!!');
+                    $('#' + cntr).replaceWith($('#' + cntr).val('').clone(true));
+                }
+                else if (parseInt(ftype) == 2) {
+                    alert('Please upload a valid document of type gif/jpg/jpeg.!!!');
+                    $('#' + cntr).replaceWith($('#' + cntr).val('').clone(true));
+                }
+                else {
+                    alert('Please Upload a valid document !!!');
+                    $('#' + cntr).replaceWith($('#' + cntr).val('').clone(true));
+                }
+            }
+            else {
+                // Restrict the file size to 2MB(1024 * 2048;)
+                if ($('#' + cntr).get(0).files[0].size > (200000)) {
+                    alert('Document size should not exceed 200KB.!!!');
+                    $('#' + cntr).replaceWith($('#' + cntr).val('').clone(true));
+                }
+                if ($('#' + cntr).get(0).files[0].name.length > 100) {
+                    alert('Document Name should be maximum 100 Characters !!!');
+                    $('#' + cntr).replaceWith($('#' + cntr).val('').clone(true));
+                }
+                else
+                    return true;
+            }
+        }
+        else
+            return true;
+    }
+</script>
+<!-- Dashboard Body content part starts -->
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12 pb-3">
+            <div class="card">
+                <div class="data-info">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <h2>Hospital Details</h2>
+                            <div class="row">
+                                    <div class="col-sm-3" hidden="hidden">
+                                        <p>State</p>
+                                        <h3 id="HdState"></h3>
+                                    </div>
+                                    <div class="col-sm-3" hidden="hidden">
+                                        <p>District</p>
+                                        <h3 id="HdDistrict"></h3>
+                                    </div>
+                                <div class="col-sm-6">
+                                    <p>Hospital Code</p>
+                                    <h3 id="HdCode"></h3>
+                                </div>
+                                <div class="col-sm-6">
+                                    <p>Name</p>
+                                    <h3 id="HdName"></h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <h2>Member Info</h2>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <p>URN Number</p>
+                                    <h3 id="urnNo"></h3>
+                                    <div id="memberID" style="visibility:hidden"></div>
+                                    <div id="memberGender" style="visibility:hidden"></div>
+                                    <div id="memberAge" style="visibility:hidden"></div>
+
+                                </div>
+                                <div class="col-sm-6">
+                                    <p>Head of Family</p>
+                                    <h3 id="headOfFam"></h3>
+                                    <h3 id="headOfFamID" style="visibility:hidden"></h3>
+                                    <div id="schemeCode" style="visibility:hidden"></div>
+                                    <div id="familyID" style="visibility:hidden"></div>
+                                </div>
+                                    <div class="col-sm-3" hidden="hidden">
+                                        <p>State</p>
+                                        <h3 id="state"></h3>
+                                        <h3 id="stateCode" style="visibility:hidden"></h3>
+                                        <div id="BlockCode" style="visibility:hidden"></div>
+                                    </div>
+                                    <div class="col-sm-3" hidden="hidden">
+                                        <p>District</p>
+                                        <h3 id="district"></h3>
+                                        <h3 id="districtCode" style="visibility:hidden"></h3>
+                                        <div id="PanchayatCode" style="visibility:hidden"></div>
+                                        <div id="VillageCode" style="visibility:hidden"></div>
+                                    </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <h2>Insurance Policy Details</h2>
+                            <div class="row pb-3">
+                                    <div class="col-sm-3" hidden="hidden">
+                                        <p>Scheme Name</p>
+                                        <h3 id="SchName"></h3>
+                                        <div id="divSchCode" hidden></div>
+                                    </div>
+                                    <div class="col-sm-3" hidden="hidden">
+                                        <p>Policy Number</p>
+                                        <h3 id="PolicyNum"></h3>
+                                    </div>
+                                <div class="col-sm-4">
+                                    <p>Start Date</p>
+                                    <h3 id="startDate"></h3>
+                                </div>
+                                <div class="col-sm-4">
+                                    <p>End Date</p>
+                                    <h3 id="endDate"></h3>
+                                </div>
+                                <div class="col-sm-4">
+                                    <p>Available Cover</p>
+                                    <h3 id="AvlCover"></h3>
+                                    <h3 id="SumDisAmnt" hidden="hidden"></h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr hidden="hidden">
+                        <div class="row" hidden="hidden">
+                            <div class="col">
+                                 <h2>Insurance Policy Details</h2>
+                                 <div class="row pb-3">
+                                     <div class="col-sm-3">
+                                         <p>Scheme Name</p>
+                                         <h3 id="SchName"></h3>
+                                         <div id="divSchCode" hidden></div>
+                                     </div>
+                                     <div class="col-sm-3">
+                                         <p>Policy Number</p>
+                                         <h3 id="PolicyNum"></h3>
+                                     </div>
+                                     <div class="col-sm-3">
+                                         <p>Start Date</p>
+                                         <h3 id="startDate"></h3>
+                                     </div>
+                                     <div class="col-sm-3">
+                                         <p>End Date</p>
+                                         <h3 id="endDate"></h3>
+                                     </div>
+                                 </div>
+                             </div>
+                             <div class="col">
+                                 <h2>&nbsp;</h2>
+                                 <div class="col-sm-2">
+                                     <p>Available Cover</p>
+                                     <h3 id="AvlCover"></h3>
+                                 </div>
+                             </div>
+
+                        </div>
+                </div>
+                <div class="card-body">
+                    <!-- <div class="doc-action text-right border-bottom-0">
+                        <div class="wrapper">
+                            <p class="text-danger m-o mr-2"><small>* Indicates mandatory</small></p>
+                        </div>
+                    </div> -->
+                    <div class="custom-tab-content px-3">
+                        <div>
+                            <form method="post" enctype="multipart/form-data">
+                                <div class="form-group row">
+                                    <label for="patientNm" class="col-sm-2 col-form-label">Patient Name</label>
+                                    <div class="col-sm-4">
+                                        <p><strong id="PName"></strong></p>
+                                    </div>
+                                    <label for="regDate" class="col-sm-2 col-form-label">Registration Date<b><span style="color:red">*</span></b></label>
+                                    <div class="col-sm-4">
+                                        <div class="input-group mb-3">
+                                            <input type="text" id="txtRDate" name="RegDate" class="form-control datepicker" placeholder="dd mmm yyyy" aria-label="Username" aria-describedby="basic-addon1" maxlength="11" autofocus readonly>
+                                            <div class="input-group-prepend">
+                                                <label for="regDate" class="input-group-text"><i class="icon-calendar"></i></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-2 col-form-label">Gender</label>
+                                    <div class="col-sm-4">
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" checked name="gender" id="male" value="male">
+                                            <label class="form-check-label" for="male">Male</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="gender" id="female" value="female">
+                                            <label class="form-check-label" for="female">Female</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="gender" id="other" value="female">
+                                            <label class="form-check-label" for="other">Other</label>
+                                        </div>
+                                    </div>
+                                    <label for="age" class="col-sm-2 col-form-label">Age<b><span style="color:red">*</span></b></label>
+                                    <div class="col-sm-4">
+                                        <input type="text" class="form-control" id="txtAge" placeholder="Enter here" name="Age" maxlength="3" onkeypress="return isNumber(event)">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="contact" class="col-sm-2 col-form-label">Contact Number<b><span style="color:red">*</span></b></label>
+                                    <div class="col-sm-4">
+                                        <input type="text" class="form-control" id="txtContactNo" name="ContactNumber" placeholder="Enter here" maxlength="10" onkeypress="return isNumber(event)">
+                                    </div>
+                                    <label for="uploadDocument" class="col-sm-2 col-form-label">Admission Slip<b><span style="color:red">*</span></b></label>
+                                    <div class="col-sm-4">
+                                        <input type="file" class="form-control" id="fuUploadDocument" placeholder="Upload here">
+                                        <span style="font-weight: bold; color: Green">Max file size is 200KB</span>
+                                        <br />
+                                        <span style="font-weight: bold; color: Green">Only pdf/jpg/jpeg document allowed</span>
+                                    </div>
+                                </div>
+                                <div class="text-center pt-3">
+                                    <input type="button" value="Back" id="btnBack" class="btn btn-outline-danger my-2 my-sm-0" />
+                                    <input type="button" value="Reset" id="btnReset" class="btn btn-outline-dark my-2 my-sm-0" onclick="return clearField();" />
+                                    <input type="button" value="Admission" id="btnSubmit" class="btn btn-outline-success my-2 my-sm-0 registration-btn" />
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="loader" id="divLoader" style="display:none">
+    <div class="center">
+        <img src="~/imgs/DataLoading.gif" alt="Loader..." />
+    </div>
+</div>
+<!-- Body content Ends here -->
+<!-- START HERE: Registration confirmation modal content -->
+<div class="modal fade" id="admissionConfirmation" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="alert text-info" role="alert">
+                    Are you sure want to Register ?
+                </div>
+                <div class="text-right">
+                    <button type="button" class="btn btn-outline-secondary btn-sm" data-dismiss="modal">NO</button>
+                    <a href="javascript: void(0);" class="btn btn-outline-success btn-sm ml-1">YES</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- END HERE: Registration confirmation modal content -->
+    <script type="text/javascript">
+        $(function () {
+            $('.secondary-menu li a').tooltip();
+        });
+    </script>
+
+

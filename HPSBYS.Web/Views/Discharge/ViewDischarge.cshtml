@@ -1,0 +1,3428 @@
+﻿@{
+    ViewBag.Title = "ViewDischarge";
+    Layout = "~/Views/Shared/_CommonLayout.cshtml";
+}
+<style type="text/css">
+        tr.highlight td.jsgrid-cell {
+            background-color: lightgoldenrodyellow;
+        }
+        .divdisable {
+            pointer-events: none;
+        }
+        tr.row_selected td {
+            background-color: #EFF9F6 !important;
+        }
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            margin: 0;
+        }
+</style>
+<div class="container">
+    <div class="col-12 pb-3 px-0">
+        <div class="card">
+            <div class="card-body">
+                @*<form>*@
+                <input type="hidden" id="blockingInvoiceNo" />
+                <input type="hidden" id="transactionID" />
+                <input type="hidden" id="MemberId" />
+                <input type="hidden" id="SelectAll" />
+                <div class="form-box-bg mb-4">
+                    <div class="row heading-pkg border-bottom mb-2 mt-2">
+                        <h5>Patient Information |  <span class="urn_bg"> URN - </span><span class="urn_bg" id="UrnNo"></span> </h5>
+                    </div>
+                    <div class="form-row">
+                        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+                            <div class="mb-2">
+                                <label class="pkg-label font-weight-normal">Patient Name :</label>
+                                <div class="pkghead-txt" id="PatientNm"></div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+                            <div class="mb-2">
+                                <label class="pkg-label font-weight-normal">Current Policy : </label>
+                                <div class="pkghead-txt" id="SchName"></div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+                            <div class="mb-2">
+                                <label class="pkg-label font-weight-normal">Blocked Amount: </label>
+                                <div class="pkghead-txt" id="BlockedAmount"></div>
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+                        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+                            <div class="mb-2">
+                                <label class="pkg-label font-weight-normal">Claimed Amount: </label>
+                                <div class="pkghead-txt" id="ClaimedAmt"></div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+                            <div class="mb-2">
+                                <label class="pkg-label font-weight-normal">Current Policy Period : </label>
+                                <div class="pkghead-txt" id="PolicyPeriodPI"></div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+                            <div class="mb-2">
+                                <label class="pkg-label font-weight-normal">Patient Phone No: </label>
+                                <div class="pkghead-txt" id="PatientPhoneNo"> </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+                            <div class="mb-2">
+                                <label class="pkg-label font-weight-normal">Case No: </label>
+                                <div class="pkghead-txt" id="caseno"> </div>
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="form-row">
+                    </div>
+                    <div class="row  mb-4 heading-pkg">
+                    </div>
+                    <div id="verificationBlock">
+                        <div class="row  mb-4 heading-pkg border-bottom">
+                            <h5> Verified Details </h5>
+                        </div>
+                        <div class="table-responsive">
+                            <table id="grdFamilyDetails" data-toggle="table" class="table table-striped">
+                            </table>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <div class="form-row" id="OverVerifieddetails">
+                            <div class="col-md-2">
+                                <input type="text" id="txtOverrideCode" readonly maxlength="7" class="form-control" />
+                            </div>
+                            <div class="col-md-3">
+                                <input class="btn btn-outline-success my-2 my-sm-0" type="button" onclick="OverrideRequest()" value="Generate Override Code" id="btnoverridegeneration" />
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+                <div id="Details_View">
+                    <div class="form-box-bg mb-4">
+                        <div class="row heading-pkg border-bottom ">
+                            <h5> Blocked Package Details </h5>
+                        </div>
+                        <div class="table-responsive mt-4">
+                            <table id="grdBlockPackage1" data-toggle="table" class="table table-striped">
+                            </table>
+
+                            <!-- block package section -->
+
+                            @*<table class="table table-striped border preauth-tbl" cellspacing="0" width="100%">
+                                <thead>
+                                    <tr>
+                                        <th>Sl No</th>
+                                        <th style="width:16% !important;"> Member Name </th>
+                                        <th>
+                                            <div class="prehed-bold"> Package Details </div>
+                                            <div class="prehed-small"> Code | Name </div>
+                                        </th>
+                                        <th>
+                                            <div class="prehed-bold"> Procedure Details </div>
+                                            <div class="prehed-small"> Code | Name  </div>
+                                        </th>
+
+                                        <th>
+                                            <div class="prehed-bold"> Amount Blocked </div>
+                                            <div class="prehed-small"> Blocked Date  </div>
+                                        </th>
+
+                                        <th> Insufficient Amount </th>
+                                        <th> Package Amount </th>
+                                        <th> Claim Amount </th>
+                                        <th> <input type="checkbox" name="checkbox"> </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>
+                                            <div class="prehed-bold">
+                                                SRI SRI JAGEVRAMANUJ BALIASINFH
+                                                </div>
+                                        </td>
+                                        <td>
+                                            <b class="text-success"> SV003I </b>
+                                            <div class="prehed-small"> Supravalvular AS repair </div>
+                                        </td>
+                                        <td>
+                                            <b class="text-success"> SV003I </b>
+                                            <div class="prehed-small"> Supravalvular AS repair	 </div>
+                                        </td>
+
+
+                                        <td>
+                                            <div class="pre-bold"> <i class="fa fa-rupee"></i> 284615 </div>
+                                            <div class="prehed-small"> 15-May-2023	 </div>
+                                        </td>
+
+                                       
+                                        <td>
+                                            <div class="prehed-small"> <i class="fa fa-rupee"></i> 284615 </div>
+                                        </td>
+                                        <td>
+                                            <div class="prehed-small"> <i class="fa fa-rupee"></i> 284615 </div>
+                                        </td>
+                                        <td>
+                                            <input type="number" name="txtimpqty" value="284615" autocomplete="off" min="0" max="99999999" oninput="this.value = Math.abs(this.value)" class="form-control txthedqytcls" style="width:100px; text-align:right;" readonly="readonly">
+                                        </td>
+                                        <td> <input type="checkbox" name="checkbox"> </td>
+                                    </tr>
+                                </tbody>
+                            </table>*@
+
+
+                            <!-- block package section -->
+
+
+
+                        </div>
+                    </div>
+
+                    <div class="form-box-bg mb-4">
+                        <div class="row heading-pkg border-bottom mt-2">
+                            <h5> Discharge Details  </h5>
+                        </div>
+                        <div class="form-row">
+                            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                <div class="form-row">
+                                    <div class="col-md-12 mb-2">
+                                        <div class="col-form-label">Actual Date of Admission <b><span style="color:red">*</span></b></div>
+                                        <input type="text" id="AdmissionDate" autocomplete="off" readonly class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                <div class="form-row">
+                                    <div class="col-md-12 mb-2">
+                                        <div class="col-form-label">Actual Date of Discharge <b><span style="color:red">*</span></b> </div>
+                                        <input type="text" id="txtDischargedate" class="form-control bg-white datepicker" autocomplete="off" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                <div class="form-row">
+                                    <div class="col-md-12 mb-2">
+                                        <label class="col-form-label">Claimed Amount<b><span style="color:red">*</span></b> </label>
+                                        <div class="pkghead-txt"> <input type="text" id="txtPresentPackageCost" autocomplete="off" readonly maxlength="8" class="form-control inputOnlyNumber"> </div>
+                                        <span id="vPresentPackageCost" style="color:red"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                <div class="mb-2">
+                                    <label class="col-form-label">Mortality  <b><span style="color:red">*</span></b> </label>
+                                    <select class="form-control" id="txtMortality" onchange="ChangeMotality(this)">
+                                        <option value="SELECT"> --Select--</option>
+                                        <option value="Y"> Yes</option>
+                                        <option value="N"> No</option>
+                                    </select>
+                                </div>
+                                <span id="vMortality" style="color:red"></span>
+                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                <div class="mb-2">
+                                    <div class="col-form-label">Select Mortality Document</div>
+                                    <input type="file" class="form-control pr-5" id="MotalityDoc" accept="image/jpeg,.pdf">
+                                    <span id="RemoveMotalityDoc" onclick="RemoveMotalityDoc(this)" class="btn btn-outline-danger btn-sm btn-crus"> <i class="fa fa-times"></i></span>
+                                </div>
+                                <div>
+                                    <small><span style="color:red">File to be uploaded in  pdf , jpeg , jpg and size should not exceed 5 MB </span></small>
+
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-12 col-sm-6 col-xs-12 form-hi8">
+                                <div class="mb-2">
+                                    <label class="col-form-label">Description <b><span style="color:red">*</span></b> </label>
+                                    <div class="pkghead-txt"> <textarea class="form-control" id="txtdesc" placeholder="Enter text.." maxlength="500" oninput="this.value = this.value.toUpperCase()"></textarea></div>
+                                    <span id="txtdesc" style="color:red"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mb-1 heading-pkg border-bottom">
+                            <h5> Vital Parameter </h5>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                                <div class="form-row">
+                                    <div class="col-md-4">
+                                        <div class="col-form-label">Parameter <b><span style="color:red"></span></b></div>
+                                        <select class="form-control" id="dlVitalParam">
+                                        </select>
+                                        <span id="errdlVitalParam" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="col-form-label">Value <b><span style="color:red"></span></b></div>
+                                        <input type="text" id="txtVtParamValue" autocomplete="off" class="form-control" onkeypress="return inputLimiter(event,'NameCharactersAndNumbers')">
+                                        <span id="errtxtVtParamValue" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-md-4 addmore-sc">
+                                        <button class="btn btn-outline-success" id="addMoreVitalParam1"> Add More &nbsp;<i class="fa fa-plus"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                                <div class="table-responsive mt-4">
+                                    <table class="table table-striped jsgrid-table" id="tblVitalParam">
+                                        <thead>
+                                            <tr class="jsgrid-header-row">
+                                                <th scope="col" class="jsgrid-header-cell" width="100">SL No</th>
+                                                <th scope="col" class="jsgrid-header-cell">Parameter</th>
+                                                <th scope="col" class="jsgrid-header-cell"> Value</th>
+                                                <th scope="col" class="jsgrid-header-cell"> Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-box-bg mb-4">
+                        <div class="row heading-pkg border-bottom d-flex align-items-center">
+                            <h5>
+                                Refer To Other Hospital
+                            </h5>
+
+                            <div class="d-flex mb-3 ml-5">
+
+                                <div class="custom-control custom-radio d-flex ml-2 mr-1">
+                                    <input type="radio" class="custom-control-input" id="Yes" name="ReferTo" value="Y" onclick="RefaralBlock();">
+                                    <label class="custom-control-label" for="Yes"> Yes </label>
+                                </div>
+
+                                <div class="custom-control custom-radio d-flex">
+                                    <input type="radio" class="custom-control-input" id="no" name="ReferTo" value="N" checked onclick="RefaralBlock();">
+                                    <label class="custom-control-label" for="no"> No </label>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div id="referalBlock">
+
+                            <div class="form-row">
+
+                                <div class="col-lg-3 col-md-5 col-sm-5 col-xs-12 mt-3 mb-3">
+                                    <div class="form-row">
+                                        <div class="custom-control custom-radio d-flex ml-2 mr-2">
+                                            <input type="radio" class="custom-control-input" id="aeh" name="Enpanel" onclick="EnpanelRadio();" value="A">
+                                            <label class="custom-control-label" for="aeh"> Any Empaneled Hospital </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12 mt-3 mb-3">
+                                    <div class="form-row">
+                                        <div class="custom-control custom-radio d-flex">
+                                            <input type="radio" class="custom-control-input" id="seh" name="Enpanel" onclick="EnpanelRadio();" value="S">
+                                            <label class="custom-control-label" for="seh"> Specific Empaneled Hospital </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div id="Empaneled_Block" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 px-0">
+                                <div class="form-row">
+                                    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                        <div class="form-row">
+                                            <div class="col-md-12 mb-2">
+                                                <div class="col-form-label"> State <b><span style="color:red">*</span></b></div>
+                                                <select class="form-control" id="ddlState" onchange="DistrictBind(this);">
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                        <div class="form-row">
+                                            <div class="col-md-12 mb-2">
+                                                <div class="col-form-label">District <b><span style="color:red">*</span></b>  </div>
+                                                <select class="form-control" id="DdlDist" onchange="BindHospital(this)">
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                        <div class="form-row">
+                                            <div class="col-md-12 mb-2">
+                                                <div class="col-form-label"> Hospital Name <b><span style="color:red">*</span></b> </div>
+                                                <select class="form-control" id="DDlHospital">
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+
+                            <div class="form-row">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 mt-2 mb-2">
+                                    <div class="heading-pkg border-bottom px-0">
+                                        <h5>
+                                            Refer From Other Hospital
+                                        </h5>
+                                    </div>
+                                </div>
+
+
+                                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                    <div class="form-row">
+                                        <div class="col-md-12 mb-2">
+                                            <div class="col-form-label">Doctor Name <b><span style="color:red">*</span></b> </div>
+                                            <input type="text" class="form-control" autocomplete="off" oninput="this.value = this.value.toUpperCase()" id="txtDoctorname" maxlength="30" onkeypress="return inputLimiter(event,'NameCharactersAndNumbers')">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                    <div class="form-row">
+                                        <div class="col-md-12 mb-2">
+                                            <div class="col-form-label">Department <b><span style="color:red">*</span></b> </div>
+                                            <input type="text" class="form-control" autocomplete="off" id="txtDepartment" maxlength="30" onkeypress="return inputLimiter(event,'NameCharactersAndNumbers')">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                    <div class="form-row">
+                                        <div class="col-md-12 mb-2">
+                                            <div class="col-form-label">Date <b><span style="color:red">*</span></b> </div>
+                                            <input type="text" class="form-control bg-white datepicker" id="txtrefardatetime" autocomplete="off" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                    <div class="form-row">
+                                        <div class="col-md-12 mb-2">
+                                            <div class="col-form-label"> Referral Document <b><span style="color:red"></span></b> </div>
+                                            <input type="file" class="form-control pr-5" id="RefaralDoc" accept="image/jpeg,.pdf">
+                                            <span id="RemoveRefaralDoc" onclick="RemoveRefaralDoc(this)" class="btn btn-outline-danger btn-sm btn-crus"> <i class="fa fa-times"></i></span>
+                                            <div>
+                                                <small><span style="color:red">File to be uploaded in  pdf , jpeg , jpg and size should not exceed 5 MB </span></small>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
+                                    <div class="form-row">
+                                        <div class="col-md-12 mb-2">
+                                            <div class="col-form-label"> Reason for Referring <b><span style="color:red">*</span></b> </div>
+                                            <textarea id="txtReasonForRefferring" oninput="this.value = this.value.toUpperCase()" class="form-control" maxlength="30"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-box-bg">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 px-0 mb-2">
+                            <div class="col-form-label">Discharge Summary Document</div>
+                            <input type="file" id="DischargeFile" accept="image/jpeg,.pdf">
+                            <span id="RemoveDischargeFile" onclick="RemoveDischargeFile(this)" class="btn btn-outline-danger btn-sm"> <i class="fa fa-times"></i></span>
+                            <div>
+                                <small><span class="text-danger">File to be uploaded in  pdf , jpeg , jpg and size should not exceed 5 MB </span></small>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+
+                                <div class="form-row">
+                                    <div class="col-lg-9 col-md-9 col-sm-6 col-xs-12">
+                                        <div class="col-form-label">Intra Surgery</div>
+                                        <input type="file" id="IntraSurgeryPic" class="form-control" accept="image/jpeg" />
+                                        <span id="RemoveIntraSurgeryPic" onclick="RemoveIntraSurgeryPic(this)" class="btn btn-danger btn-sm btn-timesbg brd-color"> <i class="fa fa-times"></i></span>
+                                        <div>
+                                            <small><span class="text-danger">Max file size is 1MB,Only jpg/jpeg document allowed</span></small>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                                        <div class="mt-2">
+                                            <img src="~/imgs/no_user.png" alt="" style="border-radius: 5px; min-height: 70px;" id="ShowIntraSurgeryPic" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+
+                                <div class="form-row">
+                                    <div class="col-lg-9 col-md-9 col-sm-6 col-xs-12">
+                                        <div class="col-form-label" id="PreviewImage">Post Surgery</div>
+                                        <input type="file" id="PostSurgeryPic" class="form-control" accept="image/jpeg" />
+                                        <span id="RemovePostSurgeryPic" onclick="RemovePostSurgeryPic(this)" class="btn btn-danger btn-sm btn-timesbg brd-color"> <i class="fa fa-times"></i></span>
+                                        <div>
+                                            <small><span class="text-danger">Max file size is 1MB,Only jpg/jpeg document allowed</span></small>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                                        <div class="mt-2" id="PreviewImage">
+                                            <img src="~/imgs/no_user.png" alt="" style="border-radius: 5px; min-height: 70px;" id="ShowPostSurgeryPic" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                                <div class="form-row">
+                                    <div class="col-lg-9 col-md-9 col-sm-6 col-xs-12">
+                                        <div class="col-form-label">Pre Surgery</div>
+                                        <input type="file" id="PreSurgeryPic" class="form-control" accept="image/jpeg" />
+                                        <span id="RemovePreSurgeryPic" onclick="RemovePreSurgeryPic(this)" class="btn btn-danger btn-sm btn-timesbg brd-color"> <i class="fa fa-times"></i></span>
+                                        <div>
+                                            <small><span class="text-danger">Max file size is 1MB,Only jpg/jpeg document allowed</span></small>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                                        <div class="mt-2" id="PreviewImage">
+                                            <img src="~/imgs/no_user.png" alt="" style="border-radius: 5px; min-height: 70px;" id="ShowPreSurgeryPic" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                                <div class="form-row">
+                                    <div class="col-lg-9 col-md-9 col-sm-6 col-xs-12">
+                                        <div class="col-form-label">Specimen Removal</div>
+                                        <input type="file" id="SpecimenRemovalPic" class="form-control" accept="image/jpeg" />
+                                        <span id="RemoveSpecimenRemovalPic" onclick="RemoveSpecimenRemovalPic(this)" class="btn btn-danger btn-sm btn-timesbg brd-color"> <i class="fa fa-times"></i></span>
+                                        <div>
+                                            <small><span class="text-danger">Max file size is 1MB,Only jpg/jpeg document allowed</span></small>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                                        <div class="mt-2" id="PreviewImage">
+                                            <img src="~/imgs/no_user.png" alt="" style="border-radius: 5px; min-height: 70px;" id="ShowSpecimenRemovalPic" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 px-0">
+                            <div class="col-form-label">Discharge Remark <b><span style="color:red">*</span></b></div>
+                            <textarea class="form-control" oninput="this.value = this.value.toUpperCase()" rows="4" id="txtRemark" placeholder="Enter Your Remarks..."></textarea>
+                        </div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-left mb-4 mt-4 px-0">
+                            <input type="hidden" id="VerifiedMemberId" />
+                            <input type="hidden" id="VerifiedMemberName" />
+                            <input type="hidden" id="AuthenticatioMode" />
+                            <input class="btn btn-success my-2 my-sm-0" type="button" value="Discharge" id="Discharge">
+                            <input class="btn btn-primary my-2 my-sm-0" type="reset" value="Clear" id="DischargeReset">
+                            <input class="btn btn-danger my-2 my-sm-0" type="button" value="Close" id="DischargeClose">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal fade" id="OTPModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static">
+                    <div class="modal-dialog modal-sm otpmodal" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel"> OTP Verification </h5>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-lg-12" align="center">
+                                        <div class="mb-4">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="col-form-label  mb-1"> OTP <b><span style="color:red">*</span></b></div>
+                                                    <input type="text" class="form-control mb-2" id="txtopt" placeholder="Enter OTP" autocomplete="off" maxlength="6" onkeypress="return inputLimiter(event,'Numbers')">
+                                                    <input type="hidden" mb-3" id="Uid" />
+                                                    <input type="hidden" mb-3" id="txn" />
+                                                    <input type="hidden" mb-3" id="OTPVerifyMemberID" />
+                                                    <input type="hidden" mb-3" id="OTPurn" />
+                                                    <input type="hidden" mb-3" id="SelectedPatientId" />
+                                                    <label class="mb-2 text-left">Time Remaining <span id="timer-countdown">05:00 </span></label>
+
+                                                    <div>
+                                                        <input type="button" class="btn btn-outline-success" value="Verify" onclick="VerifyOTP();">
+                                                        <input type="button" class="btn btn-outline-danger" value="Cancel" data-dismiss="modal" aria-label="Close">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="clearfix"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal fade" id="IrisModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg" role="document">
+                        <div class="modal-content">
+
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Authenticate</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">×</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row justify-content-center  customRadio">
+                                    <div class="col-md-3">
+                                        <div class="chkbox-bg">
+                                            <input type="radio" name="textEditor" id="rdProduction" checked="checked" value="P">
+                                            <label for="rdProduction"> Prodouction </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="chkbox-bg">
+                                            <input type="radio" name="textEditor" id="rdStaging" value="S" disabled>
+                                            <label for="rdStaging"> Staging Server </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="col-lg-12">
+                                        <div class="mb-3">
+                                            <div class="form-row mb-2">
+                                                <div class="col-md-3">
+                                                    <input type="hidden" id="getrdresponse" />
+                                                    <div class="col-form-label">RD Service Status <b><span style="color:red">*</span></b></div>
+                                                    <input type="text" class="form-control" id="rdStatus" readonly>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="col-form-label">Device Info Path <b><span style="color:red">*</span></b></div>
+                                                    <input type="text" class="form-control" id="rdinfo" readonly>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="col-form-label"> Capture Path <b><span style="color:red">*</span></b></div>
+                                                    <input type="text" class="form-control" readonly>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="col-form-label">RD Service Info <b><span style="color:red">*</span></b></div>
+                                                    <input type="text" class="form-control" readonly>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row  mb-3 heading-pkg border-bottom">
+                                    <h5> Capture Pid Data </h5>
+                                </div>
+
+                                <div class="form-row mb-3">
+
+                                    <div class="col-md-3">
+                                        <div class="col-form-label">Error Code <b><span style="color:red">*</span></b></div>
+                                        <input type="text" class="form-control" id="errCode" readonly>
+                                    </div>
+
+
+                                    <div class="col-md-3">
+                                        <div class="col-form-label">Quality Service <b><span style="color:red">*</span></b></div>
+                                        <input type="text" class="form-control" readonly>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <div class="col-form-label"> Error Info <b><span style="color:red">*</span></b></div>
+                                        <input type="text" class="form-control" id="errInfo" readonly>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <div class="col-form-label"> dpid <b><span style="color:red">*</span></b></div>
+                                        <input type="text" class="form-control" id="dpid" readonly>
+                                    </div>
+
+
+                                    <div class="col-md-3">
+                                        <div class="col-form-label"> Red/Id <b><span style="color:red">*</span></b></div>
+                                        <input type="text" class="form-control" readonly>
+                                    </div>
+
+
+                                    <div class="col-md-3">
+                                        <div class="col-form-label"> Red/info <b><span style="color:red">*</span></b></div>
+                                        <input type="text" class="form-control" readonly>
+                                    </div>
+
+
+                                    <div class="col-md-3">
+                                        <div class="col-form-label"> do <b><span style="color:red">*</span></b></div>
+                                        <input type="text" class="form-control" readonly>
+                                    </div>
+
+
+                                    <div class="col-md-3">
+                                        <div class="col-form-label"> mi <b><span style="color:red">*</span></b></div>
+                                        <input type="text" class="form-control" id="mi" readonly>
+                                    </div>
+
+
+                                    <div class="col-md-12">
+                                        <div class="col-form-label"> mc <b><span style="color:red">*</span></b></div>
+                                        <input type="text" class="form-control" id="mc" readonly>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="row  mb-3 heading-pkg border-bottom">
+                                        <h5> Auth Request </h5>
+                                    </div>
+                                    <div class="form-row mb-2">
+                                        <div class="col-md-3">
+                                            <div class="col-form-label">Aadhar UID <b><span style="color:red">*</span></b></div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <input type="text" id="AadharUidMask" class="form-control" readonly>
+                                            <input type="hidden" id="AadharUid" class="form-control" readonly>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="col-form-label"> Response Result <b><span style="color:red">*</span></b></div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <input type="text" class="form-control" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="form-row mb-2">
+                                        <div class="col-md-3">
+                                            <div class="col-form-label"> Error code <b><span style="color:red">*</span></b></div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <input type="number" class="form-control" readonly>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="col-form-label"> Error Info <b><span style="color:red">*</span></b></div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <input type="text" class="form-control" readonly>
+                                        </div>
+                                    </div>
+
+                                    <input type="hidden" id="rdInfo" />
+                                    <input type="hidden" id="rdData" />
+                                    <input type="hidden" id="vMemberId">
+                                    <input type="hidden" id="Urn">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 px-0" align="left">
+                                        <input type="button" class="btn btn-outline-success mb-2" value="Captured" id="btnCapture" onclick="Capture();">
+                                        <input type="button" class="btn btn-outline-success mb-2" value="Authentication" id="btnAuthentication">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
+
+                @*</form>*@
+            </div>
+        </div>
+    </div>
+</div>
+<!-- OverRide Request Modal -->
+<div id="MyPopupBlock" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <form id="OverrideRequestForm">
+                <div class="modal-header">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <h4 class="modal-title"> Override Request </h4>
+                        </div>
+                    </div>
+                    <button type="button" class="close" data-dismiss="modal"> &times; </button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-2">
+                            <label class="pkg-label font-weight-normal">Member Id :</label>
+                            <div class="pkghead-txt" id="lblPatientMemberId"></div>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <label class="pkg-label font-weight-normal"> Name :</label>
+                            <div class="pkghead-txt" id="lblPatientName"></div>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <label class="pkg-label font-weight-normal"> Gender :</label>
+                            <div class="pkghead-txt" id="lblPatientGender"></div>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <label class="pkg-label font-weight-normal"> Age :</label>
+                            <div class="pkghead-txt" id="lblPatientAge"></div>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <label class="pkg-label font-weight-normal"> Aadhaar No. :</label>
+                            <div class="pkghead-txt" id="lblPatientAadharNo"></div>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <label class="pkg-label font-weight-normal"> URN :</label>
+                            <div class="pkghead-txt" id="lblPatientUrnNo"></div>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <label class="pkg-label font-weight-normal">Purpose of Override Code :</label>
+                            <label>
+                                <input type="checkbox" class="packagedetails" id="chkboxblock" value="0303" />
+                                Discharge Package
+                            </label>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="pkg-label font-weight-normal"> Upload File @*<b<span style="color:red">*</span></b>*@ </label>
+                            <div class="pkghead-txt">
+                                <input type="file" class="form-control pr-5" id="uploadfile">
+                                <span id="RemoveOverrideDoc" onclick="RemoveOverrideDoc(this)" class="btn btn-outline-danger btn-sm btn-crus"> <i class="fa fa-times"></i></span>
+                            </div>
+                            <div>
+                                <small style="color:red">File to be uploaded in  pdf , jpeg , jpg and size should not exceed 5 MB</small>
+                            </div>
+                        </div>
+
+
+                        <div class="col-md-12 mb-2">
+                            <label class="pkg-label"> Description <b> <span style="color:red">*</span></b></label>
+
+                            <div class="pkghead-txt">
+                                <textarea id="txtDescription12" class="form-control" placeholder="Description" style="width:100%"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="clearfix"></div>
+
+                <div class="modal-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button type="button" id="btnSubmit" class="btn btn-sm btn-success" onclick="submitOverrideRequestForm()"> Submit </button>
+                            <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal"> Close </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- OverRide Request Modal END -->
+</div>
+
+@*<script src="~/js/commonvalidation.js"></script>*@
+<script type="text/javascript">
+    var SelectedPackage = [];
+    var userImg = '@Url.Content("~/imgs/no_user.png")';
+    var vitaladddata = [];
+    var vitalremovedata = [];
+    var PackageAddOnArryList = [];
+    var count = 0;
+    var url;
+    var currrentElement;
+    if (localStorage.getItem('DischargePackage') != null) {
+        var PackageInfo = JSON.parse(localStorage.getItem('DischargePackage'));
+    }
+    $(document).ready(function () {
+        loadNavigation('ViewDischarge', 'Mldischarge', 'pl', 'Discharge', 'View Discharge', '');
+        $("#btnCapture").hide();
+        $("#btnAuthentication").hide();
+        $("#Details_View").hide();
+        $('#path').html('Unblock Package List');
+        $('#MotalityDoc').attr('disabled', 'disabled');
+        $('#RemoveIntraSurgeryPic').hide();
+        $('#RemovePostSurgeryPic').hide();
+        $('#RemovePreSurgeryPic').hide();
+        $('#RemoveSpecimenRemovalPic').hide();
+        $("#RemoveDischargeFile").hide();
+        $("#RemoveRefaralDoc").hide();
+        $("#RemoveMotalityDoc").hide();
+        $('#RemoveOverrideDoc').hide();
+        $("#Yes").attr("disabled", true);
+
+        RefaralBlock();
+        // Display Balance and policy date
+        var BalanceParams = {
+            Action: 'A',
+            URN: PackageInfo[0].urn,
+            FamilyId: null
+        };
+        $.ajax({
+            url: ServiceURL + "/api/Common/GetAvailBalance",
+            type: "GET",
+            data: BalanceParams,
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $("#loader").show();
+            },
+            success: function (result) {
+                //console.log("GetAvailBalance-", result);
+                if (result != null) {
+                    $('#BlockedAmount').html(result.amountBlocked);
+                    $('#ClaimedAmt').html(result.claimedamount);
+                    $('#PolicyPeriodPI').html(result.policyStartDate + ' To ' + result.policyEnddate)
+                }
+                else {
+                    $('#BlockedAmount').html('NA');
+                    $('#ClaimedAmt').html('NA');
+                }
+            },
+            complete: function () {
+                $('#loader').hide();
+            },
+            error: function (error) {
+                console.log(error.responseText);
+            }
+        });
+
+        // Display Dropdown record in vital
+        var PackCatagoryParams = {
+            Action: 'A'
+        };
+        $.ajax({
+            url: ServiceURL + "/api/Common/GetVitalParameter",
+            type: "GET",
+            data: PackCatagoryParams,
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $("#loader").show();
+            },
+            success: function (data) {
+               //console.log(data);
+                $('#dlVitalParam').empty().append('<option selected="selected" value="0">--Select--</option>');
+                $.each(data, function () {
+                    $('#dlVitalParam').append($("<option></option>").val(this['id']).text(this['vitalsign']));
+                });
+            },
+            complete: function () {
+                $('#loader').hide();
+            },
+            error: function (error) {
+                console.log(error.statusText);
+            }
+        });
+
+        //Start Override Code
+        OverrideDetails(PackageInfo[0].memberID, PackageInfo[0].urn);
+        //End Override Code
+
+        // Display Family Details
+
+        var params = {
+            URN: PackageInfo[0].urn
+        };
+        $.ajax({
+            url: ServiceURL + "/api/URN/GetFamilyMemeberList",
+            type: "GET",
+            data: params,
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $("#loader").show();
+            },
+            success: function (response) {
+                //console.log("FamilyDetails : -", response);
+                $("#grdFamilyDetails").DataTable({
+                    processing: true,
+                    bLengthChange: true,
+                    lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                    bFilter: true,
+                    bSort: true,
+                    bPaginate: false,
+                    searching: false,
+                    bInfo: false,
+                    data: response,
+                    columns: [
+                        { data: 'id', type: "text", title: "Sl#", align: "center", render: function (data, type, row, meta) { return meta.row + meta.settings._iDisplayStart + 1; } },
+                        { data: "memberID", type: "text", title: "Member Id", align: "center" },
+                        { data: "memberName", type: "text", title: "Name", align: "center" },
+                        { data: "memberGender", type: "text", title: "Gender", align: "center" },
+                        { data: "memberAge", type: "text", title: "Age", align: "center" },
+                        {
+                            data: "maskAadharnumber", type: "text", title: " Aadhar Card No ", align: "center", render: function (data, type, row, meta) {
+                                //if (type === 'display') {
+                                //    var BaseUrl = response.memberDistrictCode + '/' + response.memberBlockCode + '/' + response.memberPanchayatCode + '/RationCard/' + response.adharcard;
+                                //    //console.log("baseUrl : ", BaseUrl);
+                                //    data = '<a target="_blank" href="../Download.ashx?msg=""' + encodeURIComponent(BaseUrl) + '">' + data + '</a>';
+                                //}
+                                return data;
+                            }
+                        },
+                        {
+                            data: "rationCardNumber", type: "text", title: " Ration Card No ", align: "center", render: function (data, type, row, meta) {
+                                //if (type === 'display') {
+                                //    var BaseUrl = response.memberDistrictCode + '/' + response.memberBlockCode + '/' + response.memberPanchayatCode + '/RationCard/' + response.adharcard;
+                                //    //console.log("baseUrl : ", BaseUrl);
+                                //    data = '<a target="_blank" href="../Download.ashx?msg=""' + encodeURIComponent(BaseUrl) + '">' + data + '</a>';
+                                //}
+                                return data;
+                            }
+                        },
+                    ],
+                    columnDefs: [
+                        {
+                            targets: 7,
+                            data: null,
+                            title: "IRIS",
+                            orderable: false,
+                            defaultContent: "<button type='button'id='btnIris' onclick='IrisVerification(this)' class='btn btn-outline-success focusedBtn btn-sm my-2 my-sm-0'> IRIS</button>"
+                        },
+                        {
+                            targets: 8,
+                            data: null,
+                            title: "POS",
+                            orderable: false,
+                            defaultContent: "<button type='button'id='btnPOS' onclick='POSVerification(this)' class='btn btn-outline-primary focusedBtn btn-sm my-2 my-sm-0'> POS </button>"
+                        },
+                        {
+                            targets: 9,
+                            data: null,
+                            title: "OTP",
+                            orderable: false,
+                            defaultContent: "<button type='button'id='btnOTP' onclick='OTPVerification(this)' class='btn btn-outline-warning focusedBtn btn-sm my-2 my-sm-0'> OTP </button>"
+                        }]
+                });
+            },
+            complete: function () {
+                $('#loader').hide();
+            },
+            failure: function (response) {
+                alert(response.d);
+            },
+            error: function (response) {
+                alert(response.d);
+            }
+        });
+
+        // Display Block Package Details
+        var UnblockMemberinformationParams = {
+            action: 'B',
+            urn: PackageInfo[0].urn,
+            memberId: PackageInfo[0].memberID,
+            hospitalcode: PackageInfo[0].hospitalCode,
+            transactionID: PackageInfo[0].transactionID
+        };
+        $.ajax({
+            url: ServiceURL + "/api/Common/GetUnblockinginformationByMember",
+            type: "GET",
+            data: UnblockMemberinformationParams,
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $("#loader").show();
+            },
+            success: function (response) {
+                //console.log("dataget -", response)
+                if (response.length > 0) {
+                    $('#UrnNo').html(response[0].urn);
+                    $('#PatientNm').html(response[0].memberName);
+                    $('#SchName').html(response[0].schemeName);
+                    $('#PatientPhoneNo').html(response[0].patientContactNumber);
+                    $('#blockingInvoiceNo').val(response[0].blockingInvoiceNo);
+                    $('#transactionID').val(response[0].transactionID);
+                    $('#MemberId').val(response[0].memberID);
+                    $('#AdmissionDate').val(response[0].dateofadmission);
+                   /* $('#txtPresentPackageCost').val(response[0].totalblockedamount);*/
+                    //$('#txtPresentPackageCost').data(response[0].totalblockedamount);
+                    $('#txtPresentPackageCost').data('Cost', response[0].totalblockedamount);
+                    //For Over Ride Request Data Bind
+                    $("#lblPatientMemberId").html(response[0].memberID);
+                    $("#lblPatientName").html(response[0].memberName);
+                    $("#lblPatientGender").html(response[0].patientgender);
+                    $("#lblPatientAge").html(response[0].age);
+                    $("#lblPatientAadharNo").html(response[0].uidnumber);
+                    $("#lblPatientUrnNo").html(response[0].urn);
+                    $("#caseno").html(response[0].caseno);
+                    $(".datepicker").datepicker({
+                        numberOfMonths: 1,
+                        changeMonth: true,
+                        dateFormat: "dd-M-y",
+                        changeYear: true,
+                        minDate: "@Session["backdate_discharge"]",
+                        maxDate: 0
+                        });
+                    //END
+                };
+
+                $("#grdBlockPackage1").DataTable({
+                    autoWidth: false,
+                    processing: true,
+                    bLengthChange: true,
+                    lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                    bFilter: true,
+                    bSort: true,
+                    bPaginate: false,
+                    searching: false,
+                    bInfo: false,
+                    responsive: true,
+                    bDestroy: true,
+                    data: response,
+                    columns: [
+                        { data: 'id', type: "text", title: "Sl#", align: "center", render: function (data, type, row, meta) { return meta.row + meta.settings._iDisplayStart + 1; } },
+                        {
+                            data: "memberName", type: "text", title:'<span style="width:16% !important;"> Member Name </span>',
+                            align: "left",
+                            render: function (data, type, row, meta) {
+                                return '<span class="prehed-bold">' + row.memberName + '</span>'
+                            }
+                        },
+                       /* { data: "dateofadmission", type: "text", title: "Blocked Date", align: "left" },*/
+                        { /*data: "packageheadercode",*/ type: "text", title: '<span><div class="prehed-bold"> Package Details </div><div class="prehed-small"> Code | Name </div></span>',
+                            align: "left",
+                            render: function (data, type, row, meta) {
+                                return '<span><b class="text-success"> ' + row.packageheadercode + '</b><div class="prehed-small">' + row.packageName+'</div ></span >'
+                            }
+                        },
+                       /* { data: "packageName", type: "text", title: "Package", align: "left" },*/
+                        { /*data: "procedureCode",*/ type: "text", title: '<span><div class="prehed-bold"> Procedure Details </div><div class="prehed-small"> Code | Name  </div></span>',
+                            align: "left",
+                            render: function (data, type, row, meta) {
+                                return '<span><b class="text-success"> ' + row.procedureCode + '</b><div class="prehed-small">' + row.procedureName + '</div ></span >'
+                            }
+                        },
+                      /*  { data: "procedureName", type: "text", title: "Procedure", align: "left" },*/
+                        { /*data: "amountBlocked",*/ type: "number", title: '<span><div class="prehed-bold"> Amount Blocked </div><div class="prehed-small"> Blocked Date  </div></span>',
+                            align: "right",
+                            render: function (data, type, row, meta) {
+                                return '<span><div class="pre-bold" > <i class="fa fa-rupee"></i> ' + row.amountBlocked + ' </div ><div class="prehed-small">' + row.dateofadmission +'</div></span>'
+                                   
+                                    
+                                
+                            }
+                        },
+                        {
+                            /*data: "insufficientamount",*/ type: "number", title: "Insufficient Amount",
+                            align: "right",
+                            render: function (data, type, row, meta) {
+                                return '<div class= "prehed-small" > <i class="fa fa-rupee"></i> ' + row.insufficientamount + ' </div >'
+                            }
+                        },
+                        {
+                            data: "insufficientamount", type: "number", title: "Package Amount", align: "right", render: function (data, type, row, meta) {
+                                var sum = (parseInt(row.amountBlocked) + parseInt(row.insufficientamount));
+                                 return '<div class= "prehed-small" > <i class="fa fa-rupee"></i> ' + sum + ' </div >';
+                            }
+                        },
+                        {
+                            data: "totalpackagecost", type: "number", title: "Claim Amount", align: "right", render: function (data, type, row, meta) {
+                                if (row.amountBlocked > 0) {
+                                    var html = "<input type='number' readonly name='txtimpqty' value='" + row.amountBlocked + "' autocomplete='off' min='0' max='99999999' oninput='this.value = Math.abs(this.value)' class='form-control txthedqytcls' style='width:100px; text-align:right;'>"
+                                }
+                                else {
+                                    var html = "<input type='number' readonly name='txtimpqty' value='" + row.amountBlocked + "' autocomplete='off' min='0' max='99999999' class='form-control txthedqytcls' style='width:100px; text-align:right;'>"
+                                }
+                                return html;
+                            }
+                        },
+                        {
+                            title: "<input type='checkbox' id='ckbCheckAll'>", align: "right", targets: 0, bSort: false, orderable: false,
+                            render: function (data, type, row, meta) {
+                                var count = meta.row + meta.settings._iDisplayStart + 1;
+                                var html = "<input type='checkbox' class='checkBoxClass' id='customCheck" + count + "'>"
+                                return html;
+                            }
+                        },
+                    ],
+                });
+
+                PackageAddOnArry();
+            },
+            complete: function () {
+                $('#loader').hide();
+            },
+            failure: function (response) {
+                alert(response.d);
+            },
+            error: function (response) {
+                alert(response.d);
+            }
+        });
+        DisplayVital();
+
+        //$(".checkBoxClass").click(function () {
+        //    $(".checkBoxClass").prop('checked', $(this).prop('checked'));
+        //});
+
+        //$(".checkBoxClass").change(function () {
+        //    if (!$(this).prop("checked")) {
+        //        $("#checkBoxClass").prop("checked", false);
+        //    }
+        //});
+    });
+
+    //display vital Record
+    function DisplayVital() {
+        var UnblockMemberinformationParam1 = {
+            action: 'C',
+            urn: PackageInfo[0].urn,
+            memberId: PackageInfo[0].memberID,
+            hospitalcode: PackageInfo[0].hospitalCode,
+            transactionID: PackageInfo[0].transactionID
+        };
+        $.ajax({
+            url: ServiceURL + "/api/Common/GetVital",
+            type: "GET",
+            data: UnblockMemberinformationParam1,
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $("#loader").show();
+            },
+            success: function (response) {
+                //console.log(response);
+                $("#tblVitalParam").DataTable({
+                    autoWidth: false,
+                    processing: true,
+                    bLengthChange: true,
+                    lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                    bFilter: true,
+                    bSort: false,
+                    bPaginate: false,
+                    searching: false,
+                    bInfo: false,
+                    data: response,
+                    columns: [
+                        { data: 'id', type: "text", title: "Sl#", align: "center", render: function (data, type, row, meta) { return meta.row + meta.settings._iDisplayStart + 1; } },
+                        { data: "vitalsign", type: "text", title: "Parameter", align: "center" },
+                        { data: "vitalvalue", type: "text", title: "Value", align: "center" },
+
+                    ],
+                    columnDefs: [
+                        {
+                            targets: 3,
+                            data: null,
+                            title: "Action",
+                            orderable: false,
+                            defaultContent: "<button type='button' id='btnremovevital' hidden class='btn btn-outline-danger focused Btn btn-sm my-2 my-sm-0'><i class='fa fa-trash'></i></button>"
+                        }]
+                });
+                vitalremovedata.push(response);
+
+            },
+            complete: function () {
+                $('#loader').hide();
+            },
+            error: function (error) {
+                console.log(error.statusText);
+            }
+        });
+    };
+
+    function ChangeMotality(ele) {
+        if ($("#txtMortality option:selected").val() == "Y") {
+            let SelectAlldata = $('#SelectAll').val();
+            if (SelectAlldata == 1) {
+                $('#MotalityDoc').removeAttr('disabled', 'disabled');
+            }
+            else {
+                swal({
+                    text: "Please select all packages,then motality yes can allow.",
+                    confirmButtonColor: "#36A865",
+                    type: "error",
+                    confirmButtonText: "OK",
+                    closeOnConfirm: false
+                }).then(function () {
+                    $("#txtMortality").val("SELECT");
+                });
+            }
+        }
+        else {
+            $('#MotalityDoc').attr('disabled', 'disabled');
+            $("#MotalityDoc").val("");
+            $("#RemoveMotalityDoc").hide();
+        }
+    };
+
+    function OverrideDetails(memberid,urn) {
+       //Override
+       var overideparams = {
+           Action: 'C',
+           URN: urn,
+           HospitalCode: '@Session["HospitalCode"]',
+           Memberid: memberid
+       };
+       $.ajax({
+           url: ServiceURL + "/api/Common/GetOverrideRefrral",
+           type: "GET",
+           data: overideparams,
+           dataType: "json",
+           contentType: "application/json; charset=utf-8",
+           beforeSend: function () {
+               $("#loader").show();
+           },
+           success: function (resultBal) {
+                     if (resultBal.dischargefpoverride != null) {
+                         $('#btnoverridegeneration').attr('disabled','disabled');
+                         $('#txtOverrideCode').val(resultBal.dischargefpoverride);
+                         $('#verificationBlock').addClass('divdisable');
+                         $('#txtOverrideCode').attr('disabled', 'disabled');
+                         $("#Details_View").show();
+                         $('#VerifiedMemberId').val(memberid);
+                         $('#VerifiedMemberName').val($('#PatientNm').text());
+                         $('#AuthenticatioMode').val("FPOVERRIDE");
+                     }
+           },
+           complete: function () {
+               $('#loader').hide();
+           },
+           error: function (error) {
+                                console.log(error.responseText);
+           }
+       });
+       //End Override
+    };
+
+    //Record Insert and validation in Vital
+    function ValidateParamVal() {
+        if ($("#dlVitalParam").val() == "0") {
+            $("#errdlVitalParam").text("Please select parameter!").show();
+            $("#dlVitalParam").addClass("border-danger").focus();
+            return false;
+        }
+        else {
+            var flag = "0";
+            $.each(vitaladddata, function (key, val) {
+                if ($("#dlVitalParam").val() == val.vitalsignid) {
+                    $("#errdlVitalParam").text("Parameter already added!").show();
+                    $("#dlVitalParam").addClass("border-danger").focus();
+                    flag = "1";
+                }
+            });
+            if (flag == "1") {
+                return false;
+            }
+        }
+        if ($("#txtVtParamValue").val() == "") {
+            $("#errtxtVtParamValue").text("Value cannot be blank!").show();
+            $("#txtVtParamValue").addClass("border-danger").focus();
+            return false;
+        }
+        else {
+            $("#dlVitalParam").removeClass("border-danger");
+            $("#errdlVitalParam").text("").hide();
+            $("#txtVtParamValue").removeClass("border-danger");
+            $("#errtxtVtParamValue").text("").hide();
+            return true;
+        }
+    };
+
+    //Add More Vital Parameter.
+    $("#addMoreVitalParam1").click(function () {
+        if (ValidateParamVal() != false) {
+            if ($("#tblVitalParam > tbody > tr").length <= 1) {
+                $('.dataTables_empty').parent().remove();
+            }
+            /* alert($("#tblVitalParam > tbody > tr").length);*/
+            var vitalsignid = parseInt($("#tblVitalParam > tbody > tr").length, 10) + 1;
+            var vitalid = $('#dlVitalParam').find(":selected").val();
+            var vitalname = $('#dlVitalParam').find(":selected").text();
+            var vtlParamVal = $("#txtVtParamValue").val();
+
+            var AddParamVal = "<tr><td>" + vitalsignid + "</td><td>" + vitalname + "</td><td>" + vtlParamVal + "</td><td><button type='button' id='btnremovevital' onclick='removeviataldata(this)' class='btn btn-outline-danger focusedBtn btn-sm my-2 my-sm-0'><i class='fa fa-trash'></i></button></td></tr>";
+                $("#tblVitalParam").append(AddParamVal);
+            //var d = { "vitalsignid": vitalsignid, "vitalsign": vitalname, "vitalvalue": vtlParamVal };
+            //vitaladddata.push(d);
+            vitaladddata.push({ "vitalsignid": vitalid, "vitalsign": vitalname, "vitalvalue": vtlParamVal })
+            //console.log("vitaladddata parameter add", vitaladddata)
+            $("#txtVtParamValue").val('');
+            $("#dlVitalParam").val(0);
+        };
+    });
+
+    // Remove Vital Record
+    function removeviataldata(ele) {
+        var currentRow = $(ele).closest("tr");
+        var col1 = currentRow.find("td:eq(0)").text();
+        var col2 = currentRow.find("td:eq(1)").text();
+        var col3 = currentRow.find("td:eq(2)").text();
+        var removedata = { "vitalsignid": col1, "vitalsign": col2, "vitalvalue": col3 }
+        //console.log('dataRow - ', removedata);
+        //vitaladddata.splice(vitaladddata.findIndex(a => a.vitalsignid === removedata.vitalsignid), 1);
+        $.each(vitaladddata, function (key, val) {
+            if (removedata.vitalsign == val.vitalsign) {
+                vitaladddata.splice(key, 1);
+                return false;
+            }
+        });
+        //console.log('jsonData-', vitaladddata);
+        $(ele).closest('tr').remove();
+        $("#tblVitalParam > tbody > tr").each(function (i) {
+            $(this).find("td:eq(0)").text(i + 1);
+        });
+    };
+
+    // Verification member Part
+    function VerificationMember(ele) {
+        var dataRow = $('#grdFamilyDetails').DataTable().row($(ele).closest('tr')).data();
+        //console.log('dataRow', dataRow);
+
+        if ($("#iris").is(":checked")) {
+            $('#IrisModal').modal('show');
+            $("#btnAuthentication").hide();
+            discoverRDService();
+            //DeviceInfo();
+            currrentElement = ele;
+        }
+        if ($("#pos").is(":checked")) {
+            POSVerification(ele, dataRow.urn, dataRow.memberID);
+        }
+        if ($("#otp").is(":checked")) {
+            SendOTP(dataRow.aadharnumber);
+            $('#OTPModal').modal('show');
+            $("#Uid").val(dataRow.aadharnumber);
+        }
+        $('#VerifiedMemberId').val(dataRow.memberID);
+        $('#VerifiedMemberName').val(dataRow.memberName);
+    };
+
+    // Pos Verification Part
+    function POSVerification(ele, urn, memberid) {
+
+        $.ajax({
+            url: ServiceURL + "/api/Common/CheckPosVerifyOrNot",
+            type: "get",
+            dataType: "json",
+            data: { urn: urn, memberID: memberid },
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $("#loader").show();
+            },
+            success: function (data) {
+                var currentRow = $(ele).closest("tr");
+                if (data) {
+                    var urnno = currentRow.find("td:eq(7)").find('#btnverification').text("Verified");
+                    $(ele).closest('tr').addClass('row_selected')
+                    $('#verificationBlock').addClass('divdisable')
+                    //$("#verificationBlock").attr('disabled', 'disabled');
+                }
+                else {
+                    currentRow.find("td:eq(7)").find('#btnverification').text("Not Verified");
+                }
+
+            },
+            complete: function () {
+                $('#loader').hide();
+            },
+            error: function (error) {
+                console.log(error.statusText);
+            }
+        });
+    };
+
+    //Insertion Part
+    $('#Discharge').click(function (event) {
+        if (DischargeValidation() != false) {
+            swal({
+                title: "Are you sure?",
+                text: " To discharge the Patient!",
+                type: "warning",
+                showCancelButton: true,
+                cancelButtonColor: '#d33',
+                confirmButtonColor: "#36A865",
+                confirmButtonText: 'Yes'
+            }).then(function (isConfirm) {
+                //console.log("DischargeSwal", isConfirm.value);
+                if (isConfirm.value) {
+                    var RelaxClamAmount = ($('#txtPresentPackageCost').data('Cost') - $('#txtPresentPackageCost').val());
+                    var MotalityDocUpload = $("#MotalityDoc").get(0);
+                    var RefaralDocUpload = $("#RefaralDoc").get(0);
+                    var DischargefileUpload = $("#DischargeFile").get(0);
+                    var IntraSurgeryPicUpload = $("#IntraSurgeryPic").get(0);
+                    var PostSurgeryPicUpload = $("#PostSurgeryPic").get(0);
+                    var PreSurgeryPicUpload = $("#PreSurgeryPic").get(0);
+                    var SpecimenRemovalPicUpload = $("#SpecimenRemovalPic").get(0);
+                    var Motalityfiles = MotalityDocUpload.files;
+                    var RefaralDocfiles = RefaralDocUpload.files;
+                    var Dischargefiles = DischargefileUpload.files;
+                    var IntraSurgeryfiles = IntraSurgeryPicUpload.files;
+                    var PostSurgeryfiles = PostSurgeryPicUpload.files;
+                    var PreSurgeryfiles = PreSurgeryPicUpload.files;
+                    var SpecimenRemovalfiles = SpecimenRemovalPicUpload.files;
+                    var DischargeParams = new FormData();
+                    if (Motalityfiles.length > 0) { DischargeParams.append("MoralityDoc", Motalityfiles[0]); }
+                    if (RefaralDocfiles.length > 0) { DischargeParams.append("RefaralDoc", RefaralDocfiles[0]); }
+                    if (Dischargefiles.length > 0) { DischargeParams.append("DischargeDoc", Dischargefiles[0]); }
+                    if (IntraSurgeryfiles.length > 0) { DischargeParams.append("IntraSurgeryPic", IntraSurgeryfiles[0]); }
+                    if (PostSurgeryfiles.length > 0) { DischargeParams.append("PostSurgeryPic", PostSurgeryfiles[0]); }
+                    if (PreSurgeryfiles.length > 0) { DischargeParams.append("PreSurgeryPic", PreSurgeryfiles[0]); }
+                    if (SpecimenRemovalfiles.length > 0) { DischargeParams.append("SpecimenRemovalPic", SpecimenRemovalfiles[0]); }
+                    DischargeParams.append("Urn", $('#UrnNo').text());
+                    DischargeParams.append("BlockingInvoiceNo", $('#blockingInvoiceNo').val());
+                    DischargeParams.append("TransactionId", $('#transactionID').val());
+                    DischargeParams.append("TransactionDescription", $('#txtdesc').val());
+                    DischargeParams.append("MemberId", $('#MemberId').val());
+                    DischargeParams.append("Mortality", $('#txtMortality').val());
+                    DischargeParams.append("DischargeDate", $('#txtDischargedate').val());
+                    DischargeParams.append("HospitalCode", '@Session["HospitalCode"]');
+                    DischargeParams.append("Userid", '@Session["UserID"]');
+                    DischargeParams.append("RefaralStatus", $("input[name='ReferTo']:checked").val());
+                    DischargeParams.append("RefarHospitalState", $('#ddlState').val());
+                    DischargeParams.append("RefarHospitalDistrict", $('#DdlDist').val());
+                    DischargeParams.append("RefarHospitalName", $("#DDlHospital option:selected").text());
+                    DischargeParams.append("RefarHospitalCode", $('#DDlHospital').val());
+                    DischargeParams.append("RefaralDate", $('#txtrefardatetime').val());
+                    DischargeParams.append("RefaralReason", $('#txtReasonForRefferring').val());
+                    DischargeParams.append("FPVerifiedId", '134');
+                    DischargeParams.append("VerifiedMemberID", $('#VerifiedMemberId').val());
+                    DischargeParams.append("VerifiedMemberName", $('#VerifiedMemberName').val());
+                    DischargeParams.append("AuthenticationMode", $('#AuthenticatioMode').val());
+                    DischargeParams.append("RefarDoctorName", $('#txtDoctorname').val());
+                    DischargeParams.append("RefarDepartment", $('#txtDepartment').val());
+                    DischargeParams.append("IsEmpanel", $("input[name='Enpanel']:checked").val());
+                    DischargeParams.append("Overridecode", $("#txtOverrideCode").val());
+                    DischargeParams.append("RelaxClamAmount", RelaxClamAmount);
+                    DischargeParams.append("DischargeRemark", $("#txtRemark").val());
+                    //console.log('json data :', vitaladddata);
+                    //console.log('json :', vitalremovedata);
+                    //console.log('json lenth :', vitaladddata.length);
+                    var vitaldataPushInModel = [];
+                    vitaldataPushInModel.push(vitaladddata);
+                    $.each(vitaldataPushInModel, function (index, jsonObject) {
+                        $.each(jsonObject, function (key, val) {
+                            DischargeParams.append("VitalParameterList[" + key + "].VITALSIGNID", val.vitalsignid);
+                            DischargeParams.append("VitalParameterList[" + key + "].VITALSIGN", val.vitalsign);
+                            DischargeParams.append("VitalParameterList[" + key + "].VITALVALUE", val.vitalvalue);
+                        });
+                    });
+                    var PackageClamAmountArr = [];
+                    PackageClamAmountArr.push(PackageAddOnArryList);
+                    $.each(PackageClamAmountArr, function (index, jsonObject) {
+                        $.each(jsonObject, function (key, val) {
+                            DischargeParams.append("PackageClamAmountList[" + key + "].urn", val.urn);
+                            DischargeParams.append("PackageClamAmountList[" + key + "].packageheaderid", val.packageheaderid);
+                            DischargeParams.append("PackageClamAmountList[" + key + "].packagesubcategoryid", val.packagesubcategoryid);
+                            DischargeParams.append("PackageClamAmountList[" + key + "].procedureid", val.procedureid);
+                            DischargeParams.append("PackageClamAmountList[" + key + "].blockedamount", val.blockedamount);
+                            DischargeParams.append("PackageClamAmountList[" + key + "].packagedetailid", val.packagedetailid);
+                            DischargeParams.append("PackageClamAmountList[" + key + "].transactioncode", val.transactioncode);
+                            DischargeParams.append("PackageClamAmountList[" + key + "].clamamount", val.clamamount);
+                            DischargeParams.append("PackageClamAmountList[" + key + "].insufficientamount", val.insufficientamount);
+                        });
+                    });
+                    $.ajax({
+                        url: '@Url.Action("CreatePatientDischage", "Discharge")',
+                        type: "POST",
+                        data: DischargeParams,
+                        processData: false,
+                        contentType: false,
+                        beforeSend: function () {
+                            $("#loader").show();
+                        },
+                        success: function (result) {
+                            //console.log("result-", result);
+                            var DischargeSlip = [];
+                            if (result.length > 0) {
+                                if (result[0].returnmessage == "1") {
+                                    swal({
+                                        title: "Discharge", text: "Discharged Successfully, kindly raise the claim within 7 days.", type: "success", confirmButtonColor: "#36A865",
+                                    }).then(function () {
+                                        DischargeSlip.push(JSON.stringify({
+                                            URN: result[0].URN,
+                                            MemberId: result[0].MemberId,
+                                            HospitalCode: '@Session["HospitalCode"]',
+                                            Invoiceno: result[0].Invoiceno
+                                        }));
+                                        localStorage.setItem('InsertedData', DischargeSlip);
+                                        //console.log("Dischage Click:", DischargeSlip);
+                                        windowDischargeSlipPopUp();
+                                    });
+                                }
+                                else if (result[0].returnmessage == "2") {
+                                    swal({
+                                        title: "Discharge", text: "Pre auth pending could not dischage. ", type: "error", confirmButtonColor: "#36A865", confirmButtonText: "OK",
+                                        closeOnConfirm: false
+                                    });
+                                }
+                                else if (result[0].returnmessage == "3") {
+                                    swal({
+                                        title: "Discharge", text: "Save un successfull.", type: "error", confirmButtonColor: "#36A865", confirmButtonText: "OK",
+                                        closeOnConfirm: false
+                                    });
+                                }
+                            }
+                            else {
+                                swal({
+                                    title: "Discharge", text: "Save un successfull.", type: "error", confirmButtonColor: "#36A865", confirmButtonText: "OK",
+                                    closeOnConfirm: false
+                                });
+                            }
+                        },
+                        complete: function () {
+                            $('#loader').hide();
+                            $('#Discharge').prop('disabled', false);
+                        },
+                        error: function (error) {
+                            console.log(error.responseText);
+                        }
+                    });
+                };
+               });
+        };
+    });
+
+    // Iris Device Ready or not Code
+    function discoverRDService() // Search for the valid RDService from port 11100 to 11120
+    {
+        var primaryUrl = "";
+        if (window.location.protocol != "https:") {
+            primaryUrl = "http://localhost"
+        }
+        else {
+            primaryUrl = "https://localhost"
+        }
+        document.getElementById("getrdresponse").innerHTML = primaryUrl;
+        var tempcount = 0;
+        url = "";
+        for (var i = 11100; i <= 11120; i++) {
+            var verb = "RDSERVICE";
+            var err = "";
+            var res;
+            $.support.cors = true;
+            var httpStaus = false;
+            var jsonstr = "";
+            var data = new Object();
+            var obj = new Object();
+            var xmlstr = '';
+            var RDurl = primaryUrl + ":" + i.toString();
+
+            $.ajax({
+                type: "RDSERVICE",
+                async: false,
+                crossDomain: true,
+                url: RDurl,
+                contentType: "text/xml; charset=utf-8",
+                processData: false,
+                cache: false,
+                async: false,
+                crossDomain: true,
+                beforeSend: function () {
+                    $("#loader").show();
+                },
+                success: function (data) {
+                    try {
+                        xmlstr = data.xml ? data.xml : (new XMLSerializer()).serializeToString(data);
+                        data = xmlstr;
+                        var xmlDoc = $.parseXML(data);
+                        //console.log("decvice xmldoc-", xmlDoc);
+                        var $xml = $(xmlDoc);
+                        var Name = $xml.find('RDService').attr('status');
+                        var info = $xml.find('RDService').attr('info');
+                        $('#rdStatus').val(Name);
+                        $('#rdinfo').val(info);
+
+                        if ("Biomatiques Iris (Model: EPI-1000)" == info) {
+                            url = RDurl;
+                            i = 11130;;
+                        }
+
+                        if (Name == "READY") {
+                            $("#btnCapture").show();
+                            DeviceInfo();
+                        }
+
+                        httpStaus = true;
+                        res = { httpStaus: httpStaus, data: data };
+                        tempcount++;
+
+                    }
+                    catch (e) {
+                        //alert(e.Message);
+                    }
+                },
+                complete: function () {
+                    $('#loader').hide();
+                },
+                error: function (jqXHR, ajaxOptions, thrownError) {
+                    //    res = { httpStaus: httpStaus, err: getHttpError(jqXHR) };
+                }
+            });
+        };
+        return res;
+    };
+
+    // Iris Device information
+    function DeviceInfo() {
+        $('#getrdresponse').html('');
+        var urlinfo = url + "/BISPL/info";
+        document.getElementById("getrdresponse").innerHTML = urlinfo;
+        var verb = "DEVICEINFO";
+        var err = "";
+        var res;
+        $.support.cors = true;
+        var httpStaus = false;
+        var jsonstr = "";
+        var data = new Object();
+        var obj = new Object();
+        var xmlstr = '';
+        var RDurl = urlinfo;
+
+        $.ajax({
+            type: "DEVICEINFO",
+            async: false,
+            crossDomain: true,
+            url: RDurl,
+            contentType: "text/xml; charset=utf-8",
+            processData: false,
+            cache: false,
+            async: false,
+            crossDomain: true,
+            beforeSend: function () {
+                $("#loader").show();
+            },
+            success: function (data) {
+                try {
+                    xmlstr = data.xml ? data.xml : (new XMLSerializer()).serializeToString(data);
+                    data = xmlstr;
+                    var xmlDoc = $.parseXML(data);
+                    //console.log("xmldoc-",xmlDoc);
+                    var $xml = $(xmlDoc);
+                    var dpid = $xml.find('DeviceInfo').attr('dpId');
+                    var mi = $xml.find('DeviceInfo').attr('mi');
+                    var mc = $xml.find('DeviceInfo').attr('mc');
+                    $('#mi').val(mi);
+                    $('#mc').val(mc);
+                    $('#dpid').val(dpid);
+                    $('#rdInfo').val(data);
+                    document.getElementById("getrdresponse").innerHTML = data;
+                    httpStaus = true;
+                    res = { httpStaus: httpStaus, data: data };
+                    tempcount++;
+
+                }
+                catch (e) {
+                    //Alert(e.Message);
+                }
+            },
+            complete: function () {
+                $('#loader').hide();
+            },
+            error: function (jqXHR, ajaxOptions, thrownError) {
+                //    res = { httpStaus: httpStaus, err: getHttpError(jqXHR) };
+            }
+        });
+
+    };
+
+    // Iris Device Capture information
+    function Capture() {
+       /* alert("Click");*/
+        $('#getrdresponse').html('');
+
+        var val = '';
+        if (document.getElementById('rdProduction').checked) {
+            val = document.getElementById('rdProduction').value
+        }
+        else if (document.getElementById('rdStaging').checked) {
+            val = document.getElementById('rdStaging').value
+        }
+        //else{
+        // alert("Please Select Option");
+        //}
+        var urlcapture = url + "/BISPL/capture";
+
+        var PIDOPTS = '<PidOptions ver=\"1.0\">' + '<Opts fCount=\"0\" fType=\"\" iCount=\"1\" iType=\"0\" pCount=\"\" pType=\"\" format=\"0\" pidVer=\"2.0\" timeout=\"15000\" otp=\"\" wadh=\"\" posh=\"\" env=\"' + val + '\"/>' + '</PidOptions>';
+
+        var verb = "CAPTURE";
+        var err = "";
+        var res;
+        $.support.cors = true;
+        var httpStaus = false;
+        var jsonstr = "";
+        var data = new Object();
+        var obj = new Object();
+        var xmlstr = '';
+        var RDurl = urlcapture;
+
+        $.ajax({
+            type: "CAPTURE",
+            async: false,
+            crossDomain: true,
+            url: RDurl,
+            contentType: "text/xml; charset=utf-8",
+            data: PIDOPTS,
+            processData: false,
+            cache: false,
+            async: false,
+            crossDomain: true,
+            beforeSend: function () {
+                $("#loader").show();
+            },
+            success: function (data) {
+                try {
+                    xmlstr = data.xml ? data.xml : (new XMLSerializer()).serializeToString(data);
+                    data = xmlstr;
+                    var xmlDoc = $.parseXML(data);
+                    //console.log("xmlCaptureDoc-", xmlDoc);
+                    var $xml = $(xmlDoc);
+                    var dpid = $xml.find('DeviceInfo').attr('dpId');
+                    var mi = $xml.find('DeviceInfo').attr('mi');
+                    var mc = $xml.find('DeviceInfo').attr('mc');
+                    var errorcode = $xml.find('Resp').attr('errCode');
+                    var errInfo = $xml.find('Resp').attr('errInfo');
+                    $('#mi').val(mi);
+                    $('#mc').val(mc);
+                    $('#dpid').val(dpid);
+                    $('#errCode').val(errorcode);
+                    $('#errInfo').val(errInfo);
+                    $('#rdData').val(data);
+                    if (errInfo == $('#errCode').text()) {
+                        $("#btnAuthentication").show();
+                    }
+                    document.getElementById("getrdresponse").innerHTML = data;
+                    httpStaus = true;
+                    res = { httpStaus: httpStaus, data: data };
+                    tempcount++;
+
+                }
+                catch (e) {
+                    //Alert(e.Message);
+                }
+            },
+            complete: function () {
+                $('#loader').hide();
+            },
+            error: function (jqXHR, ajaxOptions, thrownError) {
+                //    res = { httpStaus: httpStaus, err: getHttpError(jqXHR) };
+            }
+        });
+
+    };
+
+    // SweetAlert Information
+    function sweetAlert(stitle, sdata, sparam) {
+        swal({
+            title: stitle,
+            html: "<div class='row'> <div class='mb-1 col-md-12 text-center'>" + sdata + "</div> </div>",
+            confirmButtonColor: "#36A865",
+            confirmButtonText: "OK",
+            closeOnConfirm: false
+        });
+    };
+
+    // Validation of Dischage Screen.
+    function DischargeValidation() {
+        var DischargefileUpload = $("#DischargeFile").get(0);
+        var Dischargefiles = DischargefileUpload.files;
+        if (SelectedPackage.length == 0) {
+            swal({
+                text: "Please choose blocked package",
+                confirmButtonColor: "#36A865",
+                type: "error",
+                confirmButtonText: "OK",
+                closeOnConfirm: false
+            });
+            return false;
+        };
+        if ($("#txtDischargedate").val() == "") {
+            swal({
+                text: "Please enter discharge date",
+                confirmButtonColor: "#36A865",
+                type:"error",
+                confirmButtonText: "OK",
+                closeOnConfirm: false
+            }).then(function () {
+                $("#txtDischargedate").focus();
+            });
+            return false;
+        };
+        if ($('#txtPresentPackageCost').val() == "") {
+            swal({
+                text: "Please enter claim amount",
+                confirmButtonColor: "#36A865",
+                type: "error",
+                confirmButtonText: "OK",
+                closeOnConfirm: false
+            }).then(function () {
+                $("#txtPresentPackageCost").focus();
+            });
+            return false;
+        };
+        if ($('#txtPresentPackageCost').val() != "") {
+            var cost = $('#txtPresentPackageCost').data('Cost');
+                if (cost < $('#txtPresentPackageCost').val()) {
+                    swal({
+                        text: "Can not be grater than claim amount",
+                        confirmButtonColor: "#36A865",
+                        type: "error",
+                        confirmButtonText: "OK",
+                        closeOnConfirm: false
+                    }).then(function () {
+                        $("#txtPresentPackageCost").focus();
+                    });
+                    return false;
+            };
+        };
+        if ($("#txtMortality").val() == "SELECT") {
+            swal({
+                text: "Please choose mortality.",
+                confirmButtonColor: "#36A865",
+                type: "error",
+                confirmButtonText: "OK",
+                closeOnConfirm: false
+            }).then(function () {
+                $("#txtMortality").focus();
+            });
+            return false;
+        };
+        if ($("#txtMortality option:selected").val() == "Y") {
+            if ($("#MotalityDoc").val() == "") {
+                swal({
+                    text: "Please upload mortality file.",
+                    confirmButtonColor: "#36A865",
+                    type: "error",
+                    confirmButtonText: "OK",
+                    closeOnConfirm: false
+                }).then(function () {
+                    $("#MotalityDoc").focus();
+                });
+                return false;
+            }
+            else if ($("#MotalityDoc")[0].files[0].size > 5000141) {
+                swal({
+                    text: "File size cannot be greater than 5MB !!",
+                    confirmButtonColor: "#36A865",
+                    type: "error",
+                    confirmButtonText: "OK",
+                    closeOnConfirm: false
+                }).then(function () {
+                    $("#MotalityDoc").focus();
+                    $("#MotalityDoc").val("");
+                });
+                return false;
+            }
+        };
+        if ($("#txtdesc").val() == "") {
+            swal({
+                text: "Please enter description.",
+                confirmButtonColor: "#36A865",
+                type: "error",
+                confirmButtonText: "OK",
+                closeOnConfirm: false
+            }).then(function () {
+                $("#txtdesc").focus();
+            });
+            return false;
+        };
+        if ($("#Yes").is(":checked")) {
+            if ($("#seh").is(":checked")) {
+                if ($("#ddlState").val() == "0") {
+                    swal({
+                        text: "Please choose state.",
+                        confirmButtonColor: "#36A865",
+                        type: "error",
+                        confirmButtonText: "OK",
+                        closeOnConfirm: false
+                    }).then(function () {
+                        $("#ddlState").focus();
+                    });
+                    return false;
+                }
+                else if ($("#DdlDist").val() == "0") {
+                    swal({
+                        text: "Please choose district.",
+                        confirmButtonColor: "#36A865",
+                        type: "error",
+                        confirmButtonText: "OK",
+                        closeOnConfirm: false
+                    }).then(function () {
+                        $("#DdlDist").focus();
+                    });
+                    return false;
+                }
+                else if ($("#DDlHospital").val() == "0") {
+                    swal({
+                        text: "Please choose hospital.",
+                        confirmButtonColor: "#36A865",
+                        type: "error",
+                        confirmButtonText: "OK",
+                        closeOnConfirm: false
+                    }).then(function () {
+                        $("#DDlHospital").focus();
+                    });
+                    return false;
+                }
+                else if ($("#txtDoctorname").val() == "") {
+                    swal({
+                        text: "Please enter doctor name.",
+                        confirmButtonColor: "#36A865",
+                        type: "error",
+                        confirmButtonText: "OK",
+                        closeOnConfirm: false
+                    }).then(function () {
+                        $("#txtDoctorname").focus();
+                    });
+                    return false;
+                }
+                else if ($("#txtDepartment").val() == "") {
+                    swal({
+                        text: "Please enter department.",
+                        confirmButtonColor: "#36A865",
+                        type: "error",
+                        confirmButtonText: "OK",
+                        closeOnConfirm: false
+                    }).then(function () {
+                        $("#txtDepartment").focus();
+                    });
+                    return false;
+                }
+                else if ($("#txtrefardatetime").val() == "") {
+                    swal({
+                        text: "Please enter datetime.",
+                        confirmButtonColor: "#36A865",
+                        type: "error",
+                        confirmButtonText: "OK",
+                        closeOnConfirm: false
+                    }).then(function () {
+                        $("#txtrefardatetime").focus();
+                    });
+                    return false;
+                }
+                //else if ($("#RefaralDoc").val() == "") {
+                //    swal({
+                //        text: "Please enter refaral file.",
+                //        confirmButtonColor: "#36A865",
+                //        type: "error",
+                //        confirmButtonText: "OK",
+                //        closeOnConfirm: false
+                //    }).then(function () {
+                //        $("#RefaralDoc").focus();
+                //    });
+                //    return false;
+                //}
+                else if ($("#RefaralDoc")[0].files[0].size > 5000141) {
+                    swal({
+                        text: "File size cannot be greater than 5MB !!",
+                        confirmButtonColor: "#36A865",
+                        type: "error",
+                        confirmButtonText: "OK",
+                        closeOnConfirm: false
+                    }).then(function () {
+                        $("#RefaralDoc").focus();
+                        $("#RefaralDoc").val("");
+                    });
+                    return false;
+                }
+                else if ($("#txtReasonForRefferring").val() == "") {
+                    swal({
+                        text: "Please enter reason for referring.",
+                        confirmButtonColor: "#36A865",
+                        type: "error",
+                        confirmButtonText: "OK",
+                        closeOnConfirm: false
+                    }).then(function () {
+                        $("#txtReasonForRefferring").focus();
+                    });
+                    return false;
+                }
+            };
+        };
+        if ($("#Yes").is(":checked")) {
+            if ($('#aeh').is(":checked")) {
+                if ($("#txtDoctorname").val() == "") {
+                    swal({
+                        text: "Please enter doctor name.",
+                        confirmButtonColor: "#36A865",
+                        type: "error",
+                        confirmButtonText: "OK",
+                        closeOnConfirm: false
+                    }).then(function () {
+                        $("#txtDoctorname").focus();
+                    });
+                    return false;
+                }
+                else if ($("#txtDepartment").val() == "") {
+                    swal({
+                        text: "Please enter department.",
+                        confirmButtonColor: "#36A865",
+                        type: "error",
+                        confirmButtonText: "OK",
+                        closeOnConfirm: false
+                    }).then(function () {
+                        $("#txtDepartment").focus();
+                    });
+                    return false;
+                }
+                else if ($("#txtrefardatetime").val() == "") {
+                    swal({
+                        text: "Please enter datetime.",
+                        confirmButtonColor: "#36A865",
+                        type: "error",
+                        confirmButtonText: "OK",
+                        closeOnConfirm: false
+                    }).then(function () {
+                        $("#txtrefardatetime").focus();
+                    });
+                    return false;
+                }
+                //else if ($("#RefaralDoc").val() == "") {
+                //    swal({
+                //        text: "Please enter referral file.",
+                //        confirmButtonColor: "#36A865",
+                //        type: "error",
+                //        confirmButtonText: "OK",
+                //        closeOnConfirm: false
+                //    }).then(function () {
+                //        $("#RefaralDoc").focus();
+                //    });
+                //    return false;
+                //}
+                else if ($("#RefaralDoc")[0].files[0].size > 5000141) {
+                    swal({
+                        text: "File size cannot be greater than 5MB !!",
+                        confirmButtonColor: "#36A865",
+                        type: "error",
+                        confirmButtonText: "OK",
+                        closeOnConfirm: false
+                    }).then(function () {
+                        $("#RefaralDoc").focus();
+                        $("#RefaralDoc").val("");
+                    });
+                    return false;
+                }
+                else if ($("#txtReasonForRefferring").val() == "") {
+                    swal({
+                        text: "Please enter reason for referring.",
+                        confirmButtonColor: "#36A865",
+                        type: "error",
+                        confirmButtonText: "OK",
+                        closeOnConfirm: false
+                    }).then(function () {
+                        $("#txtReasonForRefferring").focus();
+                    });
+                    return false;
+                }
+            };
+        };
+
+        if (Dischargefiles.length > 0) {
+            if ($("#DischargeFile")[0].files[0].size > 5000141) {
+                swal({
+                    text: "File size cannot be greater than 5MB !!",
+                    confirmButtonColor: "#36A865",
+                    type: "error",
+                    confirmButtonText: "OK",
+                    closeOnConfirm: false
+                }).then(function () {
+                    $("#DischargeFile").focus();
+                    $("#DischargeFile").val("");
+                });
+                return false;
+            };
+        };
+
+        if ($("#txtRemark").val() == "") {
+            swal({
+                text: "Please enter remark.",
+                confirmButtonColor: "#36A865",
+                type: "error",
+                confirmButtonText: "OK",
+                closeOnConfirm: false
+            }).then(function () {
+                $("#txtRemark").focus();
+            });
+            return false;
+        }
+        return true;
+    };
+
+    // Selected Verifiy Row
+    function displaySelectedRow(ele) {
+        var currentRow = $(ele).closest("tr");
+        currentRow.find("td:eq(7)").find('#btnverification').text("Verified");
+        $(ele).closest('tr').addClass('row_selected')
+        $('#verificationBlock').addClass('divdisable')
+    };
+
+    // Iris Authentication
+    function IrisVerification(ele) {
+            var dataRow = $('#grdFamilyDetails').DataTable().row($(ele).closest('tr')).data();
+            $('#IrisModal').modal('show');
+            $("#AadharUidMask").val(dataRow.maskAadharnumber);
+            $("#AadharUid").val(dataRow.aadharnumber);
+            $("#vMemberId").val(dataRow.memberID);
+            $("#Urn").val(dataRow.urn);
+            $("#btnAuthentication").hide();
+            $('#rdInfo').val("");
+            $('#rdData').val("");
+            $('#VerifiedMemberId').val("");
+            $('#VerifiedMemberName').val("");
+            $('#AuthenticatioMode').val("");
+            discoverRDService();
+            //DeviceInfo();
+            currrentElement = ele;
+    };
+
+    // Iris Authentication
+    $('#btnAuthentication').click(function (event) {
+            var model = JSON.stringify({
+                uid: $("#AadharUid").val(),
+                memberId: $("#vMemberId").val(),
+                urn: $("#Urn").val(),
+                rdInfo: $('#rdInfo').val(),
+                rdData: $('#rdData').val(),
+                verificationThrough: "0303",
+                patientid: $('#MemberId').val(),
+                hospitalcode: '@Session["HospitalCode"]'
+            });
+            $.ajax({
+                url: ServiceURL + "/api/Common/IRISVerification",
+                type: "POST",
+                data: model,
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                beforeSend: function () {
+                    $("#loader").show();
+                },
+                success: function (result) {
+                    if (result.status == "SUCCESS") {
+                        swal({
+                            //title: "Alert",
+                            text: "Authentication Successfully",
+                            type: "success",
+                            confirmButtonColor: "#36A865",
+                            confirmButtonText: "OK"
+                        }).then(function () {
+                            $('#IrisModal').modal('hide');
+                            displayIRISSelectedRow(currrentElement, "SUCCESS");
+                        });
+                    }
+                    else if (result.status == "ERROR") {
+                        swal({
+                            //title: "Alert",
+                            text: result.errMsg,
+                            type: "error",
+                            confirmButtonColor: "#36A865",
+                            confirmButtonText: "OK"
+                        }).then(function () {
+                            $('#IrisModal').modal('hide');
+                            displayIRISSelectedRow(currrentElement, "ERROR");
+                        });
+                    }
+                    else {
+
+                    }
+                },
+                complete: function () {
+                    $("#loader").hide();
+                },
+                error: function (error) {
+                    $('#loader').hide();
+                    console.log(error.statusText);
+                }
+            });
+        });
+
+    // IRIS Selected Verifiy Row
+    function displayIRISSelectedRow(ele, result) {
+            if (result == "ERROR") {
+                var currentRow = $(ele).closest("tr");
+                currentRow.find("td:eq(7)").find('#btnIris').text("Not Verified");
+            }
+            if (result == "SUCCESS") {
+                var currentRow = $(ele).closest("tr");
+                currentRow.find("td:eq(7)").find('#btnIris').text("Verified");
+                $(ele).closest('tr').addClass('row_selected')
+                $('#verificationBlock').addClass('divdisable')
+                $('#VerifiedMemberId').val(currentRow.find("td:eq(1)").text());
+                $('#VerifiedMemberName').val(currentRow.find("td:eq(2)").text());
+                $('#AuthenticatioMode').val("IRIS");
+                $('#OverVerifieddetails').addClass('divdisable');
+                $("#Details_View").show();
+            }
+
+    };
+
+    // Pos Verification Part
+    function POSVerification(ele) {
+            var dataRow = $('#grdFamilyDetails').DataTable().row($(ele).closest('tr')).data();
+            var SelectedPaitentid = $('#MemberId').val();
+            $('#VerifiedMemberId').val("");
+            $('#VerifiedMemberName').val("");
+            $('#AuthenticatioMode').val("");
+            POSVerifyOrNot(ele, dataRow.urn, dataRow.aadharnumber, dataRow.memberID, SelectedPaitentid, "0303", '@Session["HospitalCode"]');
+    }
+
+    // Pos Verification Part
+    function POSVerifyOrNot(ele, urn, uid, memberid, SelectedPaitentid, varificationThrough,hospitalcode) {
+            $.ajax({
+                url: ServiceURL + "/api/Common/CheckPosVerifyOrNot",
+                type: "get",
+                dataType: "json",
+                data: { urn: urn, uid: uid, memberID: memberid, selectedPatient: SelectedPaitentid, verificationThrough: varificationThrough, hospitalcode:'@Session["HospitalCode"]' },
+                contentType: "application/json; charset=utf-8",
+                beforeSend: function () {
+                    $("#loader").show();
+                },
+
+                success: function (data) {
+                    var currentRow = $(ele).closest("tr");
+                    if (data.length > 0) {
+                        if (data[0].verifystatus == "Y") {
+                            var urnno = currentRow.find("td:eq(8)").find('#btnPOS').text("Verified");
+                            $(ele).closest('tr').addClass('row_selected')
+                            $('#verificationBlock').addClass('divdisable')
+                            $('#PackageDetails').show();
+                            $('#TreatmentType').addClass('divdisable');
+                            $('#VerifiedMemberId').val(currentRow.find("td:eq(1)").text());
+                            $('#VerifiedMemberName').val(currentRow.find("td:eq(2)").text());
+                            $('#AuthenticatioMode').val("POS");
+                            $('#OverVerifieddetails').addClass('divdisable');
+                            $("#Details_View").show();
+                        }
+                        else {
+                            currentRow.find("td:eq(8)").find('#btnPOS').text("Not Verified");
+                        }
+                    }
+                    else {
+                        currentRow.find("td:eq(8)").find('#btnPOS').text("Not Verified");
+                    }
+                },
+                complete: function () {
+                    $("#loader").hide();
+                },
+                error: function (error) {
+                    console.log(error.statusText);
+                }
+            });
+    };
+
+    // Send Otp
+    function OTPVerification(ele) {
+            var dataRow = $('#grdFamilyDetails').DataTable().row($(ele).closest('tr')).data();
+            $('#txtopt').val('');
+            SendOTP(dataRow.aadharnumber);
+            currrentElement = ele;
+            var SelectedPaitentid = $('#MemberId').val();
+            $("#Uid").val(dataRow.aadharnumber);
+            $('#VerifiedMemberId').val("");
+            $('#VerifiedMemberName').val("");
+            $('#AuthenticatioMode').val("");
+            $("#OTPVerifyMemberID").val(dataRow.memberID);
+            $("#OTPurn").val(dataRow.urn);
+            $("#SelectedPatientId").val(SelectedPaitentid);
+    };
+
+    // Send Otp Part
+    function SendOTP(aadharnumber) {
+        if (aadharnumber != "") {
+            //:: Kisan encrypt Format Start
+            var aadharnumberEncrypt = aadharnumber;
+            var key = CryptoJS.enc.Utf8.parse('8080808080808080');
+            var iv = CryptoJS.enc.Utf8.parse('8080808080808080');
+            var encryptedlogin = CryptoJS.AES.encrypt(CryptoJS.enc.Utf8.parse(aadharnumberEncrypt), key,
+                { keySize: 128 / 8, iv: iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 });
+            aadharnumberEncrypt = encryptedlogin;
+            //console.log(aadharnumberEncrypt);
+            //:: Kisan encrypt Format End
+                $.ajax({
+                    url: ServiceURL + "/api/Common/SendOTP?AadhaarNo=" + aadharnumberEncrypt,
+                    type: "POST",
+                    processData: false,
+                    contentType: false,
+                    beforeSend: function () {
+                        $("#loader").show();
+                    },
+                    success: function (result) {
+                        console.log("otp", result);
+                        if (result.status == "SUCCESS") {
+                            swal({
+                                //title: "OTP",
+                                text: "OTP Generated & Sent to registred mobile no. & E-mail ID!!",
+                                type: "success",
+                                confirmButtonColor: "#36A865",
+                                confirmButtonText: "OK"
+                            }).then(function () {
+                                $('#OTPModal').modal('show');
+                                $('#OTPModal').modal({
+                                    backdrop: 'static',
+                                    keyboard: false
+                                })
+                                OTPTIMER();
+                            });
+                            $('#Uid').val(aadharnumber);
+                            $('#txn').val(result.txn);
+                        }
+                        else if (result.status == "ERROR") {
+                            swal({
+                                //title: "OTP",
+                                text: "Invalid aadhaar number or aadhaar server not responding.!!",
+                                type: "error",
+                                confirmButtonColor: "#36A865",
+                                confirmButtonText: "OK",
+                                closeOnConfirm: false
+                            });
+                        }
+                        else {
+                        }
+                    },
+                    complete: function () {
+                        $("#loader").hide();
+                    },
+                    error: function (error) {
+                        $('#loader').hide();
+                        console.log(error.statusText);
+                    }
+                });
+        };
+    };
+
+    // Verification OTP Part
+    function VerifyOTP() {
+        var otpValue = $('#txtopt').val();
+        var Uid = $("#Uid").val();
+        var txn = $("#txn").val();
+        var OTPVerifyMemberID = $("#OTPVerifyMemberID").val();
+        var OTPurn = $("#OTPurn").val();
+        var SelectedPatientId = $('#MemberId').val();
+        if (otpValue != "") {
+             var model = JSON.stringify({
+                    uid: Uid,
+                    txn: txn,
+                    otpValue: otpValue,
+                    verificationThrough: "0303",
+                    memberid: OTPVerifyMemberID,
+                    urn: OTPurn,
+                    patientid: SelectedPatientId,
+                    hospitalcode:'@Session["HospitalCode"]'
+                });
+            $.ajax({
+                    url: ServiceURL + "/api/Common/OTPVerification",
+                    type: "POST",
+                    data: model,
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    beforeSend: function () {
+                        $("#loader").show();
+                    },
+                    success: function (result) {
+                        if (result == "SUCCESS") {
+                            swal({
+                                //title: "Alert",
+                                text: "OTP verified successfully!!",
+                                type: "success",
+                                confirmButtonColor: "#36A865",
+                                confirmButtonText: "OK"
+                            }).then(function () {
+                                $('#OTPModal').modal('hide');
+                                displayOTPSelectedRow(currrentElement, result);
+                            });
+                        }
+                        else if (result == "ERROR") {
+                            swal({
+                                //title: "Alert",
+                                text: "OTP not verified !!",
+                                type: "error",
+                                confirmButtonColor: "#36A865",
+                                confirmButtonText: "OK"
+                            }).then(function () {
+                                /*$('#OTPModal').modal('hide');*/
+                                $('#txtopt').val("");
+                                $('#OTPModal').modal('show');
+                                displayOTPSelectedRow(currrentElement, result);
+                            });;
+                        }
+                        else {
+                        }
+                },
+                    complete: function () {
+                        $("#loader").hide();
+                    },
+                    error: function (error) {
+                        $('#loader').hide();
+                        console.log(error.statusText);
+                    }
+                });
+        }
+        else {
+            swal({
+                text: "Please enter OTP",
+                confirmButtonColor: "#36A865",
+                type: "error",
+                confirmButtonText: "OK",
+                closeOnConfirm: false
+            }).then(function () {
+                $("#txtopt").focus();
+            });
+        }
+    };
+
+    // OTP Selected Verifiy Row
+    function displayOTPSelectedRow(ele, result) {
+            if (result == "ERROR") {
+                var currentRow = $(ele).closest("tr");
+                currentRow.find("td:eq(9)").find('#btnOTP').text("Not Verified");
+            }
+            if (result == "SUCCESS") {
+                var currentRow = $(ele).closest("tr");
+                currentRow.find("td:eq(9)").find('#btnOTP').text("Verified");
+                $(ele).closest('tr').addClass('row_selected');
+                $('#verificationBlock').addClass('divdisable');
+                $('#TreatmentType').addClass('divdisable');
+                $('#PackageDetails').show();
+                $('#VerifiedMemberId').val(currentRow.find("td:eq(1)").text());
+                $('#VerifiedMemberName').val(currentRow.find("td:eq(2)").text());
+                $('#AuthenticatioMode').val("OTP");
+                $('#OverVerifieddetails').addClass('divdisable');
+                $("#Details_View").show();
+            }
+    };
+
+    // Check RefaralBlock
+    function RefaralBlock() {
+        if ($("#Yes").is(":checked")) {
+            $('#referalBlock').show();
+            $("#aeh").prop("checked", true);
+            EnpanelRadio();
+            referKey = false;
+
+        }
+        if ($("#no").is(":checked")) {
+            $('#referalBlock').hide();
+            $("#seh").prop("checked", false);
+            referKey = true;
+            ReferalBlockReset();
+        }
+    };
+
+    function EnpanelRadio() {
+        if ($("#aeh").is(":checked")) {
+            $('#Empaneled_Block').hide();
+            ReferalBlockReset();
+        }
+        if ($("#seh").is(":checked")) {
+            $('#Empaneled_Block').show();
+            StateBind();
+            ReferalBlockReset();
+        }
+    };
+    // Bind State
+    function StateBind() {
+        $.ajax({
+            url: ServiceURL + "/api/Common/GetAllState",
+            type: "GET",
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $("#loader").show();
+            },
+            success: function (data) {
+                //console.log("state",data);
+                $('#ddlState').empty().append('<option selected="selected" value="0">--select--</option>');
+                $.each(data, function () {
+                    $('#ddlState').append($("<option></option>").val(this['stateCode']).text(this['stateName']));
+                });
+            },
+            complete: function () {
+                $("#loader").hide();
+            },
+            error: function (error) {
+                console.log(error.statusText);
+            }
+        });
+    };
+
+    // Bind District
+    function DistrictBind(ele) {
+        var stateCode = $(ele).val();
+        $.ajax({
+            url: ServiceURL + "/api/Common/GetDistrictsByStateCode",
+            type: "GET",
+            data: { "stateCode": stateCode},
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $("#loader").show();
+            },
+            success: function (data) {
+                //console.log("Dist", data);
+                $('#DdlDist').empty().append('<option selected="selected" value="0">--select--</option>');
+                $.each(data, function () {
+                    $('#DdlDist').append($("<option></option>").val(this['districtCode']).text(this['districtName']));
+                });
+            },
+            complete: function () {
+                $("#loader").hide();
+            },
+            error: function (error) {
+                console.log(error.statusText);
+            }
+        });
+    };
+
+    // Bind Hospital
+    function BindHospital(ele) {
+        var DistCode = $(ele).val();
+        var StateCode = $('#ddlState').val();
+        $.ajax({
+            url: ServiceURL + "/api/Common/GetHospitalByStateCodeAndDistrictCode",
+            type: "GET",
+            data: { "stateCode": StateCode, "districtCode": DistCode },
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $("#loader").show();
+            },
+            success: function (data) {
+                //console.log("Dist", data);
+                $('#DDlHospital').empty().append('<option selected="selected" value="0">--select--</option>');
+                $.each(data, function () {
+                    $('#DDlHospital').append($("<option></option>").val(this['hospitalCode']).text(this['hospitalname']));
+                });
+            },
+            complete: function () {
+                $("#loader").hide();
+            },
+            error: function (error) {
+                console.log(error.statusText);
+            }
+        });
+
+    };
+
+    // Reset
+    $('#DischargeReset').click(function (event) {
+         window.location.href =  window.location.href;
+        //$('#txtDischargedate').val("");
+        //$('#MotalityDoc').val("");
+        //$('#txtMortality').val("SELECT");
+        //$('#txtdesc').val("");
+    });
+
+    // Cancel
+    $('#DischargeClose').click(function (event) {
+        window.location.href = "@Url.Action("AddDischarge", "Discharge")";
+    });
+    //OverRide Request
+    function OverrideRequest() {
+        $(".packagedetails").prop('checked', true);
+        $('.packagedetails').prop('disabled', true);
+        $('#MyPopupBlock').modal('show');
+
+    }
+
+    function submitOverrideRequestForm() {
+        var MotalityDocUpload = $("#uploadfile").get(0);
+
+        var Motalityfiles = MotalityDocUpload.files;
+
+
+        var fileExtension = ['pdf', 'jpeg', 'jpg'];
+        var filename = $('#uploadfile').val();
+        var extension = filename.replace(/^.*\./, '');
+        if (filename.length != 0) {
+            var File = $("#uploadfile")[0].files[0].size;
+        }
+        //if ($('#txtNoofdays').val() == '') {
+        //    return sweetAlert('Alert', 'Please Enter No. Of Days. !!')
+
+        //}
+        // if ($('#uploadfile').val() === "") {
+        //    return sweetAlert('Alert', 'Please Upload File !!')
+
+        //}
+        if ($.inArray(extension.toLowerCase(), fileExtension) == -1 && filename.length != 0) {
+            swal({
+                text: "Please upload a valid file of type pdf, docx, jpeg, jpg !!",
+                confirmButtonColor: "#36A865",
+                type: "error",
+                confirmButtonText: "OK",
+                closeOnConfirm: false
+            }).then(function () {
+                $("#uploadfile").focus();
+            });
+            return false;
+        }
+        else if (File > 3145728) {
+            swal({
+                text: "File size cannot be greater than 5MB !!",
+                confirmButtonColor: "#36A865",
+                type: "error",
+                confirmButtonText: "OK",
+                closeOnConfirm: false
+            }).then(function () {
+                $("#uploadfile").focus();
+            });
+            return false;
+        }
+        else if ($('#txtDescription12').val() === "") {
+            swal({
+                text: "Please Enter Description !!",
+                confirmButtonColor: "#36A865",
+                type: "error",
+                confirmButtonText: "OK",
+                closeOnConfirm: false
+            }).then(function () {
+                $("#txtDescription12").focus();
+            });
+            return false;
+
+        }
+
+        else {
+
+            var OverrideRequestData = new FormData();
+            OverrideRequestData.append("MemberId", $('#lblPatientMemberId').text());
+            OverrideRequestData.append("URN", $('#lblPatientUrnNo').text());
+            OverrideRequestData.append("NoofDays", "");
+            if (Motalityfiles.length > 0) {
+                OverrideRequestData.append("UploadDoc", Motalityfiles[0]);
+            }
+            if (Motalityfiles.length > 0) {
+                OverrideRequestData.append("UploadDoc1", Motalityfiles[0].name);
+            }
+
+            OverrideRequestData.append("Description", $('#txtDescription12').val());
+            OverrideRequestData.append("GENERATEDTHROUGH", $('#chkboxblock').val());
+            OverrideRequestData.append("HospitalCode", '@Session["HospitalCode"]');
+            OverrideRequestData.append("HospitalCategoryId", @Session["HospitalCategoryId"]);
+            OverrideRequestData.append("ActionCode", "A");
+            $.ajax({
+                url: '@Url.Action("GenerateOverrideRequest", "BlockPackage")',
+                type: "POST",
+                data: OverrideRequestData,
+                processData: false,
+                contentType: false,
+                beforeSend: function () {
+                    $("#loader").show();
+                },
+                success: function (data) {
+
+                    if (data[0].output == 2 && data[0].statecode == 21) {
+                        if (data[0].exchospitaltype == 1) {
+                            $("#txtOverrideCode").val(data[0].dischargeoverridecode);
+                            $("#Details_View").show();
+                            // $("#Details_View").show();
+                            $('#MyPopupBlock').modal('hide');
+                            $("#PackageDetails").show();
+                        } else {
+                            swal({
+                            title: "Override Request generated successfully!!",
+                            text: "Click ok to redirect override view page.",
+                            icon: "success",
+                            type: "success",
+                            confirmButtonColor:"#36A865",
+                            confirmButtonText: "Ok"
+                        })
+                            .then((result) => {
+                                if (result.value) {
+                                    window.location = '@Url.Content("~/BlockPackage/OverrideView")';
+                                } else if (result.dismiss === 'cancel') {
+                                    swal(
+                                        'Cancelled',
+                                        'Your stay here :)',
+                                        'error'
+                                    )
+                                }
+                            });;
+                        }
+                    }
+                    else if (data[0].output == 2 && data[0].statecode != 21) {
+                        $("#txtOverrideCode").val(data[0].dischargeoverridecode);
+                        $("#Details_View").show();
+                        // $("#Details_View").show();
+                        $('#MyPopupBlock').modal('hide');
+                        $("#PackageDetails").show();
+                    }
+                    else if (data[0].output == 3) {
+                        swal({
+                            text: "Override request has already generated, new request not allowed. !!",
+                            confirmButtonColor: "#36A865",
+                            type: "error",
+                            confirmButtonText: "OK",
+                            closeOnConfirm: false
+                        });
+                    }
+                    else {
+                    }
+
+                },
+                complete: function () {
+                    $("#loader").hide();
+                },
+                error: function (error) {
+                    console.log(error.statusText);
+                }
+
+            });
+        };
+    };
+
+    function ReferalBlockReset() {
+            $("#ddlState")[0].selectedIndex = 0;
+            $("#DdlDist").empty();
+            $("#DdlDist")[0].selectedIndex = 0;
+            $("#DDlHospital").empty();
+            $("#DDlHospital")[0].selectedIndex = 0;
+            //$('#ddlState').val("0"),
+            //$('#DdlDist').val("0"),
+            //$('#DDlHospital').val("0"),
+            $('#txtDoctorname').val(""),
+            $('#txtDepartment').val(""),
+            $('#txtrefardatetime').val(""),
+            $('#RefaralDoc').val(""),
+            $('#txtReasonForRefferring').val("")
+    };
+
+    function windowDischargeSlipPopUp() {
+        var url = '@Url.Action("ViewDischargeSlip", "Discharge")';
+        var width = 1200;
+        var height = 700;
+        var left = (screen.width - width) / 2;
+        var top = (screen.height - height) / 2;
+        var params = 'width=' + width + ', height=' + height;
+        params += ', top=' + top + ', left=' + left;
+        params += ', directories=no';
+        params += ', location=no';
+        params += ', menubar=no';
+        params += ', resizable=no';
+        params += ', scrollbars=yes';
+        params += ', status=no';
+        params += ', toolbar=no';
+
+        newwin = window.open(url, 'windowname5', params);
+          window.location.href = "@Url.Action("ViewReferalDischarge", "Discharge")";
+        if (window.focus) { newwin.focus() }
+        return false;
+    };
+
+    function OTPTIMER() {
+        let timerOn = true;
+        function timer(remaining) {
+            var m = Math.floor(remaining / 60);
+            var s = remaining % 60;
+            m = m < 10 ? '0' + m : m;
+            s = s < 10 ? '0' + s : s;
+            document.getElementById('timer-countdown').innerHTML = m + ':' + s;
+            remaining -= 1;
+
+            if (remaining >= 0 && timerOn) {
+                setTimeout(function () {
+                    timer(remaining);
+                }, 1000);
+                return;
+            }
+
+            if (!timerOn) {
+                // Do validate stuff here
+                return;
+            }
+            // Do timeout stuff here
+            $('#OTPModal').modal('hide');
+            //alert('Timeout for otp');
+        }
+        timer(600);
+    };
+
+    $("#IntraSurgeryPic").on("change", function (e) {
+        var fileExtension = ['jpg', 'jpeg'];
+        var filename = $('#IntraSurgeryPic').val();
+        var extension = filename.replace(/^.*\./, '');
+        var fileSize = $("#IntraSurgeryPic")[0].files[0].size;
+        if ($.inArray(extension.toLowerCase(), fileExtension) == -1 && filename.length != 0) {
+            swal({
+                text: "Please upload a valid file of type jpeg, jpg !!",
+                confirmButtonColor: "#36A865",
+                type: "error",
+                confirmButtonText: "OK",
+                closeOnConfirm: false
+            }).then(function () {
+                $("#IntraSurgeryPic").focus();
+                $("#IntraSurgeryPic").val("");
+                $('#ShowIntraSurgeryPic').attr('src', userImg);
+            });
+            return false;
+        }
+        if (fileSize > 1000141) {
+            swal({
+                text: "File size cannot be greater than 1MB !!",
+                confirmButtonColor: "#36A865",
+                type: "error",
+                confirmButtonText: "OK",
+                closeOnConfirm: false
+            }).then(function () {
+                $("#IntraSurgeryPic").focus();
+                $("#IntraSurgeryPic").val("");
+                $('#ShowIntraSurgeryPic').attr('src', userImg);
+            });
+            return false;
+        }
+        else {
+            var files = e.target.files,
+                filesLength = files.length;
+            for (var i = 0; i < filesLength; i++) {
+                var f = files[i]
+                var fileReader = new FileReader();
+                fileReader.onload = (function (e) {
+                    var file = e.target;
+                    $('#ShowIntraSurgeryPic').attr('src', e.target.result);
+                    $('#RemoveIntraSurgeryPic').show();
+                });
+                fileReader.readAsDataURL(f);
+            }
+        }
+    });
+
+    $("#PostSurgeryPic").on("change", function (e) {
+        var fileExtension = ['jpg', 'jpeg'];
+        var filename = $('#PostSurgeryPic').val();
+        var extension = filename.replace(/^.*\./, '');
+        var fileSize = $("#PostSurgeryPic")[0].files[0].size;
+        if ($.inArray(extension.toLowerCase(), fileExtension) == -1 && filename.length != 0) {
+            swal({
+                text: "Please upload a valid file of type jpeg, jpg !!",
+                confirmButtonColor: "#36A865",
+                type: "error",
+                confirmButtonText: "OK",
+                closeOnConfirm: false
+            }).then(function () {
+                $("#PostSurgeryPic").focus();
+                $("#PostSurgeryPic").val("");
+                $('#ShowPostSurgeryPic').attr('src', userImg);
+            });
+            return false;
+        }
+        if (fileSize > 1000141) {
+            swal({
+                text: "File size cannot be greater than 1MB !!",
+                confirmButtonColor: "#36A865",
+                type: "error",
+                confirmButtonText: "OK",
+                closeOnConfirm: false
+            }).then(function () {
+                $("#PostSurgeryPic").focus();
+                $("#PostSurgeryPic").val("");
+                $('#ShowPostSurgeryPic').attr('src', userImg);
+            });
+            return false;
+        }
+        else {
+            var files = e.target.files,
+                filesLength = files.length;
+            for (var i = 0; i < filesLength; i++) {
+                var f = files[i]
+                var fileReader = new FileReader();
+                fileReader.onload = (function (e) {
+                    var file = e.target;
+                    $('#ShowPostSurgeryPic').attr('src', e.target.result);
+                    $('#RemovePostSurgeryPic').show();
+                });
+                fileReader.readAsDataURL(f);
+            }
+        }
+    });
+
+    $("#PreSurgeryPic").on("change", function (e) {
+        var fileExtension = ['jpg', 'jpeg'];
+        var filename = $('#PreSurgeryPic').val();
+        var extension = filename.replace(/^.*\./, '');
+        var fileSize = $("#PreSurgeryPic")[0].files[0].size;
+        if ($.inArray(extension.toLowerCase(), fileExtension) == -1 && filename.length != 0) {
+            swal({
+                text: "Please upload a valid file of type jpeg, jpg !!",
+                confirmButtonColor: "#36A865",
+                type: "error",
+                confirmButtonText: "OK",
+                closeOnConfirm: false
+            }).then(function () {
+                $("#PreSurgeryPic").focus();
+                $("#PreSurgeryPic").val("");
+                $('#ShowPreSurgeryPic').attr('src', userImg);
+            });
+            return false;
+        }
+        if (fileSize > 1000141) {
+            swal({
+                text: "File size cannot be greater than 1MB !!",
+                confirmButtonColor: "#36A865",
+                type: "error",
+                confirmButtonText: "OK",
+                closeOnConfirm: false
+            }).then(function () {
+                $("#PreSurgeryPic").focus();
+                $("#PreSurgeryPic").val("");
+                $('#ShowPreSurgeryPic').attr('src', userImg);
+            });
+            return false;
+        }
+        else {
+            var files = e.target.files,
+                filesLength = files.length;
+            for (var i = 0; i < filesLength; i++) {
+                var f = files[i]
+                var fileReader = new FileReader();
+                fileReader.onload = (function (e) {
+                    var file = e.target;
+                    $('#ShowPreSurgeryPic').attr('src', e.target.result);
+                    $('#RemovePreSurgeryPic').show();
+                });
+                fileReader.readAsDataURL(f);
+            }
+        }
+    });
+
+    $("#SpecimenRemovalPic").on("change", function (e) {
+        var fileExtension = ['jpg', 'jpeg'];
+        var filename = $('#SpecimenRemovalPic').val();
+        var extension = filename.replace(/^.*\./, '');
+        var fileSize = $("#SpecimenRemovalPic")[0].files[0].size;
+        if ($.inArray(extension.toLowerCase(), fileExtension) == -1 && filename.length != 0) {
+            swal({
+                text: "Please upload a valid file of type jpeg, jpg !!",
+                confirmButtonColor: "#36A865",
+                type: "error",
+                confirmButtonText: "OK",
+                closeOnConfirm: false
+            }).then(function () {
+                $("#SpecimenRemovalPic").focus();
+                $("#SpecimenRemovalPic").val("");
+                $('#ShowSpecimenRemovalPic').attr('src', userImg);
+            });
+            return false;
+        }
+        if (fileSize > 1000141) {
+            swal({
+                text: "File size cannot be greater than 1MB !!",
+                confirmButtonColor: "#36A865",
+                type: "error",
+                confirmButtonText: "OK",
+                closeOnConfirm: false
+            }).then(function () {
+                $("#SpecimenRemovalPic").focus();
+                $("#SpecimenRemovalPic").val("");
+                $('#ShowSpecimenRemovalPic').attr('src', userImg);
+            });
+            return false;
+        }
+        else {
+            var files = e.target.files,
+                filesLength = files.length;
+            for (var i = 0; i < filesLength; i++) {
+                var f = files[i]
+                var fileReader = new FileReader();
+                fileReader.onload = (function (e) {
+                    var file = e.target;
+                    $('#ShowSpecimenRemovalPic').attr('src', e.target.result);
+                    $('#RemoveSpecimenRemovalPic').show();
+                });
+                fileReader.readAsDataURL(f);
+            }
+        }
+    });
+
+    function PackageAddOnArry() {
+        var dataRow;
+        $("#grdBlockPackage1 .txthedqytcls").each(function () {
+            var $tr = $(this).closest('tr');
+            dataRow = $('#grdBlockPackage1').DataTable().row($tr).data();
+            //console.log("ddd", dataRow);
+            var PackageData = {
+                urn: dataRow.urn,
+                packageheaderid: dataRow.packageheaderid,
+                packagesubcategoryid: dataRow.packagesubcategoryid,
+                procedureid: dataRow.procedureid,
+                blockedamount: dataRow.amountBlocked,
+                packagedetailid: dataRow.txnpackagedetailid,
+                transactioncode: dataRow.transactioncode,
+                clamamount: dataRow.amountBlocked,
+                insufficientamount: dataRow.insufficientamount
+            };
+            PackageAddOnArryList.push(PackageData);
+        });
+        //console.log("PackageAddOnArryList", PackageAddOnArryList)
+    };
+
+    function inputLimiter(e, allow) {
+        var AllowableCharacters = '';
+        if (allow == 'NameCharactersymbol') {
+            AllowableCharacters = ' ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz./&';
+        }
+        if (allow == 'NameCharacters') {
+            AllowableCharacters = ' ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-.\'';
+        }
+        if (allow == 'NameCharactersAndNumbers') {
+            AllowableCharacters = '1234567890 ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-,/.\'';
+        }
+        if (allow == 'Description') {
+            AllowableCharacters = '1234567890 ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-,./\&(){}[]#$:';
+        }
+        if (allow == 'Numbers') {
+            AllowableCharacters = '1234567890';
+        }
+        if (allow == 'Decimal') {
+            AllowableCharacters = '1234567890.';
+        }
+        var k;
+        k = document.all ? parseInt(e.keyCode) : parseInt(e.which);
+        if (k != 13 && k != 8 && k != 0) {
+            if ((e.ctrlKey == false) && (e.altKey == false)) {
+                return (AllowableCharacters.indexOf(String.fromCharCode(k)) != -1);
+            }
+            else {
+                return true;
+            }
+        }
+        else {
+            return true;
+        }
+    };
+
+    function RemoveIntraSurgeryPic(ele) {
+        $("#IntraSurgeryPic").val("");
+        $('#ShowIntraSurgeryPic').attr('src', userImg);
+        $('#RemoveIntraSurgeryPic').hide();
+    };
+
+    function RemovePostSurgeryPic(ele) {
+        $("#PostSurgeryPic").val("");
+        $('#ShowPostSurgeryPic').attr('src', userImg);
+        $('#RemovePostSurgeryPic').hide();
+    };
+
+    function RemovePreSurgeryPic(ele) {
+        $("#PreSurgeryPic").val("");
+        $('#ShowPreSurgeryPic').attr('src', userImg);
+        $('#RemovePreSurgeryPic').hide();
+    };
+
+    function RemoveSpecimenRemovalPic(ele) {
+        $("#SpecimenRemovalPic").val("");
+        $('#ShowSpecimenRemovalPic').attr('src', userImg);
+        $('#RemoveSpecimenRemovalPic').hide();
+    };
+
+    $("#DischargeFile").on("change", function (e) {
+        var fileExtension = ['pdf', 'jpeg', 'jpg'];
+        var filename = $('#DischargeFile').val();
+        var extension = filename.replace(/^.*\./, '');
+        if ($.inArray(extension.toLowerCase(), fileExtension) == -1 && filename.length != 0) {
+            swal({
+                text: "Please upload a valid file of type pdf, jpeg, jpg !!",
+                confirmButtonColor: "#36A865",
+                type: "error",
+                confirmButtonText: "OK",
+                closeOnConfirm: false
+            }).then(function () {
+                $("#DischargeFile").focus();
+                $("#DischargeFile").val("");
+            });
+            return false;
+        };
+        var fileSize = $("#DischargeFile")[0].files[0].size;
+        if (fileSize > 5000141) {
+            swal({
+                text: "File size cannot be greater than 5MB !!",
+                confirmButtonColor: "#36A865",
+                type: "error",
+                confirmButtonText: "OK",
+                closeOnConfirm: false
+            }).then(function () {
+                $("#DischargeFile").focus();
+                $("#DischargeFile").val("");
+            });
+            return false;
+        }
+        else {
+            $("#RemoveDischargeFile").show();
+        }
+    });
+    $("#RefaralDoc").on("change", function (e) {
+        var fileExtension = ['pdf', 'jpeg', 'jpg'];
+        var filename = $('#RefaralDoc').val();
+        var extension = filename.replace(/^.*\./, '');
+        if ($.inArray(extension.toLowerCase(), fileExtension) == -1 && filename.length != 0) {
+            swal({
+                text: "Please upload a valid file of type pdf, jpeg, jpg !!",
+                confirmButtonColor: "#36A865",
+                type: "error",
+                confirmButtonText: "OK",
+                closeOnConfirm: false
+            }).then(function () {
+                $("#RefaralDoc").focus();
+                $("#RefaralDoc").val("");
+            });
+            return false;
+        };
+        var fileSize = $("#RefaralDoc")[0].files[0].size;
+        if (fileSize > 5000141) {
+            swal({
+                text: "File size cannot be greater than 5MB !!",
+                confirmButtonColor: "#36A865",
+                type: "error",
+                confirmButtonText: "OK",
+                closeOnConfirm: false
+            }).then(function () {
+                $("#SpecimenRemovalPic").focus();
+                $("#SpecimenRemovalPic").val("");
+            });
+            return false;
+        }
+        else {
+            $("#RemoveRefaralDoc").show();
+        }
+    });
+    $("#MotalityDoc").on("change", function (e) {
+        var fileExtension = ['pdf', 'jpeg', 'jpg'];
+        var filename = $('#MotalityDoc').val();
+        var extension = filename.replace(/^.*\./, '');
+        var fileSize = $("#MotalityDoc")[0].files[0].size;
+        if ($.inArray(extension.toLowerCase(), fileExtension) == -1 && filename.length != 0) {
+            swal({
+                text: "Please upload a valid file of type pdf, jpeg, jpg !!",
+                confirmButtonColor: "#36A865",
+                type: "error",
+                confirmButtonText: "OK",
+                closeOnConfirm: false
+            }).then(function () {
+                $("#MotalityDoc").focus();
+                $("#MotalityDoc").val("");
+            });
+            return false;
+        };
+        if (fileSize > 5000141) {
+            swal({
+                text: "File size cannot be greater than 5MB !!",
+                confirmButtonColor: "#36A865",
+                type: "error",
+                confirmButtonText: "OK",
+                closeOnConfirm: false
+            }).then(function () {
+                $("#SpecimenRemovalPic").focus();
+                $("#SpecimenRemovalPic").val("");
+            });
+            return false;
+        }
+        else {
+            $("#RemoveMotalityDoc").show();
+        }
+    });
+    $("#uploadfile").on("change", function (e) {
+        var fileExtension = ['pdf', 'jpeg', 'jpg'];
+        var filename = $('#uploadfile').val();
+        var extension = filename.replace(/^.*\./, '');
+        var fileSize = $("#uploadfile")[0].files[0].size;
+        if ($.inArray(extension.toLowerCase(), fileExtension) == -1 && filename.length != 0) {
+            swal({
+                text: "Please upload a valid file of type pdf, jpeg, jpg !!",
+                confirmButtonColor: "#36A865",
+                type: "error",
+                confirmButtonText: "OK",
+                closeOnConfirm: false
+            }).then(function () {
+                $("#uploadfile").focus();
+                $("#uploadfile").val("");
+            });
+            return false;
+        };
+        if (fileSize > 5000141) {
+            swal({
+                text: "File size cannot be greater than 5MB !!",
+                confirmButtonColor: "#36A865",
+                type: "error",
+                confirmButtonText: "OK",
+                closeOnConfirm: false
+            }).then(function () {
+                $("#uploadfile").focus();
+                $("#uploadfile").val("");
+            });
+            return false;
+        }
+        else {
+            $("#RemoveOverrideDoc").show();
+        }
+    });
+
+    function RemoveMotalityDoc(ele) {
+        $("#MotalityDoc").val("");
+        $('#RemoveMotalityDoc').hide();
+    };
+    function RemoveRefaralDoc(ele) {
+        $("#RefaralDoc").val("");
+        $('#RemoveRefaralDoc').hide();
+    };
+    function RemoveDischargeFile(ele) {
+        $("#DischargeFile").val("");
+        $('#RemoveDischargeFile').hide();
+    };
+    function RemoveOverrideDoc(ele) {
+        $("#uploadfile").val("");
+        $('#RemoveOverrideDoc').hide();
+    };
+
+    $('#grdBlockPackage1').on('click', '#ckbCheckAll', function () {
+         SelectedPackage = [];
+        if (this.checked) {
+            $('#SelectAll').val(1);
+            $("#Yes").attr("disabled", false);
+            $('.checkBoxClass').each(function () {
+                var $tr = $(this).closest('tr');
+                var rowData = $('#grdBlockPackage1').DataTable().row($tr).data();
+                //console.log("tr data", rowData);
+                SelectedPackage.push(rowData);
+                this.checked = true;
+                $(this).closest('tr').addClass('row_selected')
+                $(this).closest('tr').find('.txthedqytcls').attr("readonly", false);
+                $(this).closest('tr').find('.txthedqytcls').addClass('selectedclaimamt');
+                CalculateClamAmount();
+            });
+        } else {
+            $('#SelectAll').val(0);
+            if ($("#Yes").is(":checked")) {
+                $("#Yes").attr("disabled", true);
+                $('#no').prop('checked', true);
+                $('#referalBlock').hide();
+            }
+            else {
+
+            }
+            $("#txtMortality").val("SELECT");
+            $('#MotalityDoc').attr('disabled', 'disabled');
+            $("#MotalityDoc").val("");
+            $("#RemoveMotalityDoc").hide();
+            $('.checkBoxClass').each(function () {
+                SelectedPackage = [];
+                this.checked = false;
+                $(this).closest('tr').removeClass('row_selected')
+                $(this).closest('tr').find('.txthedqytcls').attr("readonly", true);
+                $(this).closest('tr').find('.txthedqytcls').removeClass('selectedclaimamt');
+                CalculateClamAmount();
+            });
+        }
+    });
+
+    $('#grdBlockPackage1').on('click', '.checkBoxClass', function () {
+        var $tr = $(this).closest('tr');
+        var rowData = $('#grdBlockPackage1').DataTable().row($tr).data();
+        if (this.checked) {
+            //console.log("tr data Check", rowData);
+            SelectedPackage.push(rowData);
+            $(this).closest('tr').addClass('row_selected')
+            $(this).closest('tr').find('.txthedqytcls').attr("readonly", false);
+            $(this).closest('tr').find('.txthedqytcls').addClass('selectedclaimamt');
+            CalculateClamAmount();
+
+        }
+        else {
+            //console.log("tr data uncheck", rowData);
+            SelectedPackage.push(rowData);
+            var data1 = SelectedPackage;
+            for (var i = 0; i < data1.length; i++) {
+                if (data1[i].txnpackagedetailid == rowData.txnpackagedetailid) {
+                    data1 = jQuery.grep(data1, function (value) {
+                        return value != data1[i];
+                    });
+                    SelectedPackage = data1;
+                }
+            }
+            $(this).closest('tr').removeClass('row_selected');
+            $(this).closest('tr').find('.txthedqytcls').attr("readonly", true);
+            $(this).closest('tr').find('.txthedqytcls').removeClass('selectedclaimamt');
+            CalculateClamAmount();
+        }
+
+        if ($('.checkBoxClass:checked').length == $('.checkBoxClass').length) {
+            $('#SelectAll').val(1);
+            $("#Yes").attr("disabled", false);
+            $('#ckbCheckAll').prop('checked', true);
+        } else {
+            if ($("#Yes").is(":checked")) {
+                $("#Yes").attr("disabled", true);
+                $('#no').prop('checked', true);
+                $('#referalBlock').hide();
+            }
+            else {
+
+            }
+            $('#SelectAll').val(0);
+            $('#ckbCheckAll').prop('checked', false);
+            $("#txtMortality").val("SELECT");
+            $('#MotalityDoc').attr('disabled', 'disabled');
+            $("#MotalityDoc").val("");
+            $("#RemoveMotalityDoc").hide();
+        }
+    });
+
+    $('#grdBlockPackage1').on('keyup change', '.txthedqytcls', function () {
+        var $tr = $(this).closest('tr');
+        var rowData = $('#grdBlockPackage1').DataTable().row($tr).data();
+        var impqty = $(this).closest("tr").find("input[name=txtimpqty]").val();
+        var currentAmmountBlock = parseInt(rowData.amountBlocked);
+        if (impqty == 0) {
+            swal({
+                text: "Claim amount cannot be allow 0 amount",
+                confirmButtonColor: "#36A865",
+                type: "error",
+                confirmButtonText: "OK",
+                closeOnConfirm: false
+            }).then(function () {
+                $tr.find("input[name=txtimpqty]").focus();
+                $tr.find("input[name=txtimpqty]").val(currentAmmountBlock);
+                CalculateClamAmount();
+            });
+            return false;
+        }
+        else if (currentAmmountBlock >= impqty) {
+            CalculateClamAmount();
+        }
+        else {
+            swal({
+                text: "Claim amount cannot be greater than block amount (" + currentAmmountBlock + ")",
+                confirmButtonColor: "#36A865",
+                type: "error",
+                confirmButtonText: "OK",
+                closeOnConfirm: false
+            }).then(function () {
+                $tr.find("input[name=txtimpqty]").focus();
+                $tr.find("input[name=txtimpqty]").val(currentAmmountBlock);
+                CalculateClamAmount();
+            });
+            return false;
+        }
+
+    });
+
+    function CalculateClamAmount() {
+        var dataRow;
+        PackageAddOnArryList = [];
+        var calculated_total_sum = 0;
+        var get_textbox_value = 0;
+        $("#grdBlockPackage1 .selectedclaimamt").each(function () {
+            get_textbox_value = $(this).val();
+            calculated_total_sum += parseFloat(get_textbox_value);
+            var $tr = $(this).closest('tr');
+            dataRow = $('#grdBlockPackage1').DataTable().row($tr).data();
+            var PackageData = {
+                urn: dataRow.urn,
+                packageheaderid: dataRow.packageheaderid,
+                packagesubcategoryid: dataRow.packagesubcategoryid,
+                procedureid: dataRow.procedureid,
+                blockedamount: dataRow.amountBlocked,
+                packagedetailid: dataRow.txnpackagedetailid,
+                transactioncode: dataRow.transactioncode,
+                clamamount: $(this).val(),
+                insufficientamount: dataRow.insufficientamount
+            };
+            PackageAddOnArryList.push(PackageData);
+        });
+        //console.log("CalculateClamAmountPackageAddOnArryList11", PackageAddOnArryList)
+        $("#txtPresentPackageCost").val(calculated_total_sum);
+    };
+
+    $("#txtDischargedate").on("change", function (e) {
+        var dischargeDate = new Date($('#txtDischargedate').val());
+        var admissionDate = new Date($('#AdmissionDate').val());
+        if (new Date(admissionDate) > new Date(dischargeDate)) {
+            swal({
+                text: "Discharge date can't be less than actual date of admission.",
+                confirmButtonColor: "#36A865",
+                type: "error",
+                confirmButtonText: "OK",
+                closeOnConfirm: false
+            }).then(function () {
+                $("#txtDischargedate").focus();
+                $("#txtDischargedate").val("");
+            });
+            return false;
+        };
+    });
+
+</script>

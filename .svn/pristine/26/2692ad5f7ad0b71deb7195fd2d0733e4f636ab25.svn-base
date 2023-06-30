@@ -1,0 +1,181 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
+using System.Web.Http;
+using HPSBYS.Data.Model;
+using HPSBYS.Data.Services;
+using NLog;
+
+namespace HPSBYS.WebAPI.Controllers
+{
+    public class CommonController : ApiController
+    {
+        [HttpGet]
+        public async Task<IList<Scheme>> GetSchemeList(int Schemecode)
+        {
+            using (var SchemeInformation = new CommonDataServices())
+            {
+                return await Task.FromResult(SchemeInformation.GetScheme(Schemecode));
+            }
+        }
+
+        [HttpGet]
+        public async Task<IList<PACKAGECATEGORY>> GetPackageCategory(string Action)
+        {
+            using (var CATEGORYdata = new CommonDataServices())
+            {
+                return await Task.FromResult(CATEGORYdata.GetPACKAGECATEGORY(Action));
+            }
+        }
+        [HttpGet]
+        public async Task<IList<PACKAGECATEGORY>> GetPackageCategory_PackageChange(string Action)
+        {
+            using (var CATEGORYdata = new CommonDataServices())
+            {
+                return await Task.FromResult(CATEGORYdata.GetPACKAGECATEGORY_PackageChange(Action));
+            }
+        }
+        [HttpGet]
+        public async Task<IList<SUBPACKAGECATEGORY>> SubGetPackage(string Action, string PackageCategoryCode)
+        {
+            using (var obj = new CommonDataServices())
+            {
+                return await Task.FromResult(obj.GetSubPackageDetail(Action, PackageCategoryCode));
+            }
+        }
+        [HttpGet]
+        public async Task<IList<SUBPACKAGECATEGORY>> SubGetPackage_PackageChange(string Action, string PackageCategoryCode)
+        {
+            using (var obj = new CommonDataServices())
+            {
+                return await Task.FromResult(obj.GetSubPackageDetail_PackageChange(Action, PackageCategoryCode));
+            }
+        }
+        [HttpGet]
+        public async Task<IList<PackageInformation>> GetPackage_PackageChange(string Action, string PackageCategoryCode, string PackageSubCategoryCode)
+        {
+            using (var obj = new CommonDataServices())
+            {
+                return await Task.FromResult(obj.GetPackageDetail_PackageChange(Action, PackageCategoryCode, PackageSubCategoryCode));
+            }
+        }
+        [HttpGet]
+        public async Task<IList<PackageInformation>> GetPackage(string Action, string PackageCategoryCode, string PackageSubCategoryCode)
+        {
+            using (var obj = new CommonDataServices())
+            {
+                return await Task.FromResult(obj.GetPackageDetail(Action, PackageCategoryCode, PackageSubCategoryCode));
+            }
+        }
+        [HttpGet]
+        public async Task<IList<WardDetail>> GetWardDetails(string Action, string PreAuthStatus)
+        {
+            using (var obj = new CommonDataServices())
+            {
+                return await Task.FromResult(obj.GetWardDetails(Action, PreAuthStatus));
+            }
+        }
+        //For  Policy Details
+
+        [HttpGet]
+        public async Task<IList<PolicyDetails>> GetPolicy(string URN)
+        {
+            using (var obj = new CommonDataServices())
+            {
+                return await Task.FromResult(obj.GetInsuranceDetail(URN));
+            }
+        }
+
+        //For UnblockingReason
+
+        [HttpGet]
+        public async Task<IList<UnblockingReason>> GetUnblockingReason( string Action)
+        {
+            using (var obj = new CommonDataServices())
+            {
+                return await Task.FromResult(obj.GetUnblockingReason(Action));
+            }
+        }
+
+        //For Login
+
+        [HttpPost]
+        public async Task<Login> GetLoginInformation(Login login)
+        {
+            using (var obj = new CommonDataServices())
+            {
+                return await Task.FromResult(obj.GetLogin(login.USERNAME, login.Password));
+            }
+        }
+
+        [HttpGet]
+        public async Task<BalanceInfo> GetAvailBalance(string Action,string URN, string FamilyId)
+        {
+            using (CommonDataServices obj = new CommonDataServices())
+            {
+                return await Task.FromResult(obj.getBalanceInfo(Action,URN,FamilyId));
+            }
+        }
+        [HttpPost]
+        public async Task<string> changePassword(Login login)
+        {
+            using (CommonDataServices obj = new CommonDataServices())
+            {
+                return await Task.FromResult(obj.changePassword(login));
+            }
+        }
+
+        [HttpGet]
+        public async Task<IList<Notice>> getNotices(string Action)
+        {
+            using (CommonDataServices obj = new CommonDataServices())
+            {
+                return await Task.FromResult(obj.getNotices(Action));
+            }
+        }
+
+        [HttpGet]
+        public async Task<IList<Dist>> GetAllDist(string Action)
+        {
+            using (var obj = new CommonDataServices())
+            {
+                return await Task.FromResult(obj.getAllDist(Action));
+            }
+        }
+        [HttpGet]
+        public async Task<IList<Block>> GetAllBlockByDistCode(string Action,int DistCode)
+        {
+            using (var obj = new CommonDataServices())
+            {
+                return await Task.FromResult(obj.getAllBlockByDistCode(Action,DistCode));
+            }
+        }
+        [HttpGet]
+        public async Task<IList<PHC>> GetAllPHCByDistCodeAndBlockCode(string Action, int DistCode,int BlockCode)
+        {
+            using (var obj = new CommonDataServices())
+            {
+                return await Task.FromResult(obj.getAllPHCByDistCodeAndBlockCode(Action, DistCode,BlockCode));
+            }
+        }
+        [HttpGet]
+        public async Task<IList<SubCentre>> GetAllSubCentreByDistBlockAndPHCCode(string Action, int DistCode, int BlockCode,int PHCCode)
+        {
+            using (var obj = new CommonDataServices())
+            {
+                return await Task.FromResult(obj.getAllSubCentreByDistBlockAndPHCCode(Action, DistCode, BlockCode,PHCCode));
+            }
+        }
+        [HttpGet]
+        public async Task<IList<DownwardReferalInfo>> getDownwardReferalByBlockingInvoiceNo(string Action, string InvoiceNo)
+        {
+            using (var obj = new CommonDataServices())
+            {
+                return await Task.FromResult(obj.getDownwardReferalByBlockingInvoiceNo(Action,InvoiceNo));
+            }
+        }
+    }
+}

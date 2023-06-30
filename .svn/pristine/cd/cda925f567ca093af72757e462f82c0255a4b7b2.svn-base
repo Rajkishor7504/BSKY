@@ -1,0 +1,93 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace HPSBYS.Data.Model
+{
+   public class PatientInfo
+    {
+        public string PreAuthStatus { get; set; }
+        public string VchFile { get; set; }
+        public string ACTIONCODE { get; set; }
+        public string SchemeCode { get; set; }
+        public string MemberStatecode { get; set; }
+        public string DistrictCode { get; set; }
+        public string MemberDistrictName { get; set; }
+        public string BlockCode { get; set; }
+        public string PanchayatCode { get; set; }
+        public string VillageCode { get; set; }
+        public string URN { get; set; }
+        public string FamilyID { get; set; }
+        public string PolicyStartDate { get; set; }
+        public string PolicyEndDate { get; set; }
+        public string CardType { get; set; }
+        public string MemberID { get; set; }
+        public string PatientName { get; set; }
+        public string PatientContactNumber { get; set; }
+        public string Gender { get; set; }
+        public string PatientCardGender { get; set; }
+        public string Age { get; set; }
+        public string PatientCardAge { get; set; }
+        public string HeadMemberID { get; set; }
+        public string HeadMemberName { get; set; }
+        public string VerifiedMemberID { get; set; }
+        public string VerifiedMemberName { get; set; }
+        public string InsuranceCompanyCode { get; set; }
+        public string InsurancePolicyNumber { get; set; }
+        public string HospitalCode { get; set; }
+        public string HospitalName { get; set; }
+        public string HospitalState { get; set; }
+        public string HospitalDistrict { get; set; }
+        public string HospitalAuthorityCode { get; set; }
+        public string RegistrationNo { get; set; }
+        public string RegistrationUserDate { get; set; }
+        public string TransactionDate { get; set; }
+        public string BlockingInvoiceNo { get; set; }
+        public string BlockingUserDate { get; set; }
+        public string DATEOFADMISSION { get; set; }
+        public string UnblockingInvoiceNo { get; set; }
+        public string UnblockingDesc { get; set; }
+        public string UnblockingSystemDate { get; set; }
+        public string DischargeInvoiceNo { get; set; }
+        public string DischargeDesc { get; set; }
+        public string DischargeUserDate { get; set; }
+        public string DATEOFDISCHARGE { get; set; }
+        public string Mortality { get; set; }
+        public string MortalitySummary { get; set; }
+        public string ProcedureCode { get; set; }
+        public string ProcedureName { get; set; }
+        public string PackageCode { get; set; }
+        public string PackageName { get; set; }
+        public int WardId { get; set; }
+        public string PackageCost { get; set; }
+        public string NoofDays { get; set; }
+        public string AmoutBlocked { get; set; }
+        public string NoofDaysActual { get; set; }
+        public string TotalAmountClaimed { get; set; }
+        public string AvailableBalance { get; set; }
+        public string TransactionCode { get; set; }
+        public string TotalAmtBlockedOnCard { get; set; }
+        public string InsufficientBalanceAmount { get; set; }
+        public string OriginalPackageCost { get; set; }
+        public string intClaimStatus { get; set; }
+        public string claimid { get; set; }
+        public string statusflag { get; set; }
+        public string patientSlip { get; set; }
+        public string TransactionID { get; set; }
+        public string IsMedSergical { get; set; }
+        public string PackageMode { get; set; }
+        public string AuthenticationMode { get; set; }
+        public string VerifiedDocumentType { get; set; }
+        public string VerifiedDocumentName { get; set; }
+        public string PatientPhoto { get; set; }
+        public string CappedAmount { get; set; }
+        public string TreatmentCompletionCer { get; set; }
+
+        public string Category { get; set; }
+
+        public string CategoryCode { get; set; }
+
+    }
+}

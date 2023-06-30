@@ -1,0 +1,136 @@
+﻿
+@{
+    ViewBag.Title = "ViewNotice";
+    Layout = "~/Views/Shared/_CommonLayout.cshtml";
+}
+<style type="text/css">
+    .jsgrid-grid-header,
+    .jsgrid-grid-body {
+        overflow: auto;
+    }
+</style>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#path').html('Notice');
+        $('#divRowCount').hide();
+        $('#ddlRows').change(function () {
+            if ($("option:selected", $("#ddlRows")).val() == '1') {
+                $("#jsGrid").jsGrid({ pageSize: 10 });
+            }
+            else if ($("option:selected", $("#ddlRows")).val() == '2') {
+                $("#jsGrid").jsGrid({ pageSize: 20 });
+            }
+            else if ($("option:selected", $("#ddlRows")).val() == '3') {
+                $("#jsGrid").jsGrid({ pageSize: 50 });
+            }
+            else if ($("option:selected", $("#ddlRows")).val() == '4') {
+                $("#jsGrid").jsGrid({ pageSize: 100 });
+            }
+            else if ($("option:selected", $("#ddlRows")).val() == '5') {
+                $("#jsGrid").jsGrid({ pageSize: 200 });
+            }
+            else if ($("option:selected", $("#ddlRows")).val() == '6') {
+                $("#jsGrid").jsGrid({ pageSize: 500 });
+            }
+        });
+        $('#jsGrid').jsGrid({
+            width: "100%",
+            sorting: true,
+            paging: true,
+            autoload: true,
+            pageSize: 10,
+            pagerFormat: "Pages: {first} {prev} {pages} {next} {last} &nbsp;&nbsp; {pageIndex} of {pageCount} &nbsp;&nbsp; Total rows: {itemCount}",
+            pageButtonCount: 10,
+            rowClick: function (args) {
+                //console.log(args)
+                var $row = this.rowByItem(args.item),
+                    selectedRow = $("#jsGrid").find('table tr.highlight');
+                if (selectedRow.length) {
+                    selectedRow.toggleClass('highlight');
+                };
+                $row.toggleClass("highlight");
+            },
+            controller: {
+                loadData: function (filter) {
+                    var d = $.Deferred();
+                    var NotParams = {                     
+                        Action: 'A'                       
+                    };
+                    return $.ajax({
+                        url: ServiceURL + "/api/Common/getNotices",
+                        type: "GET",
+                        data: NotParams,
+                        dataType: "json",
+                        contentType: "application/json; charset=utf-8",
+                        error: function (error) {
+                            console.log(error.statusText);
+                        },
+                    }).done(function (result) {
+                        // console.log(result);
+                        if (result.length > 0) {
+                            $('#divRowCount').show();
+                              d.resolve($.map(result, function (item, itemIndex) {
+                                  return $.extend(item, { "Index": itemIndex + 1 });
+                              }
+                            ));
+                        }
+                        else {
+                            $('#divRowCount').hide();
+                        }
+                    });
+                    return d.promise();
+                }
+            },
+            fields: [
+                { name: "Index", width: 30, type: "number", title: "#Sl", align: "center", filtering: false },
+                { name: "noticeInfoID", title: "NoticeInfoID", type: "number", align: "center", visible: false },
+                { name: "startDate", title: "Start Date", type: "number", align: "center" },
+                { name: "endDate", title: "End Date", type: "text", align: "center" },
+                { name: "notices", title: "Notice", type: "text", align: "center" },
+                { name: "status", title: "Status", type: "text", align: "center" },
+                {
+                    name: "noticeDocument", title: "Notice Document", align: "center",
+                    itemTemplate: function (value) {
+                        var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+                        return $("<a>").attr("href", '/UploadDocument/' + new Date().getFullYear() + '/' + months[new Date().getMonth()] +'/Notices/' + value).text(value);
+                    }, filtering: true
+                }
+            ]
+        });
+    });
+</script>
+<div class="container-fluid">
+    <ul class="nav nav-tabs custom-tab ml-4">
+        <li class="nav-item">
+            <a class="nav-link" href="@Url.Action("AddNotice", "Dashboard")">Add Notice</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link active" href="@Url.Action("ViewNotice", "Dashboard")">View Notice</a>
+        </li>
+    </ul>
+</div>
+<div class="row">
+    <div class="col-12 pb-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="row" id="divRowCount">
+                    <label for="Rows">&nbsp;&nbsp;&nbsp;Row count</label>
+                    <div class="col-sm-1">
+                        <select id="ddlRows" autofocus>
+                            <option value="1">10</option>
+                            <option value="2">20</option>
+                            <option value="3">50</option>
+                            <option value="4">100</option>
+                            <option value="5">200</option>
+                            <option value="6">500</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-10"></div>
+                </div>
+                <div class="table table-striped table-bordered" id="jsGrid">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

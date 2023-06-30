@@ -1,0 +1,188 @@
+﻿
+@{
+    ViewBag.Title = "PackageChangeIndex";
+    Layout = "~/Views/Shared/_CommonLayout.cshtml";
+}
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $('#divStoS').hide();
+        $('#divStoM').hide();
+        $('#divMtoS').hide();
+        $('#divMtoM').hide();
+        //$('#divAddOn').hide();
+        $('#path').html('Package Change');
+        if (localStorage.getItem('BlockPackageInfo') != null) {
+            var PackageInfo = JSON.parse(localStorage.getItem('BlockPackageInfo'));
+            var BlockPackageParams = {
+                HospitalCode: sessionHospitalCode,
+                Action: 'C',
+                URN: PackageInfo[0].urn,
+                BlockingINVOICENO: PackageInfo[0].invoiceNo,
+                TransactionID: PackageInfo[0].TransactionID
+            };
+            $.ajax({
+                url: ServiceURL + "/api/Registration/GetRegistrationInformationByInvoiceNo",
+                type: "GET",
+                data: BlockPackageParams,
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    if (data.length > 0) {
+                        $('#urnNum').html(data[0].urn);
+                        $('#benNm').html(data[0].memberName);
+                        $('#invNum').html(data[0].invoiceNo);
+                        $('#hfTranID').val(data[0].transactionID);
+                        if (data[0].isMedSergical == 'M') {
+                            $('#pkgType').html('Medical');
+                            $('#divMtoS').show();
+                            $('#divMtoM').show();
+                            if (data[0].procedureCode == 'CM') {
+                                $('#hfCriStatus').val('CM')
+                            }
+                            else {
+                                $('#hfCriStatus').val('NA')
+                            }
+                        }
+                        else if (data[0].isMedSergical == 'S') {
+                            $('#pkgType').html('Surgical');
+                            $('#divStoS').show();
+                            $('#divStoM').show();
+                        }
+                        else {
+                            $('#pkgType').html(data[0].isMedSergical);
+                            $('#divStoS').hide();
+                            $('#divStoM').hide();
+                            $('#divStoS').hide();
+                            $('#divStoM').hide();
+                            $('#divAddOn').hide();
+                            
+                        }
+
+                        var BlockPackageParams = {
+                                HospitalCode: sessionHospitalCode,
+                                Action: 'E',
+                                URN: PackageInfo[0].urn,
+                                BlockingINVOICENO: PackageInfo[0].invoiceNo,
+                                TransactionID: PackageInfo[0].TransactionID
+                        };
+                        $.ajax({
+                            url: ServiceURL + "/api/Registration/GetRegistrationInformationByInvoiceNo",
+                            type: "GET",
+                            data: BlockPackageParams,
+                            dataType: "json",
+                            contentType: "application/json; charset=utf-8",
+                            success: function (data) {
+                                if (data.length > 0) {
+                                   // console.log(data)
+                                    $('#hfWardCount').val(data[0].wordChangeCount);
+                                }
+                            },
+                            error: function (error) {
+                                console.log(error.responseText);
+                            }
+                        });
+                    }
+                },
+                error: function (error) {
+                    console.log(error.responseText);
+                }
+            });
+            localStorage.setItem('BlockPackageInfo', JSON.stringify(PackageInfo));
+        }
+        $('#aMtoS').click(function () {
+            if (parseInt($('#hfWardCount').val())>1)
+            {
+                alert('Cannot change to Surgical Package due to multiple ward change!');
+            }
+            else if ($('#hfCriStatus').val() == 'CM')
+            {
+                alert('Cannot change to Surgical Package due to Critical Care Package change!');
+            }
+            else {
+                window.location = '@Url.Action("AddPackageMedicalToSurgical", "BlockPackage")';
+            }
+        });
+        $('#aMtoM').click(function () {
+            if (parseInt($('#hfWardCount').val())>1)
+            {
+                alert('Cannot change to Medical Package due to multiple ward change!');
+            }
+             else if ($('#hfCriStatus').val() == 'CM')
+            {
+                alert('Cannot change to Surgical Package due to Critical Care Package change!');
+            }
+            else {
+                window.location = '@Url.Action("AddPackageMedicalToMedical", "BlockPackage")';
+            }
+        });
+        $('#aAddOn').click(function () {
+             window.location = "../BlockPackage/AddOnPackage?Id="+$('#hfTranID').val();
+        });
+       
+    });
+</script>
+<div class="container">
+    <div class="row dashboard-menu mt-5"></div>
+    <div class="row dashboard-menu mt-5">
+       
+        <div class="col">
+            <p class="text-info">HIMCARE Number :</p>
+            <input type="hidden"  id="hfWardCount"/>
+            <h3 id="urnNum"></h3>
+        </div>
+        <div class="col">
+            <p class="text-info">Invoice Number :</p>
+            <h3 id="invNum"></h3>
+        </div>
+    </div>
+    <div class="row dashboard-menu mt-5">
+       
+        <div class="col">
+            <p class="text-info">Patient Name :</p>
+            <h3 id="benNm"></h3>
+        </div>
+        <div class="col">
+            <p class="text-info">Current Package Type :</p>
+            <h3 id="pkgType"></h3>
+            <input type="hidden" id="hfCriStatus"/>
+            <input type="hidden" id="hfTranID"/>
+        </div>
+    </div>
+    <div class="row dashboard-menu mt-5"></div>
+    <div class="row dashboard-menu mt-5">
+        <div class="col" id="divStoS">
+            <a href="@Url.Action("AddBlockPackage", "BlockPackage")" class="col2">
+                <img src="~/imgs/SurgicalToSergical.png" alt="">
+                <p>Surgical To Surgical</p>
+            </a>
+        </div>
+        <div class="col" id="divStoM">
+            <a href="@Url.Action("PackageChange", "BlockPackage")" class="col2">
+                <img src="~/imgs/SurgicalToMedical.png" alt="">
+                <p>Surgical To Medical</p>
+            </a>
+        </div>
+        <div class="col" id="divMtoS">
+            <a id="aMtoS" href="#" class="col2">
+                <img src="~/imgs/MedicalToSurgical.png" alt="">
+                <p>Medical To Surgical</p>
+            </a>
+        </div>
+        <div class="col" id="divMtoM">
+            <a id="aMtoM" href="#" class="col3">
+                <img src="~/imgs/MedicalToMedical.png" alt="">
+                <p>Medical To Medical</p>
+            </a>
+        </div>
+        <div class="col" id="divAddOn">
+            <a id="aAddOn" href="#" class="col3">
+                <img src="~/imgs/AddOnPackage.png" alt="">
+                <p>Add On Package</p>
+            </a>
+        </div>
+
+
+    </div>
+</div>
+

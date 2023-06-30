@@ -1,0 +1,277 @@
+﻿
+@{
+    ViewBag.Title = "ViewPatientStatus";
+    Layout = "~/Views/Shared/_CommonLayout.cshtml";
+}
+<style type="text/css">
+    tr.highlight td.jsgrid-cell {
+        background-color: lightgoldenrodyellow;
+    }
+    .jsgrid-grid-header,
+    .jsgrid-grid-body {
+        overflow: auto;
+    }
+</style>
+<script>
+    $(document).ready(function () {
+        $('#path').html('Patient Status');
+        $('#divRowCount').hide();
+        $('#DivNote').hide();
+       // fillgrid();
+        $('#ddlRows').change(function () {
+            if ($("option:selected", $("#ddlRows")).val() == '1') {
+                $("#jsGrid").jsGrid({ pageSize: 10 });
+            }
+            else if ($("option:selected", $("#ddlRows")).val() == '2') {
+                $("#jsGrid").jsGrid({ pageSize: 20 });
+            }
+            else if ($("option:selected", $("#ddlRows")).val() == '3') {
+                $("#jsGrid").jsGrid({ pageSize: 50 });
+            }
+            else if ($("option:selected", $("#ddlRows")).val() == '4') {
+                $("#jsGrid").jsGrid({ pageSize: 100 });
+            }
+            else if ($("option:selected", $("#ddlRows")).val() == '5') {
+                $("#jsGrid").jsGrid({ pageSize: 200 });
+            }
+            else if ($("option:selected", $("#ddlRows")).val() == '6') {
+                $("#jsGrid").jsGrid({ pageSize: 500 });
+            }           
+        });
+        $('#btnSearch').click(function () {
+            if (validate()) {
+                fillgrid();
+            }
+        });
+    });
+    function fillgrid() {
+           $('#jsGrid').jsGrid({
+            width: "100%",
+            sorting: true,
+            paging: true,
+            autoload: true,
+            pageSize: 10,
+            pagerFormat: "Pages: {first} {prev} {pages} {next} {last} &nbsp;&nbsp; {pageIndex} of {pageCount} &nbsp;&nbsp; Total rows: {itemCount}",
+            pageButtonCount: 10,
+            rowClick: function (args) {
+                //console.log(args)
+                var $row = this.rowByItem(args.item),
+                    selectedRow = $("#jsGrid").find('table tr.highlight');
+                if (selectedRow.length) {
+                    selectedRow.toggleClass('highlight');
+                };
+                $row.toggleClass("highlight");
+            },
+            controller: {
+                loadData: function (filter) {
+                    var d = $.Deferred();
+                    var RegParams = {                      
+                        Action: 'A',
+                        URN: $('#urnNo').val()
+                    };
+                    return $.ajax({
+                        url: ServiceURL + "/api/Registration/GetPatientStatus",
+                        type: "GET",
+                        data: RegParams,
+                        dataType: "json",
+                        contentType: "application/json; charset=utf-8",
+                        error: function (error) {
+                            console.log(error.statusText);
+                        },
+                    }).done(function (result) {
+                        // console.log(result);
+                        if (result.length > 0) {
+                            $('#divRowCount').show();
+                            $('#DivNote').show();
+                              d.resolve($.map(result, function (item, itemIndex) {
+                                  return $.extend(item, { "Index": itemIndex + 1 });
+                              }
+                            ));
+                        }
+                        else {
+                            $('#divRowCount').hide();
+                        }
+                    });
+                    return d.promise();
+                }
+            },
+            fields: [
+                { name: "Index", width: 30, type: "number", title: "#Sl", align: "center"},
+                { name: "urn", type: "text", title: "URN", align: "center" },
+                { name: "patientName", type: "text", title: "Patient Name", align: "center" },
+                { name: "hospitalCode", type: "text", title: "Hospital Code", align: "center" }, 
+                { name: "hospitalName", type: "text", title: "Hospital Name", align: "center" },  
+                { name: "registrationUserDate", type: "text", title: "Admission Date", align: "center" }  
+            ]
+           });
+    }
+    function validate() {
+        if ($('#urnNo').val() == '') {
+            alert('Please Enter URN !!');
+            $('#urnNo').focus();
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+    function inputLimiter(e, allow) {
+        var AllowableCharacters = '';
+        if (allow == 'NameCharactersymbol') {
+            AllowableCharacters = ' ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz./&';
+        }
+        if (allow == 'NameCharacters') {
+            AllowableCharacters = ' ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-.\'';
+        }
+        if (allow == 'NameCharactersAndNumbers') {
+            AllowableCharacters = '1234567890 ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-,/.\'';
+        }
+        if (allow == 'Description') {
+            AllowableCharacters = '1234567890 ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-,./\&(){}[]#$:';
+        }
+        if (allow == 'Numbers') {
+            AllowableCharacters = '1234567890';
+        }
+        if (allow == 'Decimal') {
+            AllowableCharacters = '1234567890.';
+        }
+        var k;
+        k = document.all ? parseInt(e.keyCode) : parseInt(e.which);
+        if (k != 13 && k != 8 && k != 0) {
+            if ((e.ctrlKey == false) && (e.altKey == false)) {
+                return (AllowableCharacters.indexOf(String.fromCharCode(k)) != -1);
+            }
+            else {
+                return true;
+            }
+        }
+        else {
+            return true;
+        }
+    }
+</script>
+<div class="container">
+<div class="row">
+    <div class="col-12 pb-3">
+        <div class="card">
+            <div class="card-body">
+               <div class="form-box-bg mb-4">
+                  <ul class="nav nav-tabs custom-tab mb-4">
+                            <li class="nav-item">
+                                <a class="nav-link" href="@Url.Action("ViewBlockPackage","BlockPackage")">Add</a>
+                            </li>
+
+                             <li class="nav-item">
+                                <a class="nav-link active" href="@Url.Action("ViewBlockPackage","BlockPackage")">View</a>
+                            </li>
+
+
+
+                            <!-- <li class="nav-item">
+                                <a class="nav-link active" href="@Url.Action("BlockPreApproval","BlockPackage")">  Pre-Approval Request </a>
+                            </li>
+                            <li class="nav-item"> <a class="nav-link" href="@Url.Action("BlockOverrideRequest","BlockPackage")"> Override Request </a> </li>
+                            <li class="nav-item"> <a class="nav-link" href="@Url.Action("BlockOverrideView","BlockPackage")"> Override View </a> </li> -->
+                        </ul>
+                        
+                <div class="row">
+                    <div class="col">
+                        <form>
+                          <div class="pkg_grey">
+                            <div class="form-row">
+                                <div class="col-lg-12 col-md-12 col-sm-8 col-xs-12 form-row form-designsc">
+                                <label for="packageHeader" class="col-form-label">URN No<b><span style="color:red">*</span></b></label>
+                               <div class="col-lg-3 col-md-4 col-sm-4 col-xs-12  px-0">
+                                    <input type="text" class="form-control" autofocus id="urnNo" placeholder="Enter here" maxlength="17" onkeypress="return inputLimiter(event,'Numbers')" />
+                                </div>                             
+                                 <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 px-0">
+                                    <input class="btn btn-outline-success my-2 my-sm-0" type="button" value="Search" id="btnSearch">
+                                </div>
+                                
+                            </div>
+                            </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+               <div class="table-responsive mt-2">
+                            <table id="example2" class="table table-striped" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">SL No</th>
+                                        <th scope="col">URN No</th>
+                                        <th scope="col">Name</th>
+                                        <th scope="col"> Invoice No</th>
+                                        <th scope="col"> Registration Date </th>
+                                        <th scope="col">Contact Number</th>
+                                        <th scope="col">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>02020100218039283</td>
+                                        <td> Shyam jena</td>
+                                        <td>INV093234545</td>
+                                        <td>05-July-21</td>
+                                        <td>9858785875</td>
+                                    
+                                        <td>
+                                            <button type="button" class="btn btn-outline-danger focusedBtn btn-sm my-2 my-sm-0"> Delete <i class="fa fa-trash"></i> </button>
+
+
+                                        </td>
+
+                                    </tr>
+
+                                    <tr>
+                                        <td>2</td>
+                                        <td>02020100218039283</td>
+                                        <td> Pramod Barik</td>
+                                        <td>INV093234545</td>
+                                        <td> 04-Jun-23</td>
+                                        <td>9858785875</td>
+                                    
+                                        <td> <button type="button" class="btn btn-outline-danger focusedBtn btn-sm my-2 my-sm-0"> Delete <i class="fa fa-trash"></i> </button></td>
+
+                                    </tr>
+
+                                    <tr>
+                                        <td>3</td>
+                                        <td>02020100218039283</td>
+                                        <td>Deepak Nanda</td>
+                                        <td>INV093234545</td>
+                                        <td>10-Mar-22</td>
+                                        <td>9858785875</td>
+                                    
+                                        <td> <button type="button" class="btn btn-outline-danger focusedBtn btn-sm my-2 my-sm-0"> Delete <i class="fa fa-trash"></i> </button></td>
+
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('#example2').DataTable({
+            responsive: true
+        });
+
+    });
+</script>
+
+<script>
+    // breadcrumb active & menu active
+    $(document).ready(function () {
+        loadNavigation('', 'MtReports', 'pl');
+        loadNavigation('ViewPatientStatus', 'MtReports', 'pl', 'Report', 'View Report', '');
+    });
+</script>
+

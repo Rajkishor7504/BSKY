@@ -1,0 +1,483 @@
+﻿@{
+    ViewBag.Title = "OverrideView";
+    Layout = "~/Views/Shared/_CommonLayout.cshtml";
+}
+
+<!-- Dashboard Body content part starts -->
+<div class="container">
+    <div class="row">
+        <div class="col-12 pb-3">
+            <div class="card">
+                <div class="card-body">
+                    <div class="clearfix"></div>
+                    <!-- patient info -->
+                    <div class="form-box-bg mb-4">
+                        <ul class="nav nav-tabs custom-tab mb-4">
+                            <li class="nav-item">
+                                <a class="nav-link" href="@Url.Action("OverrideRequest","BlockPackage")">Add</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link active" href="@Url.Action("OverrideView","BlockPackage")">View</a>
+                            </li>
+                        </ul>
+                        @*<div class="pkg_grey">
+                                <div class="form-row">
+                                    <div class="col-lg-10 col-md-12 col-sm-8 col-xs-12 form-row form-designsc">
+                                        <label for="packageHeader" class="col-lg-2 col-md-4 col-sm-4 col-xs-12 col-form-label">NFSA/SFSS NO<b><span style="color:red">*</span></b></label>
+                                        <div class="col-lg-3 col-md-4 col-sm-4 col-xs-12 mb-2 px-0">
+                                            <input id="txtUrnNo" type="text" class="form-control" autofocus placeholder="Enter here" maxlength="17" onkeypress="return inputLimiter(event,'Numbers')" />
+                                        </div>
+                                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 px-0">
+                                            <input class="btn btn-outline-success my-2 my-sm-0" type="button" value="Search" id="btnSearch">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>*@
+                        <div class="col-md-12 col-sm-12 col-xs-12 px-0">
+                            <div class="form-row">
+                                <div class="col-lg-2">
+                                    <div class="mb-4">
+                                        <label class="pkg-label mb-1"> From Date :</label>
+                                        <input type="text" id="txtFromDate" class="form-control dateFormat" />
+                                    </div>
+                                </div>
+                                <div class="col-lg-2">
+                                    <div class="mb-4">
+                                        <label class="pkg-label mb-1"> To Date :</label>
+                                        <input type="text" id="txtToDate" class="form-control dateFormat" />
+                                    </div>
+                                </div>
+                                <div class="col-lg-2">
+                                    <div class="mb-4">
+                                        <label class="pkg-label mb-1">Status :</label>
+                                        <select id="ddloverridestatus" class="form-control form-group">
+                                            <option value="A">ALL</option>
+                                            <option value="N">PENDING</option>
+                                            <option value="Y">APPROVED</option>
+                                            <option value="R">REJECTED</option>
+                                        </select>
+                                        @*<input type="text" id="txtToDate" class="form-control dateFormat" />*@
+                                    </div>
+                                </div>
+                                <div class="col-lg-2 d-flex justify-content-start align-items-center">
+                                    <input class="btn btn-outline-success" type="button" value="Search" id="btnSearch">
+                                </div>
+                            </div>
+                        </div>
+                        <div id="DvOverrideView">
+                            @*<div class="row mb-1 heading-pkg border-bottom ">
+                                    <h5>Override Details</h5>
+                                </div>*@
+                            <div class="clearfix"></div>
+                            <div class="col-md-12 col-sm-12 col-xs-12 px-0">
+                                <div class="table-responsive">
+                                    @*<table id="grdOverrideView" class="table table-striped jsgrid-table">
+                                            <thead>
+                                                <tr class="jsgrid-header-row">
+                                                    <th scope="col" class="jsgrid-header-cell" style="width:5% !important;">Sl No.</th>
+                                                    <th scope="col" class="jsgrid-header-cell">Member Id</th>
+                                                    <th scope="col" class="jsgrid-header-cell">Name</th>
+                                                    <th scope="col" class="jsgrid-header-cell">URN</th>
+                                                    <th scope="col" class="jsgrid-header-cell">Override Code</th>
+                                                    <th scope="col" class="jsgrid-header-cell">Purpose Of Override</th>
+                                                    <th scope="col" class="jsgrid-header-cell">No. of days</th>
+                                                    <th scope="col" class="jsgrid-header-cell">Description</th>
+                                                    <th scope="col" class="jsgrid-header-cell">Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            </tbody>
+                                        </table>*@
+
+                                    <!-- Override View -->
+                                    <div class="table-responsive">
+                                        <table id="grdOverrideView" class="table table-striped border preauth-tbl" cellspacing="0" width="100%">
+                                            <thead>
+                                                <tr>
+                                                    <th style="width:5% !important;">Sl No</th>
+                                                    <th style="width:10% !important;">URN</th>
+                                                    <th style="width:20% !important;">
+                                                        <div class="prehed-bold"> Member Details </div>
+                                                        <div class="prehed-small"> ID | Name </div>
+                                                    </th>
+
+                                                    <th style="width:10% !important;"> Override Code </th>
+
+                                                    <th style="width:10% !important;"> No of Days </th>
+
+                                                    <th style="width:10% !important;"> Purpose </th>
+
+                                                    <th style="width:30% !important;">
+                                                        <div class="prehed-bold"> Status </div>
+                                                        <div class="prehed-small"> Description </div>
+                                                    </th>
+
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>1</td>
+                                                    <td>02120610257</td>
+                                                    <td>
+                                                        <b class="text-success"> 59776523 </b>
+                                                        <div class="pre-bold"> BIBHU JENA </div>
+                                                    </td>
+
+                                                    <td> B11807 </td>
+
+                                                    <td> Pending </td>
+
+                                                    <td> 2 </td>
+
+                                                    <td>
+
+                                                        <div class="badge badge-warning badge-font mb-1"> Pending </div>
+                                                        <div>  SDSDAS fsdhfbh sdfgb bsdfj sdjf sdf dsfsd fdsf sdf s fsd  </div>
+
+                                                    </td>
+
+                                                </tr>
+
+                                                <tr>
+                                                    <td>2</td>
+                                                    <td>02120610257</td>
+                                                    <td>
+                                                        <b class="text-success"> 59776523 </b>
+                                                        <div class="pre-bold"> RUNU GOUDA </div>
+                                                    </td>
+
+                                                    <td> B11807 </td>
+
+                                                    <td> Pending </td>
+
+                                                    <td> 2 </td>
+
+                                                    <td>
+
+                                                        <div class="badge badge-success badge-font mb-1"> Approved </div>
+                                                        <div>  SDSDAS fsdhfbh sdfgb bsdfj sdjf sdf dsfsd fdsf sdf s fsd  </div>
+
+                                                    </td>
+
+                                                </tr>
+
+                                                <tr>
+                                                    <td>3</td>
+                                                    <td>02120610257</td>
+                                                    <td>
+                                                        <b class="text-success"> 59776523 </b>
+                                                        <div class="pre-bold"> RUNU GOUDA </div>
+                                                    </td>
+
+                                                    <td> B11807 </td>
+
+                                                    <td> Pending </td>
+
+                                                    <td> 2 </td>
+
+                                                    <td>
+
+                                                        <div class="badge badge-danger badge-font mb-1"> Rejected </div>
+                                                        <div>  SDSDAS fsdhfbh sdfgb bsdfj sdjf sdf dsfsd fdsf sdf s fsd  </div>
+
+                                                    </td>
+
+                                                </tr>
+
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <!-- Override View -->
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        $('.secondary-menu li a').tooltip();
+    });
+</script>
+<script typeof="javascript">
+    $(document).ready(function () {
+        $('#path').html('Block Override View');
+
+        var d = new Date();
+        var currentDate = d.getDate();
+        var currMonth = d.getMonth();
+        var currYear = d.getFullYear();
+        var startDate = new Date(currYear, currMonth, 1);
+        var endDate = new Date(currYear, currMonth, currentDate);
+        $("#txtFromDate").val(moment(startDate).format("DD-MMM-YY"));
+        $("#txtToDate").val(moment(endDate).format("DD-MMM-YY"));
+        var from_date = $("#txtFromDate").val();
+        var to_date = $("#txtToDate").val();
+        getSearchData(from_date, to_date);
+
+        $('#DvOverrideView').show();
+        /*$("#btnSearch").click(function () {
+            if (validate()) {
+                bindgrdOverrideView();
+            }
+        });*/
+    });
+
+    $("#btnSearch").click(function () {
+        var fromDt = $("#txtFromDate").val();
+        var toDt = $("#txtToDate").val();
+        var from = "";
+        var to = "";
+        if (fromDt != "")
+            from = new Date($("#txtFromDate").val());
+        if (toDt != "")
+            to = new Date($("#txtToDate").val());
+        if (to != "" && from === "") {
+            swal({
+                text: "Please Select From Date",
+                confirmButtonColor: "#36A865",
+                type: "error",
+                confirmButtonText: "OK",
+                closeOnConfirm: false
+            }).then((result) => {
+                $('#txtFromDate').focus();
+            });
+        }
+        else if (from != "" && to === "") {
+            swal({
+                text: "Please Select To Date",
+                confirmButtonColor: "#36A865",
+                type: "error",
+                confirmButtonText: "OK",
+                closeOnConfirm: false
+            }).then((result) => {
+                $('#txtToDate').focus();
+            });
+        }
+        else if (from > to) {
+            swal({
+                text: "From date should not be greater than To date",
+                confirmButtonColor: "#36A865",
+                type: "error",
+                confirmButtonText: "OK",
+                closeOnConfirm: false
+            }).then((result) => {
+                    $('#txtFromDate').focus();
+                });
+        }
+        else {
+            getSearchData(fromDt, toDt);
+        }
+    });
+
+    function getSearchData(fromdate, todate) {
+        var param = {
+            ACTIONCODE: 'A',
+            HospitalCode: '@Session["HospitalCode"]',
+            FromDate: fromdate,
+            ToDate: todate,
+            statusflag: $('#ddloverridestatus').val()
+        };
+        console.log(param);
+        $.ajax({
+            url: ServiceURL + "/api/BlockPackage/GetOverrideCodeList",
+            type: "POST",
+            data: param,
+            dataType: "json",
+            success: function (response) {
+                bindgrdOverrideView(response);
+            },
+            error: function (error) {
+                console.log(error.responseText);
+            }
+        });
+    };
+
+    function bindgrdOverrideView(responseData) {
+        $("#grdOverrideView").DataTable({
+            bLengthChange: true,
+            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+            //bFilter: false,
+            bSort: false,
+            paging: true,
+            responsive: true,
+            autoWidth:false,
+            bDestroy: true,
+            data: responseData,
+            columns: [
+                { data: 'id', type: "text", title: '<span style="width: 5 % !important;">Sl No</span>', align: "center", render: function (data, type, row, meta) { return meta.row + meta.settings._iDisplayStart + 1; } },
+                //{ data: "patientName", type: "text", title: "Member Name", align: "center" },
+                //{ data: "memberID", type: "text", title: "Member Id", align: "center" },
+                { data: "urn", type: "text", title: '<span style="width:10% !important;">URN</span>', align: "center" },
+                {
+                    data: null,
+                    title: '<div class="prehed-bold"> Member Details </div><div class="prehed- small"> Code | Name </div>',
+                    align: "left",
+                    render: function (data, type, row, meta) {
+                        var memberColumn = '<b class="text-success">' + row.memberID + '</b>';
+                        memberColumn += '<div class="pre-bold">' + row.patientName + '</div>';
+                        return memberColumn;
+                    }
+                },
+                {
+                    type: "text", title: '<span style="width:10% !important;"> Override Code </span>', align: "center",
+                    render: function (data, type, row, meta) {
+                        if (row.approveStatus == "Approved") {
+                            return row.overrideCode;
+                        }
+                        return '';
+                    }
+                },
+                //{ data: "overrideCode", type: "text", title: "Override Code", align: "center" },
+
+                { data: "noofDays", type: "text", title: '<span style="width:10% !important;"> No of Days </span>', align: "center" },
+                { data: "generatedthrough", type: "text", title: '<span style="width:10% !important;"> Purpose </span>', align: "center" },
+                {
+                    data: null, type: "text", title: '<div class="prehed- bold">Status</div><div class="prehed-small">Description</div>', align: "left", render: function (data, type, row, meta) {
+                        if (row.approveStatus == "Approved") {
+                            var html = '<div class="badge badge-success mb - 3 p - 2">' + row.approveStatus + '</div><div>' + row.description + '</div>'
+                            return html;
+                        }
+                        if (row.approveStatus == "Pending") {
+                            var html = '<div class="badge badge-warning mb - 3 p - 2">' + row.approveStatus + '</div><div>' + row.description + '</div>'
+                            return html;
+                        }
+                        else return '<div class="badge badge-danger mb - 3 p - 2">' + row.approveStatus + '</div><div>' + row.description + '</div>'
+
+                    }
+                },
+                //{ data: "description", type: "text", title: "Description", align: "center" },
+                //{ data: "approveStatus", type: "text", title: "Status", align: "center" }
+            ]
+        });
+    }
+
+    function OldbindgrdOverrideView() {
+        ////debugger;
+        $('#grdOverrideView').jsGrid({
+            width: "100%",
+            sorting: true,
+            paging: true,
+            pageSize: 10,
+            autoload: true,
+            controller: {
+                loadData: function () {
+                    var d = $.Deferred();
+                    var params = {
+                        ACTIONCODE: 'B',
+                        URN: $('#txtUrnNo').val(),
+                        HospitalCode: '@Session["HospitalCode"]'
+                    };
+                    params = JSON.stringify(params);
+                    return $.ajax({
+                        url: ServiceURL + "/api/BlockPackage/GetOverrideCodeList",
+                        type: "POST",
+                        data: params,
+                        dataType: "json",
+                        contentType: "application/json; charset=utf-8",
+                        error: function (error) {
+                            console.log(error.statusText);
+                        },
+                    }).done(function (result) {
+                        $('#DvOverrideView').show();
+                        if (result.length > 0) {
+                            d.resolve($.map(result, function (item, itemIndex) {
+                                return $.extend(item, { "Index": itemIndex + 1 });
+                            }));
+                        }
+                    });
+                }
+            },
+            fields: [
+                { name: "Index", title: "Sl No.", type: "number", width: "50", align: "center" },
+                { name: "memberName", title: "Name", type: "text", align: "center" },
+                { name: "memberID", title: "Id", type: "text", align: "center" },
+                { name: "urn", title: "Urn", type: "text", align: "center" },
+                { name: "memberAge", title: "Override Code", type: "text", align: "center" },
+                { name: "noofDays", title: "No. of days", type: "text", align: "center" },
+                { name: "description", title: "Description", type: "text", align: "center" },
+                { name: "memberName", title: "Status", type: "text", align: "center" }
+            ]
+        });
+    }
+
+    function validate() {
+        if ($('#txtUrnNo').val() == '') {
+            alert('Please enter NFSA/SFSS NO !!');
+            $('#txtUrnNo').focus();
+            return false;
+        }
+        return true;
+    }
+
+    $(function () {
+        $(".dateFormat").datepicker({
+            numberOfMonths: 1,
+            changeMonth: true,
+            dateFormat: "dd-M-y",
+            changeYear: true
+        });
+    });
+
+    function inputLimiter(e, allow) {
+        var AllowableCharacters = '';
+        if (allow == 'NameCharactersymbol') {
+            AllowableCharacters = ' ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz./&';
+        }
+        if (allow == 'NameCharacters') {
+            AllowableCharacters = ' ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-.\'';
+        }
+        if (allow == 'NameCharactersAndNumbers') {
+            AllowableCharacters = '1234567890 ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-,/.\'';
+        }
+        if (allow == 'Description') {
+            AllowableCharacters = '1234567890 ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-,./\&(){}[]#$:';
+        }
+        if (allow == 'Numbers') {
+            AllowableCharacters = '1234567890';
+        }
+        if (allow == 'Decimal') {
+            AllowableCharacters = '1234567890.';
+        }
+        var k;
+        k = document.all ? parseInt(e.keyCode) : parseInt(e.which);
+        if (k != 13 && k != 8 && k != 0) {
+            if ((e.ctrlKey == false) && (e.altKey == false)) {
+                return (AllowableCharacters.indexOf(String.fromCharCode(k)) != -1);
+            }
+            else {
+                return true;
+            }
+        }
+        else {
+            return true;
+        }
+    }
+    //Restrict special character input into fields
+    $('input').bind('input', function () {
+        var c = this.selectionStart,
+            r = /[^a-z0-9 .]/gi,
+            v = $(this).val();
+        if (r.test(v)) {
+            $(this).val(v.replace(r, ''));
+            c--;
+        }
+        this.setSelectionRange(c, c);
+    });
+</script>
+
+<script>
+    // breadcrumb active & menu active
+    $(document).ready(function () {
+        loadNavigation('OverrideView', 'MtOverride', 'pl', 'Block Package', 'Override View', '');
+    });
+</script>
+

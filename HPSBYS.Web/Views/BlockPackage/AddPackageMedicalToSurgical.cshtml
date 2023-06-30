@@ -1,0 +1,787 @@
+﻿
+@{
+    ViewBag.Title = "AddPackageMedicalToSurgical";
+    Layout = "~/Views/Shared/_CommonLayout.cshtml";
+}
+
+@Scripts.Render("~/bundles/blockpackage")
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        //$('.datepicker').datepicker({
+        //    format: 'dd M yyyy',
+        //    endDate: 'today',
+        //    autoclose: true
+        //}); //code for datepicker
+        //$(".datepicker").datepicker("setDate", (new Date().toDateString()));
+        //$('.datepicker').datepicker('remove');
+        //$('#blockingDt').attr('readonly', true);
+        $('#DocInfo').hide();
+        $('#fuValText').hide();
+        $('#CurBlkHeader').hide();
+        $('#jsGrid').hide();
+        $('#PrevBlkHeader').hide();
+        $('#jsGridPrev').hide();
+        $('#divWardDtls').hide();
+        $('#lblWardDtls').hide();
+        $('#ChkList').hide();
+       // BindPackageHeader();
+        getHospitalInfo();
+
+         var arrPackageInfo = [];
+        $('#PApackageHeader').change(function () {
+            PackageSubCategoryChange();
+        });
+
+        $('#PApackageSubPackageDetail').change(function () {
+            PackageHeaderChange();
+        });
+
+        if (localStorage.getItem('BlockPackageInfo') != null) {
+            var PackageInfo = JSON.parse(localStorage.getItem('BlockPackageInfo'));
+            $('#divPageStatus').html(PackageInfo[0].PageBackStatus);
+            if ($('#divPageStatus').text() == 'M') {
+                $('#btnBack').hide();
+                $('#path').html('<a href="@Url.Action("ViewPackageChange", "BlockPackage")">Package Change List</a> / Block Package');
+            }
+            else {
+                $('#btnBack').show();
+                 $('#path').html('<a href="@Url.Action("ViewBlockPackage", "BlockPackage")">Block Package List</a> / Block Package');
+            }
+            var BlockPackageParams = {
+                HospitalCode: sessionHospitalCode,
+                Action: 'C',
+                URN: PackageInfo[0].urn,
+                BlockingINVOICENO: PackageInfo[0].invoiceNo,
+                TransactionID: PackageInfo[0].TransactionID
+            };
+            $.ajax({
+                url: ServiceURL + "/api/Registration/GetRegistrationInformationByInvoiceNo",
+                type: "GET",
+                data: BlockPackageParams,
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    if (data.length > 0) {
+                        arrPrevPackageInfo = [];
+                        var TotalBlkAmnt = 0;
+                        for (var i = 0; i < data.length-1; i++) {
+                            TotalBlkAmnt += parseInt(data[i].amoutBlocked);
+                            arrPrevPackageInfo.push({
+                                IsMedSergical: data[i].isMedSergical,
+                                procedureCode: data[i].procedureCode,
+                                ProcedureName: data[i].procedureName,
+                                PackageName: data[i].packageName,
+                                PackageCode: data[i].packageCode,
+                                PackageCost: data[i].packageCost,
+                                AmoutBlocked: data[i].amoutBlocked,
+                                NoofDays: data[i].noofDays,
+                                InvoiceNo: data[i].invoiceNo,
+                                BlockingUserDate: data[i].blockingUserDate,
+                                Category: data[i].category,
+                                CategoryCode: data[i].categoryCode
+                            });
+                        }
+                        if (arrPrevPackageInfo.length > 0) {
+                            $('#ChkList').show();
+                            $('#CurTraBlockAmnt').html(TotalBlkAmnt);
+                        }
+                        else {
+                            $('#CurTraBlockAmnt').html(0)
+                        }
+                        if ($('#divPageStatus').text() == 'N') {
+                            $('#PrevBlkHeader').hide();
+                            $('#jsGridPrev').hide();
+                        }
+                        else {
+                            $('#PrevBlkHeader').show();
+                            $('#jsGridPrev').show();
+                        }
+                        bindPrevBlockPackageGrid();
+                        // console.log(data);
+                        $('#urnNum').html(data[0].urn);
+                        $('#headOfFamily').html(data[0].headMemberName);
+                        $('#headOfFamilyID').html(data[0].headMemberID);
+                        $('#regDate').html(data[0].registrationDate);
+                        $('#benefName').html(data[0].memberName);
+                        $('#state').html(data[0].memberStateName);
+                        $('#stateCode').html(data[0].memberStateCode);
+                        $('#district').html(data[0].memberDistrictName);
+                        $('#districtCode').html(data[0].memberDistrictCode);
+                        $('#memberBlockCode').html(data[0].memberBlockCode);
+                        $('#panchayatCode').html(data[0].panchayatCode);
+                        $('#villageCode').html(data[0].villageCode);
+                        $('#invNo').html(data[0].invoiceNo);
+                        $('#IsMedSergical').html(data[0].isMedSergical);
+                        $('#divSchCode').html(data[0].schemeCode);
+                        $('#SchName').html(data[0].schemeName);
+                        $('#familyID').html(data[0].familyID);
+                        var date1_ms = new Date(data[0].blockingUserDate).getTime();
+                        var date2_ms = new Date().getTime();
+                        var difference_ms = date2_ms - date1_ms;
+                        difference_ms = difference_ms / 1000;
+                        difference_ms = difference_ms / 60;
+                        difference_ms = difference_ms / 60;
+                        var days = Math.floor(difference_ms / 24);
+                        $('.datepicker').datepicker({
+                            format: 'dd-M-yy',
+                            startDate: '-' + days + 'd',
+                            endDate: 'today',
+                            autoclose: true
+                        }); //code for datepicker
+                        $(".datepicker").datepicker("setDate", (new Date().toDateString()));
+                        if (data[0].urn != "") {
+                            var BalanceParams = {
+                                Action: 'R',
+                                URN: data[0].urn,
+                                FamilyId: $('#familyID').text()
+                            };
+                            $.ajax({
+                                url: ServiceURL + "/api/Common/GetAvailBalance",
+                                type: "GET",
+                                data: BalanceParams,
+                                dataType: "json",
+                                contentType: "application/json; charset=utf-8",
+                                success: function (result) {
+                                    if (result != null) {
+                                        $('#AvlCover').html(result.availableBalance);
+                                    }
+                                    else {
+                                        $('#AvlCover').html('NA');
+                                    }
+                                },
+                                error: function (error) {
+                                    console.log(error.responseText);
+                                }
+                            });
+                        }
+                        if (data[0].memberDistrictCode != "") {
+                            var PolicyParams = {
+                                //MemberDistrictCode: data[0].memberDistrictCode,
+                                //SchemeCode: $('#divSchCode').text()
+                                URN: $('#urnNum').text()
+                            };
+                            $.ajax({
+                                url: ServiceURL + "/api/Common/GetPolicy",
+                                type: "GET",
+                                data: PolicyParams,
+                                dataType: "json",
+                                contentType: "application/json; charset=utf-8",
+                                success: function (data) {
+                                    if (data.length > 0) {
+                                        // console.log(data);
+                                        $('#IPNumber').html(data[0].policynumber)
+                                        $('#StartDt').html(data[0].policyStartDate)
+                                        $('#EndDt').html(data[0].policyEnddate)
+                                    }
+                                },
+                                error: function (error) {
+                                    console.log(error.responseText);
+                                }
+                            });
+                        }
+                        BindPackageHeader_PackageChange(data[0].isMedSergical,'S');
+                    }
+                },
+                error: function (error) {
+                    console.log(error.responseText);
+                }
+            });
+        }
+        $('#btnAddPackage').click(function () {
+
+                AddPackage_MedicalToSurgical();
+
+        });
+         $('#btnBack').click(function () {
+            if ($('#divPageStatus').text() == 'M') {
+                 window.location.href = '@Url.Action("ViewMultipleBlockPackage", "BlockPackage")';
+            }
+            else if ($('#divPageStatus').text() == 'N') {
+                 window.location.href = '@Url.Action("ViewBlockPackage", "BlockPackage")';
+            }
+         });
+        $('#PApackageDetail').change(function () {
+            PackageDetailsChangeMtoS();
+        });
+        $('#ddlWardDtls').change(function () {
+            if (arrWardDtls.length > 0) {
+                arrWardDtls.forEach(function (entry) {
+                    if (entry.childid == $('#ddlWardDtls').val()) {
+                        $('#PAtreatmentCost').val(entry.amount);
+                    }
+                    else {
+                        //$('#PAtreatmentCost').val('');
+                    }
+                });
+            }
+        });
+        $('#btnBlock').click(function () {
+            var confirm = checkconfirmReq();
+            if (confirm == true) {
+                $('#divLoader').show();
+                var CappedAmnt;
+                if ($('#CapAmnt').text() == '') {
+                    CappedAmnt = 0;
+                }
+                else {
+                    CappedAmnt = $('#CapAmnt').text();
+                }
+                var gridPackageInfo = $("#jsGrid").jsGrid("option", "data");
+                if (gridPackageInfo.length > 0) {
+                    var fileUpload = $("#DocFile").get(0);
+                    var files = fileUpload.files;
+                    var BlockPackageParams = new FormData();
+                    if (files.length > 0) {
+                        BlockPackageParams.append("VchFile", files[0]);
+                    }
+                    BlockPackageParams.append("__RequestVerificationToken", gettoken());
+                    BlockPackageParams.append("ACTIONCODE",'MS');
+                    BlockPackageParams.append("BlockingInvoiceNo", gridPackageInfo[0].InvoiceNo);
+                    BlockPackageParams.append("BlockingUserDate", gridPackageInfo[0].BlockingDate);
+                    BlockPackageParams.append("DATEOFADMISSION", gridPackageInfo[0].BlockingDate);
+                    BlockPackageParams.append("ProcedureCode", gridPackageInfo[0].ProcedureCode);
+                    BlockPackageParams.append("ProcedureName", gridPackageInfo[0].Procedure);
+                    BlockPackageParams.append("PackageCode", gridPackageInfo[0].PackageCode);
+                    BlockPackageParams.append("PackageName", gridPackageInfo[0].Package);
+                    BlockPackageParams.append("PackageWard", gridPackageInfo[0].PackageWard);
+                    BlockPackageParams.append("PackageCost", gridPackageInfo[0].PackageCost);
+                    BlockPackageParams.append("NoofDays", gridPackageInfo[0].Days);
+                    BlockPackageParams.append("AmoutBlocked", gridPackageInfo[0].AmountBlocked);
+                    BlockPackageParams.append("CappedAmount", CappedAmnt);
+                    BlockPackageParams.append("TransactionCode", '301');
+                    BlockPackageParams.append("IsMedSergical", gridPackageInfo[0].Type);
+                    BlockPackageParams.append("URN", $('#urnNum').text());
+                    BlockPackageParams.append("PreAuthStatus", $('#AuthStatus').text());
+                    BlockPackageParams.append("Category", gridPackageInfo[0].Category);
+                    BlockPackageParams.append("CategoryCode", gridPackageInfo[0].CategoryCode);
+
+                      $.ajax({
+                       url: '@Url.Action("AddMedicalToSurgicalPackage", "BlockPackage")',
+                            type: "POST",
+                          data: BlockPackageParams,
+                            processData: false,
+                          contentType: false,
+                          success: function (data) {
+                              $('#divLoader').hide();
+                            if (data == "2") {
+                                alert('Package Blocked Successfully!!');
+                                window.location.href = '@Url.Action("ViewPackageChange", "BlockPackage")';
+                            }
+                            else if (data == "1") {
+                                alert('Package Request Raised Successfully for Approval!!');
+                                window.location.href = '@Url.Action("PackageChangePreAuthorizationDetails", "PreAuthorization")';
+                            }
+                          },
+                          error: function (error) {
+                              $('#divLoader').hide();
+                                console.log(error.statusText);
+                          }
+                      });
+                }
+            }
+        });
+        $('#DocFile').on('change', function (e) {
+            if (!ValidateFile('DocFile', 'Valid Document')) {
+                return false;
+            };
+            if (!CheckFileType('DocFile', '1')) {
+                return false;
+            };
+        });
+    });
+</script>
+<div class="container">
+    <div class="row">
+        <div class="col-12 pb-3">
+            <div class="card-body" id="viewTable">
+             <div class="form-box-bg mb-4">
+                <div class="data-info noPrint">
+                    <div class="row">
+
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 noPrint">
+                        <div class="row heading-pkg border-bottom mb-2 mt-2">
+                             <h5>Hospital Details </h5>
+                        </div>
+                        
+                        <div class="form-row">
+
+                        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 noPrint"  hidden="hidden">
+                            <div class="mb-2">
+                                <label class="pkg-label font-weight-normal">State :</label>
+                                <div class="pkghead-txt" id="hdState"> </div>
+                            </div>
+
+                        </div>
+
+                        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 noPrint"  hidden="hidden">
+                            <div class="mb-2">
+                                <label class="pkg-label font-weight-normal">District :</label>
+                                <div class="pkghead-txt" id="hdDistrict"> </div>
+                            </div>
+
+                        </div>
+
+                         <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 noPrint">
+                            <div class="mb-2">
+                                <label class="pkg-label font-weight-normal">Hospital Code :</label>
+                                <div class="pkghead-txt" id="hdHospitalCode"> </div>
+                            </div>
+
+                        </div>
+
+                        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 noPrint">
+                            <div class="mb-2">
+                                <label class="pkg-label font-weight-normal">Name :</label>
+                                <div class="pkghead-txt" id="HdName"> </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                        <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12 noPrint">
+                             <div class="row heading-pkg border-bottom mb-2 mt-2">
+                             <h5>Member Info </h5>
+                        </div>
+
+                         <div class="form-row">
+
+                        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 noPrint">
+                            <div class="mb-2">
+                                <label class="pkg-label font-weight-normal">URN Number :</label>
+                                <div class="pkghead-txt" id="urnNum"> </div>
+                                 <div id="memberBlockCode" hidden></div>
+                                 <div id="invNo" hidden></div>
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 noPrint">
+                            <div class="mb-2">
+                                <label class="pkg-label font-weight-normal">Head of Family :</label>
+                                <div class="pkghead-txt" id="headOfFamily"> </div>
+                                <h3 id="headOfFamilyID" hidden></h3>
+                                <div id="familyID" hidden></div>
+                            </div>
+
+                        </div>
+
+                        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 noPrint" hidden="hidden">
+                            <div class="mb-2">
+                                <label class="pkg-label font-weight-normal">State :</label>
+                                <div class="pkghead-txt" id="state"> </div>
+                               <h3 id="stateCode" hidden></h3>
+                                    <div id="panchayatCode" hidden></div>
+                            </div>
+
+                        </div>
+
+                         <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 noPrint" hidden="hidden">
+                            <div class="mb-2">
+                                <label class="pkg-label font-weight-normal">StaDistrictte :</label>
+                                <div class="pkghead-txt" id="district"> </div>
+                               <h3 id="districtCode" hidden></h3>
+                                    <div id="villageCode" hidden></div>
+                            </div>
+
+                        </div>
+
+
+                            </div>
+
+
+
+                        </div>
+
+                        <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12 noPrint">
+                            <div class="row heading-pkg border-bottom mb-2 mt-2">
+                             <h5>Insurance Policy Details </h5>
+                        </div>
+
+                        <div class="form-row">
+
+                        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12" hidden="hidden">
+                            <div class="mb-2">
+                                <label class="pkg-label font-weight-normal">Scheme Name :</label>
+                                <div class="pkghead-txt" id="SchName"> </div>
+                                <div id="divSchCode" hidden></div>
+                            </div>
+
+                        </div>
+
+
+                         <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12" hidden="hidden">
+                            <div class="mb-2">
+                                <label class="pkg-label font-weight-normal">Policy Number :</label>
+                                <div class="pkghead-txt" id="IPNumber"> </div>
+                            </div>
+
+                        </div>
+
+                        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+                            <div class="mb-2">
+                                <label class="pkg-label font-weight-normal">Start Date :</label>
+                                <div class="pkghead-txt" id="StartDt"> </div>
+                            </div>
+
+                        </div>
+
+                        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+                            <div class="mb-2">
+                                <label class="pkg-label font-weight-normal">End Date :</label>
+                                <div class="pkghead-txt" id="EndDt"> </div>
+                            </div>
+
+                        </div>
+
+                        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+                            <div class="mb-2">
+                                <label class="pkg-label font-weight-normal">Current Transaction Blocked Amount :</label>
+                                <div class="pkghead-txt" id="CurTraBlockAmnt"> </div>
+                            </div>
+
+                        </div>
+
+                        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+                            <div class="mb-2">
+                                <label class="pkg-label font-weight-normal">Available Cover :</label>
+                                <div class="pkghead-txt" id="AvlCover"> </div>
+                            </div>
+                        <div id="divPageStatus" hidden></div>
+                        </div>
+
+
+                            </div>
+
+
+                        </div>
+
+
+                    </div>
+                    @* <hr>
+                        <div class="row noPrint">
+                            <div class="col noPrint">
+                                <h2>Insurance Policy Details</h2>
+                                <div class="row pb-3">
+                                    <div class="col-sm-3">
+                                        <p>Scheme Name</p>
+                                        <h3 id="SchName"></h3>
+                                        <div id="divSchCode" hidden></div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <p>Policy Number</p>
+                                        <h3 id="IPNumber"></h3>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <p>Start Date</p>
+                                        <h3 id="StartDt"></h3>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <p>End Date</p>
+                                        <h3 id="EndDt"></h3>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col noPrint">
+                                <h2>&nbsp;</h2>
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <p>Current Transaction Blocked Amount</p>
+                                        <h3 id="CurTraBlockAmnt"></h3>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <p>Available Cover</p>
+                                        <h3 id="AvlCover"></h3>
+                                    </div>
+                                    <div id="divPageStatus" hidden></div>
+                                </div>
+                            </div>
+                        </div>*@
+                </div>
+       
+                            <form>
+
+            <div class="form-row">
+
+                        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+                            <div class="mb-2">
+                                <label for="beneficiaryNm" class="col-form-label noPrint">Beneficiary Name <b><span style="color:red">*</span></b></label>
+                                <p class="form-control noPrint" id="benefName"></p>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+                            <div class="mb-2">
+                                <label for="blockingDt" class="col-form-label noPrint" id="lblBlockingDt">Blocking Date <b><span style="color:red">*</span></b></label>
+                               <div class="input-group mb-3">
+                                            <input type="text" id="blockingDt" class="form-control datepicker" placeholder="dd mmm yyyy" aria-label="Username" aria-describedby="basic-addon1" maxlength="11" autofocus readonly>
+                                            <div class="input-group-prepend">
+                                                <label for="blockingDt" class="input-group-text"><i class="fa fa-calendar"></i></label>
+                                            </div>
+                                        </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+                            <div class="mb-2">
+                                 <label for="regDt" class="col-form-label noPrint">Registration Date</label>
+                                 <p class="form-control noPrint" id="regDate"></p>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+                            <div class="mb-2">
+                                  <label for="packageHeader" class="col-form-label noPrint">Package Header <b><span style="color:red">*</span></b></label>
+                                  <select name="" id="PApackageHeader" class="form-control noPrint"></select>
+                            </div>
+                        </div>
+
+
+                          <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+                            <div class="mb-2">
+                                   <label for="packageSubPackageDetail" class="col-form-label noPrint">Category<b><span style="color:red">*</span></b></label>
+                                  <select name="" id="PApackageSubPackageDetail" class="form-control noPrint"></select>
+                            </div>
+                        </div>
+
+                         <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+                            <div class="mb-2">
+                                   <label for="packageDetail" class="col-form-label noPrint">Package Detail <b><span style="color:red">*</span></b></label>
+                                   <select name="" id="PApackageDetail" class="form-control noPrint"></select>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12" id="lblWardDtls">
+                            <div class="mb-2">
+                                    <label for="WardDetail" class="col-form-label noPrint" id="lblWardDtls">Ward Detail <b><span style="color:red">*</span></b></label>
+                                    <div id="divWardDtls">
+                                       <select name="" id="ddlWardDtls" class="form-control noPrint"></select>
+                                  </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+                            <div class="mb-2">
+                                    <label for="treatmentCost" class="col-form-label noPrint">Treatment Cost (Rs.) <b><span style="color:red">*</span></b></label>
+                                    <div class="noPrint">
+                                        <input type="text" class="form-control" id="PAtreatmentCost" placeholder="Enter here" onkeypress="return checkDec(event)" maxlength="15" readonly="readonly" />
+                                        <div id="PackageCost" hidden="hidden"></div>
+                                        <div id="Days" hidden="hidden"></div>
+                                        <div id="AuthStatus" hidden="hidden"></div>
+                                        <div id="MedSer" hidden="hidden"></div>
+                                        <div id="CapAmnt" hidden="hidden"></div>
+                                    </div>
+                            </div>
+                        </div>
+
+
+                         <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 noPrint" id="DocInfo">
+                            <div class="mb-2">
+                                    <label for="packageHeader" class=" col-form-label noPrint">Document <b><span style="color:red">*</span></b></label>
+                                    <div class="noPrint">
+                                        <input type="file" class="form-control noPrint" id="DocFile" />
+                                    </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 noPrint" id="fuValText">
+                            <div class="mb-2">
+                                     <label class="col-form-label"></label>
+                                     <div style="font-weight: bold; color: Green">Max file size is 200KB</div>
+                                     <div style="font-weight: bold; color: Green">Only pdf/jpg/jpeg document allowed</div>
+                                     <label for="packageDetail" class="col-form-label"></label>
+                                     <div class="col-sm-12"></div>
+                            </div>
+                        </div>
+
+
+                        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12" id="PreAuthDoc">
+                            <div class="mb-2">
+                                     <label for="packageDetail" class="col-form-label noPrint">PreAuthorization Document</label>
+                                     <div id="divDoc" class="noPrint"></div>
+                            </div>
+                        </div>
+
+
+
+                </div>
+
+
+      
+                                     
+                                <div class="text-right py-3 noPrint">
+                                    <input class="btn btn-outline-success my-2 my-sm-0" type="button" id="btnAddPackage" value="Add Package" title="Add Package" />
+                                    <button type="button" id="ChkList" value="Check List" class="btn btn-outline-secondary" title="Generate Treatment Check List" hidden>Generate Addmission Slip</button>
+
+                                </div>
+                                
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 px-0">
+
+                                    <div class="row heading-pkg border-bottom noPrint" id="CurBlkHeader">
+                                            <h5> Current Selected Package Details </h5>
+                                    </div>
+
+                                    <div class="table table-striped table-bordered noPrint" id="jsGrid"></div>
+
+                                     <div class="row heading-pkg border-bottom noPrint" id="PrevBlkHeader">
+                                            <h5> Previous Blocked Package Details </h5>
+                                    </div>
+
+                                    <div class="table table-striped table-bordered packageTable" id="jsGridPrev"></div>
+
+                                </div>
+                                <div class="text-right py-3 noPrint">
+                                    <input type="button" value="Back" class="btn btn-outline-danger my-2 my-sm-0" id="btnBack" />
+                                    <input class="btn btn-outline-success my-2 my-sm-0" type="button" value="Block" id="btnBlock" style="visibility:hidden">
+                                </div>
+                            </form>
+                        
+
+                
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<div class="loader" id="divLoader" style="display:none">
+    <div class="center">
+        <img src="~/imgs/DataLoading.gif" alt="Loader..." />
+    </div>
+</div>
+<!-- Body content Ends here -->
+<!-- START HERE: Registration confirmation modal content -->
+<div class="modal fade" id="admissionConfirmation" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="alert text-info" role="alert">
+                    Are you sure want to Register ?
+                </div>
+                <div class="text-right">
+                    <button type="button" class="btn btn-outline-secondary btn-sm" data-dismiss="modal">NO</button>
+                    <a href="javascript: void(0);" class="btn btn-outline-success btn-sm ml-1">YES</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- END HERE: Registration confirmation modal content -->
+    <style type="text/css">
+        .yesPrint {
+            display: none;
+        }
+
+        @@media print {
+            @@page {
+                size: landscape
+            }
+        }
+
+        .jsgrid-grid-header,
+        .jsgrid-grid-body {
+            overflow: auto;
+        }
+    </style>
+    <script type="text/javascript">
+        $(function () {
+            $('.secondary-menu li a').tooltip();
+        });
+    </script>
+    <script type="text/javascript">
+        $(function () {
+            $('#ChkList').click(function () {
+                ////debugger;
+                var printHeader = "<h5>Admission Slip</h5>";
+                var printHeaderSlip = "<h6>Blocking slip - Hospital copy</h6>"
+                var AvlClaimCardBalance = $('#AvlCover').text();
+                var TotalAmountBlocked = $('#CurTraBlockAmnt').text();
+
+                //Date.prototype.toShortFormat = function () {
+                //    var month_names = ["Jan", "Feb", "Mar",
+                //        "Apr", "May", "Jun",
+                //        "Jul", "Aug", "Sep",
+                //        "Oct", "Nov", "Dec"];
+                //    var day = this.getDate();
+                //    var month_index = this.getMonth();
+                //    var year = this.getFullYear();
+                //    return "" + day + " " + month_names[month_index] + " " + year;
+                //}
+
+                var windowName = "PrintPage";
+                var wOption = "width=1000,height=650,menubar=yes,scrollbars=yes,location=no,left=100,top=100";
+                var cloneTable = $("#viewTable").clone();
+                cloneTable.find('input[type=text],select,textarea').each(function () {
+                    var elementType = $(this).prop('tagName');
+                    if (elementType == 'SELECT')
+                        var textVal = $(this).find("option:selected").text();
+                    else
+                        var textVal = $(this).val();
+                    $(this).replaceWith('<label>' + textVal + '</label>');
+                });
+                cloneTable.find('a').each(function () {
+                    var anchorVal = $(this).text();
+                    $(this).replaceWith('<label>' + anchorVal + '</label>');
+                });
+                cloneTable.find('.packageTable').each(function () {
+                    var hdrData = $(this).find('.jsgrid-grid-header .jsgrid-header-row').clone();
+                    $(this).find('.jsgrid-grid-header .jsgrid-header-row').remove();
+                    $(this).find('.jsgrid-grid-body table').prepend("<thead>" + hdrData.html() + "</thead>");
+                });
+
+
+                var wWinPrint = window.open("", windowName, wOption);
+                wWinPrint.document.open();
+                wWinPrint.document.write("<html><head><link href='../css/Print.css' rel='stylesheet'><link href='../css/bootstrap.min.css' rel='stylesheet'><link href='../css/style.css' rel='stylesheet'><title></title></head><body @*onload='window.print();'*@ class='border'>");
+                //wWinPrint.document.write('<div class="prntlogo"><img src=@Url.Content("~/imgs/hpsbys-logo.png") width=70><span><h2>Himachal Pradesh Swasthya Bima Yojna Society</h2><p>Department of Health &amp; Family Welfare<br>Government of Himachal Pradesh</p></span></div>');
+                wWinPrint.document.write("<div align='center'><button style='background: url(@Url.Content("~/imgs/document_print.gif")); width: 20px; height: 20px' onclick='window.print();' id='btnPrint'/></div>");
+                wWinPrint.document.write("<div id='printHeader' align='center'>" + printHeader + "</div>");
+                wWinPrint.document.write("<div align='center'><b>" + printHeaderSlip + "</b></div>");
+                wWinPrint.document.write("<div class='form-group row'></div>");
+                wWinPrint.document.write("<div class='form-group row'></div>");
+                wWinPrint.document.write("<div class='form-group row'>");
+                wWinPrint.document.write("<div class='col-sm-3'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Slip Date :</div>");
+                wWinPrint.document.write("<div class='col-sm-3'><b>" + new Date().toLocaleDateString() + "</b></div>");
+                wWinPrint.document.write("<div class='col-sm-3'>Hospital Code :</div>");
+                wWinPrint.document.write("<div class='col-sm-3'><b>" + sessionHospitalCode+ "</b></div>");
+                wWinPrint.document.write("</div>");
+                wWinPrint.document.write("<div class='form-group row'>");
+                wWinPrint.document.write("<div class='col-sm-3'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;URN :</div>");
+                wWinPrint.document.write("<div class='col-sm-3'><b>" + $('#urnNum').text() + "</b></div>");
+                wWinPrint.document.write("<div class='col-sm-3'>Hospital Name :</div>");
+                wWinPrint.document.write("<div class='col-sm-3'><b>" + "@Session["HospitalName"]"+ "</b></div>");
+                wWinPrint.document.write("</div>");
+                 wWinPrint.document.write("<div class='form-group row'>");
+                wWinPrint.document.write("<div class='col-sm-3'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;State :</div>");
+                wWinPrint.document.write("<div class='col-sm-3'><b>" + $('#state').text() + "</b></div>");
+                wWinPrint.document.write("<div class='col-sm-3'>Dist :</div>");
+                wWinPrint.document.write("<div class='col-sm-3'><b>" + $('#district').text()+ "</b></div>");
+                wWinPrint.document.write("</div>");
+                 wWinPrint.document.write("<div class='form-group row'>");
+                wWinPrint.document.write("<div class='col-sm-3'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Beneficiary Name :</div>");
+                wWinPrint.document.write("<div class='col-sm-3'><b>" + $('#benefName').text() + "</b></div>");
+                wWinPrint.document.write("<div class='col-sm-3'>Registration Date :</div>");
+                wWinPrint.document.write("<div class='col-sm-3'><b>" + $('#regDate').text()+ "</b></div>");
+                wWinPrint.document.write("</div>");
+                wWinPrint.document.write("<div class='form-group row'></div>");
+                wWinPrint.document.write("<div class='form-group row'></div>");
+                wWinPrint.document.write("<div align='center'>Available claim(Card Balance): <b>" + AvlClaimCardBalance + "</b></div>");
+                wWinPrint.document.write("<div id='printContent'>" + cloneTable.html() + "</div>");
+                wWinPrint.document.write("<div align='center'>Total Amount Blocked : <b>" + TotalAmountBlocked + "</b></div>");
+                wWinPrint.document.write("<div align='center'>Insufficient amount : <b>0.00</b></div>");
+                wWinPrint.document.write("</body></html>");
+                wWinPrint.document.close();
+                wWinPrint.focus();
+                return wWinPrint;
+            });
+        });
+    </script>
+
+
+
+
+
+
+
+

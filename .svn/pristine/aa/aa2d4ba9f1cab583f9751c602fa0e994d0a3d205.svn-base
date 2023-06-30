@@ -1,0 +1,6 @@
+2020-06-26 11:02:05.2838 ERROR System.NullReferenceException: Object reference not set to an instance of an object.
+   at HPSBYS.Data.Services.CommonExtension.ToDynamicParameters(Object[] parameters, String outParameter, DbType dbType) in D:\Ram\HPSBYS_1.2.0.0\HPSBYS.Data\Services\CommonExtension.cs:line 37
+   at HPSBYS.Data.Services.PatientDataServices.addRoomTypeDetails(PatientInfo obj) in D:\Ram\HPSBYS_1.2.0.0\HPSBYS.Data\Services\PatientDataServices.cs:line 166
+2020-06-26 11:03:31.7876 ERROR System.NullReferenceException: Object reference not set to an instance of an object.
+   at HPSBYS.Data.Services.CommonExtension.ToDynamicParameters(Object[] parameters, String outParameter, DbType dbType) in D:\Ram\HPSBYS_1.2.0.0\HPSBYS.Data\Services\CommonExtension.cs:line 37
+   at HPSBYS.Data.Services.PatientDataServices.addRoomTypeDetails(PatientInfo obj) in D:\Ram\HPSBYS_1.2.0.0\HPSBYS.Data\Services\PatientDataServices.cs:line 166

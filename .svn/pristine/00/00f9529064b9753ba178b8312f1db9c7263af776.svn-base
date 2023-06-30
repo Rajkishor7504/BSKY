@@ -1,0 +1,80 @@
+﻿using HPSBYS.Data.Model;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Web.Http;
+using HPSBYS.Data.Services;
+using System.Threading.Tasks;
+
+namespace HPSBYS.WebAPI.Controllers
+{
+    public class BlockPackageController : ApiController
+    {
+        [HttpPost]
+        public async Task<string> addPatientBlockPackage(PatientInfo obj)
+        {
+            using (var PatientDataServices = new PatientDataServices())
+            {
+                return await Task.FromResult(PatientDataServices.addPatientBlockPackage(obj));
+            }
+
+        }
+
+        [HttpPost]
+        public async Task<string> addpreAuthPackage(PreAuthApprovedPackageBlock obj)
+        {
+            using (var PreAuthApprovedPackageBlock = new PatientDataServices())
+            {
+                return await Task.FromResult(PreAuthApprovedPackageBlock.PreAuthPackageBlock(obj));
+            }
+
+        }
+        [HttpPost]
+        public async Task<string> addWardpreAuthPackage(PreAuthApprovedPackageBlock obj)
+        {
+            using (var PreAuthApprovedPackageBlock = new PatientDataServices())
+            {
+                return await Task.FromResult(PreAuthApprovedPackageBlock.PreWardAuthPackageBlock(obj));
+            }
+
+        }
+        [HttpPost]
+        public async Task<string> addCancelPackage(CancelPackage obj)
+        {
+            using (var patientDataServices = new PatientDataServices())
+            {
+                return await Task.FromResult(patientDataServices.addCancelPackage(obj));
+            }
+
+        }
+        [HttpPost]
+        public async Task<string> addWardCancelPackage(CancelPackage obj)
+        {
+            using (var patientDataServices = new PatientDataServices())
+            {
+                return await Task.FromResult(patientDataServices.addWardCancelPackage(obj));
+            }
+
+        }
+        [HttpPost]
+        public async Task<string> addAddOnCancelPackage(CancelPackage obj)
+        {
+            using (var patientDataServices = new PatientDataServices())
+            {
+                return await Task.FromResult(patientDataServices.addAddOnCancelPackage(obj));
+            }
+
+        }
+        [HttpPost]
+        public async Task<string> addAddOnpreAuthPackage(PreAuthApprovedPackageBlock obj)
+        {
+            using (var PreAuthApprovedPackageBlock = new PatientDataServices())
+            {
+                return await Task.FromResult(PreAuthApprovedPackageBlock.AddOnPreAuthPackageBlock(obj));
+            }
+
+        }
+    }
+}

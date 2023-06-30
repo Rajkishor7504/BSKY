@@ -1,0 +1,8 @@
+﻿<div class="form-group row">
+    <label for="schemeName" class="col-sm-2 col-form-label">Verified Member Name <b><span style="color:red">*</span></b></label>
+    <div class="col-sm-2">
+        <select class="form-control" id="VerMembName">
+        </select>
+    </div>
+</div>
+

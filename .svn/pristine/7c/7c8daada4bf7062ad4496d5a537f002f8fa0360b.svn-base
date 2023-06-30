@@ -1,0 +1,58 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace HPSBYS.Data.Model
+{
+    
+    public  class URNInformation
+    {
+
+        public string URN { get; set; }
+        public string HOH { get; set; }
+        public string HeadMemberID { get; set; }
+        public string MemberState { get; set; }
+        public string MemberDistrict { get; set; }
+        public string MemberDistrictCode { get; set; }
+        public string MemberBlock { get; set; }
+        public string MemberBlockCode { get; set; }
+        public string MemberPanchayatCode { get; set; }
+        public string MemberPanchayatName { get; set; }
+        public string MemberVillageCode { get; set; }
+        public string MemberVillageName { get; set; }
+
+
+
+        public string MemberStateCode { get; set; }
+        public string MemberName { get; set; }
+        public int MemberID { get; set; }
+        public int MemberAge { get; set; }
+        public String MemberGender { get; set; }
+        // public string MemberContactnumber { get; set; }
+        // public string MemberRegDate { get; set; }
+        // public string MemberAdmissionSlip { get; set; }
+
+        public string Aadharnumber { get; set; }
+        public string RationCardNumber { get; set; }
+
+        public string FamilyID { get; set; }
+        public string policystartdate { get; set; }
+        public string policyenddate { get; set; }
+        public string RationCardBackDoc { get; set; }
+        public string Adharcard { get; set; }
+        public string Mobile { get; set; }
+
+    }
+
+
+
+
+
+
+
+
+
+
+}

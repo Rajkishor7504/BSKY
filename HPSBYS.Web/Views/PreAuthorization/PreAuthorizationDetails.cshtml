@@ -1,0 +1,455 @@
+﻿
+@{
+    ViewBag.Title = "Pre-authorizationDetails";
+    Layout = "~/Views/Shared/_CommonLayout.cshtml";
+}
+<style type="text/css">
+    tr.highlight td.jsgrid-cell {
+        background-color: lightgoldenrodyellow;
+    }
+
+    .jsgrid-grid-header,
+    .jsgrid-grid-body {
+        overflow: auto;
+    }
+</style>
+<script type="text/javascript">
+     $(document).keydown(function (event) {
+        event = (event || window.event);
+         if ((event.keyCode == 49) && (event.shiftKey === true)) {
+             window.location.href = '@Url.Action("ViewBlockPackage", "BlockPackage")';
+        }
+         else if ((event.keyCode == 50) && (event.shiftKey === true)) {
+            window.location.href = '@Url.Action("ViewMultipleBlockPackage", "BlockPackage")';
+        }
+        else if ((event.keyCode == 51) && (event.shiftKey === true)) {
+                window.location.href = '@Url.Action("PreAuthorizationDetails", "PreAuthorization")';
+         }
+          @*else if ((event.keyCode == 52) && (event.shiftKey === true)) {
+            window.location.href = '@Url.Action("ViewExtensionOfStay", "ExtensionOfStay")';
+        }*@
+    });
+    $(document).ready(function () {
+        $('#path').html('PreAuthorization Request');
+        var arrRequestPackage = [];
+        fillgrid();
+        $('#ddlRows').change(function () {
+            if ($("option:selected", $("#ddlRows")).val() == '1') {
+                $("#jsGrid").jsGrid({ pageSize: 10 });
+            }
+            else if ($("option:selected", $("#ddlRows")).val() == '2') {
+                $("#jsGrid").jsGrid({ pageSize: 20 });
+            }
+            else if ($("option:selected", $("#ddlRows")).val() == '3') {
+                $("#jsGrid").jsGrid({ pageSize: 50 });
+            }
+            else if ($("option:selected", $("#ddlRows")).val() == '4') {
+                $("#jsGrid").jsGrid({ pageSize: 100 });
+            }
+            else if ($("option:selected", $("#ddlRows")).val() == '5') {
+                $("#jsGrid").jsGrid({ pageSize: 200 });
+            }
+            else if ($("option:selected", $("#ddlRows")).val() == '6') {
+                $("#jsGrid").jsGrid({ pageSize: 500 });
+            }
+        });
+        $('#btnSearch').click(function () {
+            if (validate()) {
+                fillgrid();
+            }
+        });
+    });
+    function fillgrid() {
+    var arrRequestPackage = [];
+    $('#jsGrid').jsGrid({
+            width: "100%",
+            sorting: true,
+            paging: true,
+            pageSize: 10,
+            pagerFormat: "Pages: {first} {prev} {pages} {next} {last} &nbsp;&nbsp; {pageIndex} of {pageCount} &nbsp;&nbsp; Total rows: {itemCount}",
+            pageButtonCount: 10,
+            //filtering: true,
+            autoload: true,
+            rowClick: function (args) {
+                //console.log(args)
+                var $row = this.rowByItem(args.item),
+                    selectedRow = $("#jsGrid").find('table tr.highlight');
+                if (selectedRow.length) {
+                    selectedRow.toggleClass('highlight');
+                };
+
+                $row.toggleClass("highlight");
+            },
+            controller: {
+                loadData: function (filter) {
+                    var d = $.Deferred();
+                    var RegParams = {
+                        HospitalCode:'@Session["HospitalCode"]' ,
+                        Action: 'B',
+                        URN: $('#urnNo').val(),
+                        BlockingINVOICENO: null,
+                        TransactionID: '0'
+                    };
+                    return $.ajax({
+                        url: ServiceURL + "/api/Registration/GetRegistrationformation",
+                        type: "GET",
+                        data: RegParams,
+                        dataType: "json",
+                        contentType: "application/json; charset=utf-8",
+                        error: function (error) {
+                            console.log(error.statusText);
+                        },
+                    }).done(function (result) {
+                        // console.log(result);
+                        if (result.length > 0) {
+                            $('#divRowCount').show();
+                            d.resolve($.map(result, function (item, itemIndex) {
+                                return $.extend(item, { "Index": itemIndex + 1 });
+                            }
+                            ));
+                        }
+                        else {
+                            $('#divRowCount').hide();
+                        }
+                    });
+                    return d.promise();
+                }
+            },
+             fields: [
+                    { name: "Index", type: "number", width: 30, title: "#Sl", align: "center" },
+                    { name: "memberID", title: "memberID", type: "number", visible: false },
+                 { name: "headMemberName", title: "HeadOfFamily", type: "text", visible: false },
+                 { name: "transactionID", title: "transactionID", type: "text", visible: false },
+                 { name: "category", title: "Category", type: "text", visible: false },
+                 { name: "ward", title: "Ward", type: "text", visible: false },
+                 { name: "schemeCode", title: "schemeCode", type: "text", visible: false },
+                 { name: "packageName", title: "packageName", type: "text", visible: false },
+                 { name: "packageCost", title: "packageCost", type: "text", visible: false },
+                 { name: "amoutBlocked", title: "AmoutBlocked", type: "text", visible: false },
+                 { name: "procedureName", title: "procedureName", type: "text", visible: false },
+                 { name: "headMemberID", title: "headMemberID", type: "text", visible: false },
+                 { name: "headMemberName", title: "headMemberName", type: "text", visible: false },
+                 { name: "memberDistrictCode", title: "MemberDistrictCode", type: "number", visible: false },
+                 { name: "memberDistrictName", title: "MemberDistrictName", type: "text", visible: false },
+                 { name: "memberStateName", title: "MemberStateName", type: "text", visible: false },
+                 { name: "memberStateCode", title: "memberStateCode", type: "text", visible: false },
+                 { name: "memberBlockCode", title: "memberBlockCode", type: "text", visible: false },
+                 { name: "panchayatCode", title: "panchayatCode", type: "text", visible: false },
+                 { name: "villageCode", title: "villageCode", type: "text", visible: false },
+                 { name: "urn", type: "text", title: "URN", align: "center" },
+                 { name: "cardNo", type: "text", title: "Card No.", align: "center", visible: false },
+                 { name: "memberName", type: "text", title: "Name", align: "center"},
+                 { name: "invoiceNo", type: "text", title: "Invoice No.", align: "center" },
+                 { name: "preAuthDt", type: "number",title: "PreAuth Date", align: "center", visible: false },
+                 { name: "registrationDate", type: "number",title: "Registration Date", align: "center" },
+                 { name: "patientContactNumber", type: "number",title: "Contact Number", align: "center" },
+                 { name: "preAuthStatus", type: "text", title: "Status", align: "center" },
+                 { name: "preAuthDoc", type: "text", title: "PreAuthDoc", align: "center", visible: false  },
+                 { name: "tpaRemarks", type: "text", title: "Remarks", align: "center" },
+                 { type: "control", editButton: false, deleteButton: false,  align: "center",
+                        itemTemplate: function (value,item) {
+                            return $("<button>").attr({ type: "button", class: "btn btn-outline-success focusedBtn btn-sm my-2 my-sm-0" }).text("Block")
+                                .on("click", function () {
+                                    arrRequestPackage.push({
+                                        schemeCode: item.schemeCode,
+                                        urn: item.urn,
+                                        cardNo: item.cardNo,
+                                        memberName: item.memberName,
+                                        patientContactNumber:item.patientContactNumber,
+                                        memberID:item.memberID,
+                                        invoiceNo:item.invoiceNo,
+                                        registrationDate: item.registrationDate,
+                                        PreAuthDate:item.preAuthDt,
+                                        headMemberID: item.headMemberID,
+                                        headMemberName: item.headMemberName,
+                                        memberDistrictCode: item.memberDistrictCode,
+                                        memberDistrictName: item.memberDistrictName,
+                                        memberStateName: item.memberStateName,
+                                        memberStateCode: item.memberStateCode,
+                                        memberBlockCode: item.memberBlockCode,
+                                        panchayatCode: item.panchayatCode,
+                                        villageCode: item.villageCode,
+                                        transactionID: item.transactionID,
+                                        procedureName: item.procedureName,
+                                        packageCost: item.packageCost,
+                                        packageName: item.packageName,
+                                        amoutBlocked: item.amoutBlocked,
+                                        preAuthStatus: item.preAuthStatus,
+                                        PageBackStatus: 'P',
+                                        ward: item.ward,
+                                        category: item.category,
+                                        preAuthDoc:item.preAuthDoc
+                                    })
+                                    localStorage.setItem('PreAuthRequestInfo', JSON.stringify(arrRequestPackage));
+                                    if (item.preAuthStatus == "Approved" || item.preAuthStatus == "Rejected") {
+                                        window.location.href = '@Url.Action("AddPreAuthorizationDetails", "PreAuthorization")';
+                                    }
+                                    else {
+                                        alert('Cannot block this Package Please Check the Status!!');
+                                        window.location.reload();
+                                    }
+                                });
+                        },
+                        headerTemplate: function () {
+                            return $("<div>").prop("title", "Action").text("Action");
+                        }
+                 },
+                 {
+                    type: "control", editButton: false, deleteButton: false, align: "center",
+                    itemTemplate: function (value, item) {
+                        return $("<button>").attr({ type: "button", class: "btn btn-outline-danger focusedBtn btn-sm my-2 my-sm-0" }).text("Cancel")
+                            .on("click", function () {
+                                var arrCancellation = [];
+                                arrCancellation.push({
+                                    schemeCode: item.schemeCode,
+                                    urn: item.urn,
+                                    cardNo: item.cardNo,
+                                    memberName: item.memberName,
+                                    patientContactNumber: item.patientContactNumber,
+                                    memberID: item.memberID,
+                                    invoiceNo: item.invoiceNo,
+                                    registrationDate: item.registrationDate,
+                                    headMemberID: item.headMemberID,
+                                    headMemberName: item.headMemberName,
+                                    memberDistrictCode: item.memberDistrictCode,
+                                    memberDistrictName: item.memberDistrictName,
+                                    memberStateName: item.memberStateName,
+                                    memberStateCode: item.memberStateCode,
+                                    memberBlockCode: item.memberBlockCode,
+                                    panchayatCode: item.panchayatCode,
+                                    villageCode: item.villageCode,
+                                    amoutBlocked: item.amoutBlocked,
+                                    PageBackStatus: 'P',
+                                    TransactionID: item.transactionID
+                                })
+                                if (item.preAuthStatus == "Rejected Two Times" || item.preAuthStatus == "Rejected" || item.preAuthStatus == "Pending") {
+                                    localStorage.setItem('CancellationInfo', JSON.stringify(arrCancellation));
+                                        window.location.href = '@Url.Action("AddCancellation", "BlockPackage")';
+                                    }
+                                    else {
+                                        alert('Cannot Cancel this Package Please Check the Status!!');
+                                        window.location.reload();
+                                }
+                            });
+                    },
+                    headerTemplate: function () {
+                        return $("<div>").prop("title", "Action").text("Cancel");
+                    }
+                 }
+             ]
+        });
+    }
+    function validate() {
+        if ($('#urnNo').val() == '') {
+            alert('Please Enter URN !!');
+            $('#urnNo').focus();
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+    function inputLimiter(e, allow) {
+        var AllowableCharacters = '';
+        if (allow == 'NameCharactersymbol') {
+            AllowableCharacters = ' ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz./&';
+        }
+        if (allow == 'NameCharacters') {
+            AllowableCharacters = ' ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-.\'';
+        }
+        if (allow == 'NameCharactersAndNumbers') {
+            AllowableCharacters = '1234567890 ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-,/.\'';
+        }
+        if (allow == 'Description') {
+            AllowableCharacters = '1234567890 ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-,./\&(){}[]#$:';
+        }
+        if (allow == 'Numbers') {
+            AllowableCharacters = '1234567890';
+        }
+        if (allow == 'Decimal') {
+            AllowableCharacters = '1234567890.';
+        }
+        var k;
+        k = document.all ? parseInt(e.keyCode) : parseInt(e.which);
+        if (k != 13 && k != 8 && k != 0) {
+            if ((e.ctrlKey == false) && (e.altKey == false)) {
+                return (AllowableCharacters.indexOf(String.fromCharCode(k)) != -1);
+            }
+            else {
+                return true;
+            }
+        }
+        else {
+            return true;
+        }
+    }
+</script>
+<!-- Dashboard Body content part starts -->
+<div class="container">
+                <div class="card-body">
+<div class="justify-content-start customRadio customCheckbox mt-2 mt-4">
+                 
+
+    <!-- <ul class="nav nav-tabs custom-tab ml-4">
+        <li class="nav-item">
+            <a class="nav-link" href="@Url.Action("ViewBlockPackage", "BlockPackage")"> Surgical</a>
+        </li>
+        @*<li class="nav-item">
+            <a class="nav-link" href="@Url.Action("ViewMultipleBlockPackage", "BlockPackage")">Blocked Package</a>
+        </li>*@        
+        <li class="nav-item">
+            <a class="nav-link active" href="@Url.Action("PreAuthorizationDetails", "PreAuthorization")"> Pre-Auth </a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link" href="@Url.Action("PreAuthorizationDetails", "PreAuthorization")"> Emergency </a>
+        </li>
+
+        @*<li class="nav-item">
+            <a class="nav-link" href="@Url.Action("ViewExtensionOfStay", "ExtensionOfStay")">Extension Of Stay</a>
+        </li>*@
+    </ul> -->
+
+
+    <div class="row">
+        <div class="col-12 pb-3">
+            <div class="card bg-trans">
+
+                <div class="form-box-bg mb-4">
+                    <div class="row">
+                        <div class="col">
+                        <div class="pkg_grey">
+                            <form>
+                                <div class="form-row">
+                                     <div class="col-lg-12 col-md-12 col-sm-8 col-xs-12 form-row form-designsc">
+                                     <label for="packageHeader" class="col-form-label">  URN<b><span style="color:red">*</span></b> </label>
+                                     
+
+                                   <div class="col-lg-3 col-md-4 col-sm-4 col-xs-12  px-0">
+                                        <input type="text" class="form-control" autofocus id="urnNo" placeholder="Enter here" maxlength="17" onkeypress="return inputLimiter(event,'Numbers')" />
+                                    </div>
+                                    @*<label for="packageHeader" class="col-sm-2 col-form-label">From Date</label>
+                                        <div class="col-sm-2">
+                                            <div class="input-group mb-3">
+                                                <input type="text" id="FrmDt" class="form-control datepicker" placeholder="dd mmm yyyy" aria-label="Username" aria-describedby="basic-addon1" maxlength="11">
+                                                <div class="input-group-prepend">
+                                                    <label for="blockingDt" class="input-group-text"><i class="fa fa-calendar"></i></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <label for="packageHeader" class="col-sm-2 col-form-label">To Date</label>
+                                        <div class="col-sm-2">
+                                            <div class="input-group mb-3">
+                                                <input type="text" id="ToDt" class="form-control datepicker" placeholder="dd mmm yyyy" aria-label="Username" aria-describedby="basic-addon1" maxlength="11">
+                                                <div class="input-group-prepend">
+                                                    <label for="blockingDt" class="input-group-text"><i class="fa fa-calendar"></i></label>
+                                                </div>
+                                            </div>
+                                        </div>*@
+                                    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 px-0">
+                                        <input class="btn btn-outline-success my-2 my-sm-0 px-4" type="button" value="Search" id="btnSearch">
+                                    </div>
+                                    </div>
+                                </div>
+                            </form>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="table-responsive mt-2">
+                    <table id="example2" class="table table-striped" style="width:100%">
+                    <thead>
+                        <tr>
+                                <th scope="col">SL No</th>
+                                <th scope="col">URN No</th>
+                                <th scope="col">Name</th>
+                                <th scope="col"> Invoice No</th>
+                                <th scope="col"> Registration Date </th>
+                                <th scope="col">Contact Number</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Remarks</th>
+                                <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>02020100218039283</td>
+                            <td> Shyam jena</td>
+                            <td>INV093234545</td>
+                            <td>05-July-21</td>
+                            <td>9858785875</td>
+                             <td>Active</td>
+                            <td> Good </td>
+                             <td>
+                              <button type="button" class="btn btn-outline-success focusedBtn btn-sm my-2 my-sm-1 mr-2"> Change <i class="fi-rr-exchange-alt"></i </button>
+                              <button type="button" class="btn btn-outline-danger focusedBtn btn-sm my-2 my-sm-1" id="warning"> Cancel <i class="fa fa-trash"></i </button>
+                              
+                              </td>
+                       
+                        </tr>
+
+                          <tr>
+                            <td>2</td>
+                            <td>02020100218039283</td>
+                            <td> Shyam jena</td>
+                            <td>INV093234545</td>
+                            <td>05-July-21</td>
+                            <td>9858785875</td>
+                             <td>Active</td>
+                            <td> Good </td>
+                             <td>
+                              <button type="button" class="btn btn-outline-success focusedBtn btn-sm my-2 my-sm-1 mr-2"> Change <i class="fi-rr-exchange-alt"></i </button>
+                              <button type="button" class="btn btn-outline-danger focusedBtn btn-sm my-2 my-sm-1" id="warning"> Cancel <i class="fa fa-trash"></i </button>
+                              
+                              </td>
+                       
+                        </tr>
+                         <tr>
+                            <td>3</td>
+                            <td>02020100218039283</td>
+                            <td> Shyam jena</td>
+                            <td>INV093234545</td>
+                            <td>05-July-21</td>
+                            <td>9858785875</td>
+                             <td>Active</td>
+                            <td> Good </td>
+                             <td>
+                              <button type="button" class="btn btn-outline-success focusedBtn btn-sm my-2 my-sm-1 mr-2"> Change <i class="fi-rr-exchange-alt"></i </button>
+                              <button type="button" class="btn btn-outline-danger focusedBtn btn-sm my-2 my-sm-1" id="warning"> Cancel <i class="fa fa-trash"></i </button>
+                              
+                              </td>
+                       
+                        </tr>
+                    </tbody>
+                    </table>
+                    </div>
+
+
+
+               
+                </div>
+
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+     </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        $('.secondary-menu li a').tooltip();
+    });
+</script>
+
+<script>
+$(document).ready(function () {
+$('#example2').DataTable( {
+    responsive: true
+} );
+    
+});
+</script>
+

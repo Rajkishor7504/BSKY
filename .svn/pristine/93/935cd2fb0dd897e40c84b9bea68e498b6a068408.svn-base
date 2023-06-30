@@ -1,0 +1,209 @@
+﻿
+@{
+    ViewBag.Title = "ViewPreviousWardDetails";
+    Layout = "~/Views/Shared/_CommonLayout.cshtml";
+}
+<style type="text/css">
+    tr.highlight td.jsgrid-cell {
+        background-color: lightgoldenrodyellow;
+    }
+
+    .jsgrid-grid-header,
+    .jsgrid-grid-body {
+        overflow: auto;
+    }
+</style>
+<script>
+    window.location.hash = "no-back-button";
+    window.location.hash = "Again-No-back-button";
+    window.onhashchange = function () { window.location.hash = "no-back-button"; }
+</script>
+<script type="text/javascript">
+    var arrRegData = [];
+    $(document).keydown(function (event) {
+        event = (event || window.event);
+        if ((event.keyCode == 49) && (event.shiftKey === true)) {
+             window.location.href = '@Url.Action("ViewBlockPackage", "BlockPackage")';
+        }
+        else if ((event.keyCode == 50) && (event.shiftKey === true)) {
+             window.location.href = '@Url.Action("ViewMultipleBlockPackage", "BlockPackage")';
+        }
+        else if ((event.keyCode == 51) && (event.shiftKey === true)) {
+           window.location.href = '@Url.Action("PreAuthorizationDetails", "PreAuthorization")';
+        }
+         else if ((event.keyCode == 52) && (event.shiftKey === true)) {
+            window.location.href = '@Url.Action("ViewExtensionOfStay", "ExtensionOfStay")';
+        }
+    });
+    $(document).ready(function () {
+         $('#divCal').hide();
+        $('#divTranId').text('@ViewBag.Id'); 
+        $('#DisDt').text('@ViewBag.Dt');
+        if ($('#DisDt').text() != '') {
+             $('#divCal').show();
+        }
+        $('#path').html('Previous Ward Details');
+        fillgrid();
+        
+        $('#ddlRows').change(function () {
+            if ($("option:selected", $("#ddlRows")).val() == '1') {
+                $("#jsGrid").jsGrid({ pageSize: 10});
+            }
+           else if ($("option:selected", $("#ddlRows")).val() == '2') {
+                $("#jsGrid").jsGrid({ pageSize: 20 });
+            }
+           else if ($("option:selected", $("#ddlRows")).val() == '3') {
+                $("#jsGrid").jsGrid({ pageSize: 50 });
+            }
+           else if ($("option:selected", $("#ddlRows")).val() == '4') {
+                $("#jsGrid").jsGrid({ pageSize: 100 });
+            }
+          else if ($("option:selected", $("#ddlRows")).val() == '5') {
+                $("#jsGrid").jsGrid({ pageSize: 200 });
+            }
+          else if ($("option:selected", $("#ddlRows")).val() == '6') {
+                $("#jsGrid").jsGrid({ pageSize: 500 });
+            }
+        });
+         
+    });
+    function fillgrid() {
+        if (localStorage.getItem('WardTransactionInfo') != null) {
+            var WardInfo = JSON.parse(localStorage.getItem('WardTransactionInfo'));
+           // console.log(WardInfo)                      
+            $('#jsGrid').jsGrid({
+                width: "100%",
+                sorting: true,
+                paging: true,
+                autoload: true,
+                pageSize: 10,
+                pagerFormat: "Pages: {first} {prev} {pages} {next} {last} &nbsp;&nbsp; {pageIndex} of {pageCount} &nbsp;&nbsp; Total rows: {itemCount}",
+                pageButtonCount: 10,
+                rowClick: function (args) {
+                    //console.log(args)
+                    var $row = this.rowByItem(args.item),
+                        selectedRow = $("#jsGrid").find('table tr.highlight');
+                    if (selectedRow.length) {
+                        selectedRow.toggleClass('highlight');
+                    };
+                    $row.toggleClass("highlight");
+                },
+                controller: {
+                    loadData: function (filter) {
+                        var d = $.Deferred();
+                        var TranId;
+                        if ($('#divTranId').text() != '') {
+                            TranId = $('#divTranId').text();
+                        }
+                        else {
+                            TranId = WardInfo[0].TranId;
+                        }                        
+                        var RegParams = {
+                            Action: 'B',
+                            TransactionID: TranId,
+                            DischargeDate:$('#DisDt').text()
+                        };
+                        return $.ajax({
+                            url: ServiceURL + "/api/Registration/GetPreviousWardDetailsByTranId",
+                            type: "GET",
+                            data: RegParams,
+                            dataType: "json",
+                            contentType: "application/json; charset=utf-8",
+                            error: function (error) {
+                                console.log(error.statusText);
+                            },
+                        }).done(function (result) {
+                             //console.log(result);
+                            if (result.length > 0) {
+                                $('#divRowCount').show();
+                                d.resolve($.map(result, function (item, itemIndex) {
+                                    return $.extend(item, { "Index": itemIndex + 1 });
+                                }
+                                ));
+                            }
+                            else {
+                                $('#divRowCount').hide();
+                            }
+                        });
+                        return d.promise();
+                    }
+
+                },
+                onRefreshed: function (args) {
+                    if ($('#DisDt').text() != '') {
+                        var items = args.grid.option("data");
+                        var count=0;
+                        if (items.length > 0) {
+                            var LastWardAmount;
+                            var TotAmnt = 0;
+                            var TotDays = 0;
+                            for (var i = 0; i < items.length; i++) {
+                                count++;
+                                if (items[i].noOfDays!=0) {
+                                     TotAmnt = parseInt(TotAmnt) + parseInt(items[i].wardDischargeAmount);
+                                }
+                               TotDays=parseInt(TotDays)+parseInt(items[i].noOfDays);
+                                //if (count == items.length) {
+                                //    var Dif = new Date(new Date($('#DisDt').text()) - new Date(items[i].wardBlockingDate));
+                                //    ActDay = Dif / 1000 / 60 / 60 / 24;
+                                //    if (ActDay == 0) {
+                                //        LastWardAmount = items[i].amount;
+                                //    }
+                                //    else {
+                                //        LastWardAmount = (items[i].amount * ActDay);
+                                //    }
+                                //}
+                            }
+                            //var Diff = new Date(new Date($('#DisDt').text()) - new Date(items[0].wardBlockingDate));
+                            //ActDays = Diff / 1000 / 60 / 60 / 24;
+                            //$('#TotNoDay').text(ActDays);
+                           // $('#TotAmnt').text(parseInt(TotAmnt) + parseInt(LastWardAmount));
+                            $('#TotNoDay').text(TotDays);
+                            $('#TotAmnt').text(TotAmnt);
+                        }
+                    }
+                },
+                fields: [
+                    { name: "Index", width: 50, type: "number", title: "#Sl", align: "center", filtering: false },
+                    { name: "procedureName", type: "text", title: "Procedure", align: "center" },
+                    { name: "procedureCode", type: "text", title: "Procedure Code", align: "center",visible: false },
+                    { name: "category", type: "text", title: "Category", align: "center" },
+                    { name: "categoryCode", type: "text", title: "Category Code", align: "center", visible: false },
+                    { name: "packageName", type: "text", title: "Package Name", align: "center" },
+                    { name: "packageCode", type: "text", title: "Package Code", align: "center", visible: false },
+                    { name: "ward", type: "text", title: "Ward", align: "center" },
+                    { name: "wardId", type: "text", title: "WardId", align: "center", visible: false },
+                    { name: "amount", type: "text", title: "Amount(Rs.)", align: "center" },
+                    { name: "wardBlockingDate", type: "text", title: "Blocking Date", align: "center" },
+                    { name: "wardDischargeDate", type: "text", title: "Discharge Date", align: "center" },
+                    { name: "noOfDays", type: "text", title: "No Of Days", align: "center" },
+                    { name: "wardDischargeAmount", type: "text", title: "Discharge Amount(Rs.)", align: "center" }
+                ]
+            });
+            
+        }
+       
+    }
+</script>
+<!-- Dashboard Body content part starts -->
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12 pb-3">
+            <div class="card">
+                <div class="card-body">
+                    <div id="divTranId" hidden></div>
+                    <div class="table table-striped table-bordered" id="jsGrid">
+                    </div>
+                    <div class="row border border-secondary" id="divCal">
+                        <div class="col col-sm-2">Discharge Date:</div>
+                        <div class="col col-sm-2"><strong id="DisDt"></strong></div>
+                        <div class="col col-sm-2">Total No Of Days:</div>
+                        <div class="col col-sm-2"><strong id="TotNoDay"></strong></div>
+                        <div class="col col-sm-3">Total Discharge Amount:</div>
+                        <div class="col col-sm-1"><strong id="TotAmnt"></strong></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

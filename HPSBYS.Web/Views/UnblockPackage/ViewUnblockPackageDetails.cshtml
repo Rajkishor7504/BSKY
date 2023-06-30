@@ -1,0 +1,830 @@
+﻿@{
+    ViewBag.Title = "ViewUnblockPackageDetails";
+    Layout = "~/Views/Shared/_CommonLayout.cshtml";
+}
+<script src="~/js/PackageBlock.js"></script>
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="clearfix"></div>
+
+                    <!-- Family Verification info -->
+                    <div class="form-box-bg mb-4">
+
+                        <ul class="nav nav-tabs custom-tab mb-4">
+                            <li class="nav-item">
+                                <a class="nav-link" href="@Url.Action("ViewUnblockPackage","UnblockPackage")">Add</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link active" href="@Url.Action("ViewUnblockPackageDetails","UnblockPackage")">View</a>
+                            </li>
+                        </ul>
+                        <div class="col-md-12 p-0">
+                            <div class="row">
+                                <div class="col-lg-2">
+                                    <div class="mb-4">
+                                        <label class="pkg-label"> From Date :</label>
+                                        <input type="text" id="fromdate" class="form-control datepicker" />
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-2">
+                                    <div class="mb-4">
+                                        <label class="pkg-label"> To Date :</label>
+                                        <input type="text" id="todate" class="form-control datepicker" />
+                                    </div>
+                                </div>
+                                <div class="col-lg-2">
+                                    <div class="mb-4">
+                                        <label class="pkg-label"> Type :</label>
+                                        <select id="ddlDateType" class="form-control form-group">
+                                            <option value="A">Admission Date</option>
+                                            <option value="U">Unblocking Date</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="mt-4">
+                                    <input class="btn btn-outline-success" type="button" value="Search" id="btnSearch">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-2">
+                            <!--<table id="example2" class="table table-striped" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">SL No</th>
+                                        <th scope="col">URN</th>
+                                        <th scope="col">Member Name</th>
+                                        <th scope="col">Member Id</th>
+                                        <th scope="col">Aadhaar No</th>-->
+                                        @*<th scope="col">Invoice No</th>*@
+                                        <!--<th scope="col">Case No</th>
+                                        <th scope="col">Admission Date </th>
+                                        <th scope="col">Unblock Date </th>
+                                        <th scope="col">Action</th>
+                                    </tr>
+                                </thead>
+
+                            </table>-->
+
+                            <!-- View Un-block packages -->
+
+                            <table id="example2" class="table table-striped border preauth-tbl" width="100%">
+                                <thead>
+                                    <tr>
+                                        <th width="5%">Sl No</th>
+                                        <th width="10%">URN</th>
+                                        <th width="20%"> <div class="prehed-bold"> Member Details </div> <div class="prehed-small"> ID | Name </div> </th>
+                                        <th width="12%"> Aadhar No </th>
+                                        <th width="15%">Case No</th>
+                                        <th width="12%"> Admission Date </th>
+                                        <th width="12%"> Un-block Date </th>
+                                        <th width="20%" class="text-center"> Action </th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>02120610257</td>
+                                        <td> <b class="text-success"> #59776523 </b> <div class="pre-bold"> SRI SRI RAJENDRA BALIAR SINGH DEO </div> </td>
+                                        <td> XXXX XXXX 2156 </td>
+                                        <td> CASE/27237006/16052023/005 </td>
+                                        <td> 16-May-23 </td>
+                                        <td> 16-May-23 </td>
+                                        <td>
+                                            <span style="float: right;">
+                                                <button type="button" tooltip="Hospital Slip" class="btn btn-outline-secondary focusedBtn btn-sm my-2 my-sm-0 mr-2"><i class="fa fa-files-o"></i></button>
+                                                <button type="button" tooltip="Patient Slip" class="btn btn-outline-warning focusedBtn btn-sm my-2 my-sm-0 mr-2"><i class="fa fa-file-text-o"></i></button>
+                                                <button type="button" tooltip="View Details" toggle="modal" class="btn btn-outline-danger focusedBtn btn-sm my-2 mr-2 my-sm-0"> <i class="fa fa-eye"></i></button>
+                                            </span>
+
+
+                                        </td>
+
+                                    </tr>
+
+                                    <tr>
+                                        <td>2</td>
+                                        <td>02120610257</td>
+                                        <td> <b class="text-success"> #59776523 </b> <div class="pre-bold"> SRI SRI BIBHU RANJAN DUBEY </div> </td>
+                                        <td> XXXX XXXX 2156 </td>
+                                        <td> CASE/27237006/16052023/005 </td>
+                                        <td> 16-May-23 </td>
+                                        <td> 16-May-23 </td>
+                                        <td>
+                                            <span style="float: right;">
+                                                <button type="button" tooltip="Hospital Slip" class="btn btn-outline-secondary focusedBtn btn-sm my-2 my-sm-0 mr-2"><i class="fa fa-files-o"></i></button>
+                                                <button type="button" tooltip="Patient Slip" class="btn btn-outline-warning focusedBtn btn-sm my-2 my-sm-0 mr-2"><i class="fa fa-file-text-o"></i></button>
+                                                <button type="button" tooltip="View Details" toggle="modal" class="btn btn-outline-danger focusedBtn btn-sm my-2 mr-2 my-sm-0"> <i class="fa fa-eye"></i></button>
+                                            </span>
+
+
+                                        </td>
+
+                                    </tr>
+
+
+                                    <tr>
+                                        <td>3</td>
+                                        <td>02120610257</td>
+                                        <td> <b class="text-success"> #59776523 </b> <div class="pre-bold"> SRI SRI SUDHANSHU SEKHAR TRIPATHY</div> </td>
+                                        <td> XXXX XXXX 2156 </td>
+                                        <td> CASE/27237006/16052023/005 </td>
+                                        <td> 20-June-23 </td>
+                                        <td> 12-April-23 </td>
+                                        <td>
+                                            <span style="float: right;">
+                                                <button type="button" tooltip="Hospital Slip" class="btn btn-outline-secondary focusedBtn btn-sm my-2 my-sm-0 mr-2"><i class="fa fa-files-o"></i></button>
+                                                <button type="button" tooltip="Patient Slip" class="btn btn-outline-warning focusedBtn btn-sm my-2 my-sm-0 mr-2"><i class="fa fa-file-text-o"></i></button>
+                                                <button type="button" tooltip="View Details" toggle="modal" class="btn btn-outline-danger focusedBtn btn-sm my-2 mr-2 my-sm-0"> <i class="fa fa-eye"></i></button>
+                                            </span>
+
+
+                                        </td>
+
+                                    </tr>
+
+
+
+
+
+                                </tbody>
+                            </table>
+
+
+                            <!-- View Un-block packages -->
+
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- View details modal start -->
+<div class="modal fade wow fadeInUp animated" id="ViewDetails" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="col-lg-10 px-0">
+                    <div class="form-row">
+                        <div class="col-md-6">
+                            <div class="heading-pkg px-0"><h5 class="mb-0"> View Details </h5> </div>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="border p-3 rounded">
+                    <div class="row heading-pkg border-bottom mb-3">
+                        <h5> Patient Details </h5>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-2">
+                            <label class="pkg-label font-weight-normal">Name :</label>
+                            <div class="pkghead-txt">
+                                <span id="pmembername"></span>
+                            </div>
+                        </div>
+                        <div class="col-lg-2">
+                            <label class="pkg-label font-weight-normal">Member ID :</label>
+                            <div class="pkghead-txt">
+                                <span id="memberid"></span>
+                            </div>
+                        </div>
+                        <div class="col-lg-2">
+                            <label class="pkg-label font-weight-normal">Gender : </label>
+                            <div class="pkghead-txt">
+                                <span id="patientgender"></span>
+                            </div>
+                        </div>
+                        <div class="col-lg-2">
+                            <label class="pkg-label font-weight-normal">Age :</label>
+                            <div class="pkghead-txt">
+                                <span id="age"></span>
+                            </div>
+                        </div>
+                        <div class="col-lg-2">
+                            <label class="pkg-label font-weight-normal">Aadhaar Card :</label>
+                            <div class="pkghead-txt">
+                                <span id="uidnumber"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <label class="pkg-label font-weight-normal col-lg-2">Surgical Type :</label>
+                        <div class="pkghead-txt col-lg-2">
+                            <span id="surgicaltype"></span>
+                        </div>
+                    </div>
+
+                    <div class="row heading-pkg border-bottom mb-3">
+                        <h5> Package Details </h5>
+                    </div>
+
+                    <div class="row mx-0 mb-4">
+                        <div class="table-responsive border">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Sl#</th>
+                                        <th>Package Header</th>
+                                        <th>Sub-Package</th>
+                                        <th>Package Details</th>
+                                        <th>Ward Cost</th>
+                                        <th>Treatment Days</th>
+                                        <th>Approval Require</th>
+                                        <th>Unblock Package Date</th>
+                                        <th colspan="2"> Action </th>
+                                    </tr>
+                                </thead>
+                                <tbody id="packageDetailsbody">
+                                    <tr>
+                                        <td> 1 </td>
+                                        <td>Burns Management</td>
+                                        <td>Electrical Contact Burns</td>
+                                        <td>BM004A</td>
+                                        <td>51187</td>
+                                        <td>0</td>
+                                        <td>NO</td>
+                                        <td>23-Feb-23</td>
+                                        <td> <button type="button" class="btn btn-outline-success focusedBtn btn-sm my-2 my-sm-0" data-toggle="collapse" data-target="#pkgmodalcls"> View Details <i class="fa fa-eye"></i></button> </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="12" class="m-0 p-0 border-0">
+                                            <div class="accordian-body collapse" id="pkgmodalcls">
+                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 mt-3">
+                                                    <div class="headingpkg-bg"> Package Details </div>
+                                                    <div class="row d-flex align-items-center">
+                                                        <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                                                            <div class="impl_head"> Implant Details </div>
+                                                        </div>
+                                                        <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                                                            <div class="row d-flex align-items-center">
+                                                                <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12">
+                                                                    <div class="impl_head"> HighEndDrugs Details </div>
+                                                                </div>
+                                                                <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12"></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-lg-6" id="table-scroll">
+                                                            <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12 mt-3"></div>
+                                                            <table class="table table-striped tblImplView" id="tblImplantView1">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th scope="bg-white text-align-left" style="background-color:#fff !important;"> Implant Name</th>
+                                                                        <th scope="bg-white text-align-center" style="background-color:#fff !important;"> Unit </th>
+                                                                        <th scope="bg-white text-align-right" style="background-color:#fff !important;"> Price </th>
+                                                                        <th scope="bg-white text-align-right" style="background-color:#fff !important;"> Total Price </th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody></tbody>
+                                                                <tfoot>
+                                                                    <tr>
+                                                                        <td class="font-weight-5">Total </td>
+                                                                        <td class="font-weight-5"></td>
+                                                                        <td></td>
+                                                                        <td colspan="2" class="font-weight-5 clsImplTotalInner1"></td>
+                                                                    </tr>
+                                                                </tfoot>
+                                                            </table>
+                                                        </div>
+                                                        <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12 mt-3">
+                                                            <div id="table-scroll" class="table-scroll table-responsive mb-3">
+                                                                <table id="tblHgDrugsInnerList1" class="main-table table table-striped">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th scope="bg-white text-align-left" style="background-color:#fff !important;"> HighEndDrugs Name </th>
+                                                                            <th scope="bg-white text-align-center" style="background-color:#fff !important;"> Unit </th>
+                                                                            <th scope="bg-white text-align-right" style="background-color:#fff !important;"> Price </th>
+                                                                            <th scope="bg-white text-align-right" style="background-color:#fff !important;"> Total Price </th>
+                                                                            <th scope="bg-white text-align-right" style="background-color:#fff !important;"> Pre-Auth Required </th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        <tr>
+                                                                            <td>IV immunoglobins</td>
+                                                                            <td>1<input type="hidden" id="hdnTabname" name="hdHedltabName" value="tblHgDrugsInnerList1"></td>
+                                                                            <td>250000.00</td>
+                                                                            <td>250000.00</td>
+                                                                            <td class="hedPreAuth"><input type="hidden" name="hedPreAuthcls" value="isPackAuthReq1">Yes<input type="hidden" id="hdnParentIsPreAuth" name="hdnnmParentIsPreAuth" value="YES"></td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                    <tfoot>
+                                                                        <tr>
+                                                                            <td colspan="1">Total </td>
+                                                                            <td class="font-weight-5">&nbsp;</td>
+                                                                            <td>&nbsp;</td>
+                                                                            <td class="font-weight-5" colspan="3">₹2,51,700.00</td>
+                                                                        </tr>
+                                                                    </tfoot>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="8"> <b> Total Cost (Total Package Cost +Implant Cost +Highend Drugs Cost) </b> </td>
+                                        <td colspan="2" align="right"> <b id="TotalPackageCost"></b></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                        <!-- package details section -->
+                    </div>
+
+
+                    <div class="border p-3 rounded">
+                        <div class="row heading-pkg border-bottom mb-3">
+                            <h5> Admission Details </h5>
+                        </div>
+
+                        <div class="row mx-0 mb-4">
+                            <div class="table-responsive">
+                                <table class="table" id="tbladmissiondetails">
+                                    <thead>
+                                        <tr>
+                                            <th>Sl#</th>
+                                            <th>Actual Date of Admission</th>
+                                            <th>Doctor Name</th>
+                                            <th>Doctor Phone No</th>
+                                            <th>Patient Phone No</th>
+                                            <th>Override Code</th>
+                                            <th>Referral Code</th>
+                                            <th>Description</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>1</td>
+                                            <td id="admissiondate">Actual Date of Admission</td>
+                                            <td id="doctorname"></td>
+                                            <td id="doctorphno"></td>
+                                            <td id="patientcontactnumber"></td>
+                                            <td id="overridecode"></td>
+                                            <td id="referalcode"></td>
+                                            <td id="description"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="border p-3 rounded">
+                        <div class="row heading-pkg border-bottom mb-3">
+                            <h5> Verified Details </h5>
+                        </div>
+
+                        <div class="row mx-0 mb-4">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Sl#</th>
+                                            <th>Member Id</th>
+                                            <th>Name</th>
+                                            <th>Gender</th>
+                                            <th>Age</th>
+                                            <th>Aadhaar Card No</th>
+                                            <th>Ration Card No</th>
+                                            <th>Verified Through</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>1</td>
+                                            <td id="verifiedmemberid"></td>
+                                            <td id="verifiedmembername"></td>
+                                            <td id="verifiedmembergender"></td>
+                                            <td id="verifiedmemberage"></td>
+                                            <td id="verifiedmemberaadhar"></td>
+                                            <td id="urn"></td>
+                                            <td id="verificationmode"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <label class="pkg-label font-weight-normal col-lg-1">Remark :</label>
+                        <div class="pkghead-txt col-lg-8">
+                            <span id="idremarks"></span>
+                        </div>
+                    </div>
+
+                    <hr />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- View details modal end -->
+<script>
+ document.mynamespace = {};
+    document.mynamespace.hospitalcode = '@HttpContext.Current.Session["HospitalCode"]';
+    var hospitalcode = document.mynamespace.hospitalcode;
+$(document).ready(function () {
+    $('#path').html('View Unblock Package List');
+    loadNavigation('ViewUnblockPackageDetails', 'Mlunblockpackage', 'pl', 'Unblock Package', 'View Unblock Package Details', '');
+    $(".datepicker").datepicker({
+        numberOfMonths: 1,
+        changeMonth: true,
+        dateFormat: "dd-M-y",
+        changeYear: true
+    });
+    $('#example2').DataTable({
+        responsive: true
+    });
+    var d = new Date();
+    var currentDate = d.getDate();
+    var currMonth = d.getMonth();
+    var currYear = d.getFullYear();
+    var startDate = new Date(currYear, currMonth, 1);
+    var endDate = new Date(currYear, currMonth, currentDate);
+    $("#fromdate").val(moment(startDate).format("DD-MMM-YY"));
+    $("#todate").val(moment(endDate).format("DD-MMM-YY"));
+    var frmdate = $("#fromdate").val();
+    var to_date = $("#todate").val();
+    getData(frmdate, to_date);
+});
+
+function getData(frmdate, to_date) {
+    var param = {
+        HospitalCode: hospitalcode,
+        fromdate: frmdate,
+        todate: to_date,
+        searchtype: $("#ddlDateType").val()
+    };
+    $.ajax({
+        url: ServiceURL + "/api/UnblockPackage/GetViewUnBlockpackagedetailsList",
+        type: "POST",
+        data: param,
+        dataType: "json",
+        beforeSend: function () {
+            $("#loader").show();
+        },
+        success: function (resultBal) {
+            drawTable(resultBal);
+        },
+        complete: function () {
+            $("#loader").hide();
+        },
+        error: function (error) {
+            console.log(error.responseText);
+        }
+    });
+};
+
+function drawTable(data) {
+    var table = $('#example2').DataTable();
+    table.destroy();
+    $('#example2').dataTable({
+        "responsive": true,
+        //sDom: 'lrtip',//remove search textbox from datatable
+        "aaData": data,   //this is your JSON object, which is what is showing in your post above with console.log(data)
+        "aoColumns": [
+            {
+                "render": function (data, type, full, meta) {
+                    return meta.row + 1;
+                }
+            },
+            { "mDataProp": "urn" },
+            {
+                mDataProp: null,
+                render: function (data, type, row) {
+                    return '<b class="text-success">' + row.memberid + '</b><div class="pre-bold" >' + row.membername+'</div>';
+                }
+            },
+            //{ "mDataProp": "membername" },
+            //{ "mDataProp": "memberid" },
+            { "mDataProp": "uidnumber" },
+            { "mDataProp": "caseno" },
+            { "mDataProp": "admissiondate" },
+            { "mDataProp": "unblockeddate" },
+            {
+                "render": function (data, type, row) {
+                    var actionContent = "<span style='float:right;'>";
+                    actionContent += "<button type = 'button' tooltip = 'Patient Slip' onclick='UnBlockpackageslip(this)' class='btn btn-outline-success focusedBtn btn-sm my-2 my-sm-0 mr-2' > <i class='fa fa-file-text-o'></i></button>" +
+                        "<button type = 'button' tooltip = 'Hosiptal Slip' onclick='UnBlockHospitalSlip(this)' class='btn btn-outline-secondary focusedBtn btn-sm my-2 my-sm-0 mr-2' > <i class='fa fa-files-o'></i></button>"
+                        + "<button type = 'button' tooltip = 'View Details' onclick='ShowUnBlockdetails(this)' class='btn btn-outline-danger focusedBtn btn-sm my-2 mr-2 my-sm-0' ><i class='fa fa-eye'></i></button></span>";
+                    return actionContent;
+                    return actionContent;
+                }
+            },
+        ]
+    });
+}
+
+$("#btnSearch").click(function () {
+
+    var fromDt = $("#fromdate").val();
+    var toDt = $("#todate").val();
+    var from = "";
+    var to = "";
+    if (fromDt != "")
+        from = new Date($("#fromdate").val());
+    if (toDt != "")
+        to = new Date($("#todate").val());
+    if (to != "" && from === "") {
+        swal({
+            text: "Please select From Date.",
+            confirmButtonColor: "#36A865",
+            type: "error",
+            confirmButtonText: "OK",
+            closeOnConfirm: false
+        }).then(function () {
+            $("#fromdate").focus();
+        });
+    }
+    else if (from != "" && to === "") {
+        swal({
+            text: "Please select to Date.",
+            confirmButtonColor: "#36A865",
+            type: "error",
+            confirmButtonText: "OK",
+            closeOnConfirm: false
+        }).then(function () {
+            $("#todate").focus();
+        });
+    }
+    else if (from > to) {
+        swal({
+            text: "From date should not be greater than To date.",
+            confirmButtonColor: "#36A865",
+            type: "error",
+            confirmButtonText: "OK",
+            closeOnConfirm: false
+        }).then(function () {
+            $("#fromdate").focus();
+        });
+    }
+    else {
+        getData(fromDt, toDt);
+    }
+});
+
+function ShowUnBlockdetails(ele) {
+    var hospitalcode = document.mynamespace.hospitalcode;
+    var dataRow = $('#example2').DataTable().row($(ele).closest('tr')).data();
+    var param = {
+        hospitalcode: hospitalcode,
+        transactionid: dataRow.transactionid,
+        txnpackagedetailid: dataRow.txnpackagedetailid
+    };
+    $.ajax({
+        url: ServiceURL + "/api/UnblockPackage/GetUnBlockDetailsView",
+        type: "POST",
+        data: param,
+        dataType: "json",
+        beforeSend: function () {
+            $("#loader").show();
+        },
+        success: function (response) {
+            $("#packageDetailsbody").empty();
+            console.log("unblock viw", response);
+            $('#pmembername').html(response.patientDetails.membername);
+            $('#memberid').html(response.patientDetails.memberid);
+            $('#patientgender').html(response.patientDetails.patientgender);
+            $('#age').html(response.patientDetails.age);
+            $('#uidnumber').html(response.patientDetails.uidnumber);
+            $('#surgicaltype').html(response.patientDetails.surgicaltype);
+            $('#idremarks').html(response.patientDetails.remarks);
+            $('#admissiondate').html(response.patientDetails.admissiondate);
+            $('#doctorname').html(response.patientDetails.doctorname);
+            $('#doctorphno').html(response.patientDetails.doctorphno);
+            $('#patientcontactnumber').html(response.patientDetails.patientcontactnumber);
+            $('#overridecode').html(response.patientDetails.overridecode);
+            $('#referalcode').html(response.patientDetails.referalcode);
+            $('#description').html(response.patientDetails.description);
+            $('#description').html(response.patientDetails.description);
+            $('#verifiedmemberid').html(response.patientDetails.verifiedmemberid);
+            $('#verifiedmembergender').html(response.patientDetails.verifiedmembergender);
+            $('#verifiedmemberage').html(response.patientDetails.verifiedmemberage);
+            $('#verifiedmemberaadhar').html(response.patientDetails.verifiedmemberaadhar);
+            $('#urn').html(response.patientDetails.urn);
+            $('#verificationmode').html(response.patientDetails.verificationmode);
+            $('#verifiedmembername').html(response.patientDetails.verifiedmembername);
+            var TotatCost = 0;
+            for (var i = 0; i < response.packageDetails.length; i++) {
+                if (i == 0) {
+                    TotatCost = response.packageDetails[0].totalpackagecost;
+                    $('#TotalPackageCost').html(TotatCost);
+                }
+                var slno = i + 1;
+                var AddParameter = "<tr class='parent'>" +
+                    "<td>" + slno + "</td>" +
+                    "<td>" + response.packageDetails[i].packageheadername + "</td>" +
+                    "<td>" + response.packageDetails[i].packagesubcategoryname + "</td>" +
+                    "<td>" + response.packageDetails[i].procedurecode + "</td>" +
+                    "<td>" + response.packageDetails[i].wardcost + "</td>" +
+                    "<td>" + response.packageDetails[i].days + "</td>" +
+                    "<td>" + response.packageDetails[i].preauthstatus + "</td>" +
+                    "<td>" + response.packageDetails[i].blockinguserdate + "</td>" +
+                    "<td><button type='button' class='btn btn-outline-success focusedBtn btn-sm my-2 my-sm-0 detailsPanal' data-toggle='collapse' data-target='#pkgmodalcls_" + slno + "'> View Details <i class='fa fa-eye'></i></button></td></tr>";
+
+                AddParameter += "<tr class ='child'>";
+                AddParameter += "<td colspan='12' class='m-0 p-0 border-0'>";
+                AddParameter += "<div class='accordian-body collapse' id='pkgmodalcls_" + slno + "'>";
+                AddParameter += "<div class='col-lg-12 col-md-12 col-sm-12 col-xs-12 mt-3'>";
+                AddParameter += "<div class='headingpkg-bg'> Package Details </div>";
+                AddParameter += "<div class='row d-flex align-items-center'>";
+                AddParameter += "<div class='col-lg-6 col-md-12 col-sm-12 col-xs-12'>";
+                AddParameter += "<div class='impl_head'> Implant Details </div>";
+                AddParameter += "</div>";
+                AddParameter += "<div class='col-lg-6 col-md-12 col-sm-12 col-xs-12'>";
+                AddParameter += "<div class='row d-flex align-items-center'>";
+                AddParameter += "<div class='col-lg-7 col-md-7 col-sm-12 col-xs-12'>";
+                AddParameter += "<div class='impl_head'> HighEndDrugs Details </div>";
+                AddParameter += "</div>";
+                AddParameter += "<div class='col-lg-5 col-md-5 col-sm-12 col-xs-12'></div>";
+                AddParameter += "</div>";
+                AddParameter += "</div>";
+                AddParameter += "</div>";
+                AddParameter += "<div class='row'>";
+                AddParameter += "<div class='col-lg-6' id='table-scroll'>";
+                AddParameter += "<div class='col-lg-6 col-md-12 col-sm-12 col-xs-12 mt-3'></div>";
+                AddParameter += "<table class='table table-striped tblImplView' id='tblImplantView1'>";
+                AddParameter += "<thead>";
+                AddParameter += "<tr>";
+                AddParameter += "<th scope='bg-white text-align-left' style='background-color:#fff !important;'> Implant Name</th>";
+                AddParameter += "<th scope='bg-white text-align-center' style='background-color:#fff !important;'> Unit </th>";
+                AddParameter += "<th scope='bg-white text-align-right' style='background-color:#fff !important;'> Price </th>";
+                AddParameter += "<th scope='bg-white text-align-right' style='background-color:#fff !important;'> Total Price </th>";
+                AddParameter += "</tr>";
+                AddParameter += "</thead>";
+                AddParameter += "<tbody id=Implant_" + slno + ">";
+                var implantTotalamount = 0;
+                for (var j = 0; j < response.implantDetails.length; j++) {
+                    if (response.implantDetails[j].txnpackagedetailid == response.packageDetails[i].txnpackagedetailid) {
+                        if (j == 0) {
+                            implantTotalamount = response.implantDetails[0].totalamount
+                        }
+                        AddParameter += "<tr>";
+                        AddParameter += "<td>" + response.implantDetails[j].implantname + "</td>";
+                        AddParameter += "<td>" + response.implantDetails[j].unit + "</td>";
+                        AddParameter += "<td>" + response.implantDetails[j].unitcycleprice + "</td>";
+                        AddParameter += "<td>" + response.implantDetails[j].amount + "</td>";
+                        AddParameter += "</tr>";
+                    }
+                }
+                AddParameter += "</tbody>";
+                AddParameter += "<tfoot>";
+                AddParameter += "<tr>";
+                AddParameter += "<td class='font-weight-5'>Total </td>";
+                AddParameter += "<td class='font-weight-5'></td>";
+                AddParameter += "<td></td>";
+                AddParameter += "<td colspan='2' class='font-weight-5 clsImplTotalInner1'>" + implantTotalamount + "</td>";
+                AddParameter += "</tr>";
+                AddParameter += "</tfoot>";
+                AddParameter += "</table>";
+                AddParameter += "</div>";
+                AddParameter += "<div class='col-lg-6 col-md-12 col-sm-12 col-xs-12 mt-3'>";
+                AddParameter += "<div id='table-scroll' class='table-scroll table-responsive mb-3'>";
+                AddParameter += "<table id='tblHgDrugsInnerList1' class='main-table table table-striped'>";
+                AddParameter += "<thead>";
+                AddParameter += " <tr>";
+                AddParameter += " <th scope='bg-white text-align-left' style='background-color:#fff !important;'> HighEndDrugs Name </th>";
+                AddParameter += "<th scope='bg-white text-align-center' style='background-color:#fff !important;'> Unit </th>";
+                AddParameter += "<th scope='bg-white text-align-right' style='background-color:#fff !important;'> Price </th>";
+                AddParameter += "<th scope='bg-white text-align-right' style='background-color:#fff !important;'> Total Price </th>";
+                AddParameter += "<th scope='bg-white text-align-right' style='background-color:#fff !important;'> Pre-Auth Required </th>";
+                AddParameter += "</tr>";
+                AddParameter += "</thead>";
+                AddParameter += "<tbody id='HgDrugs_" + slno + "'>";
+                var highAndDrugTotalamount = 0;
+                for (var k = 0; k < response.highAndDrugDetails.length; k++) {
+                    if (response.highAndDrugDetails[k].txnpackagedetailid == response.packageDetails[i].txnpackagedetailid) {
+                        if (k == 0) {
+                            implantTotalamount = response.highAndDrugDetails[0].totalhedprice
+                        }
+                        AddParameter += "<tr>";
+                        AddParameter += "<td>" + response.highAndDrugDetails[k].hedname + "</td>";
+                        AddParameter += "<td>" + response.highAndDrugDetails[k].hedunit + "</td>";
+                        AddParameter += "<td>" + response.highAndDrugDetails[k].hedpriceperunit + "</td>";
+                        AddParameter += "<td>" + response.highAndDrugDetails[k].preauth + "</td>";
+                        AddParameter += "</tr>";
+                    }
+                }
+                AddParameter += "</tbody>";
+                AddParameter += "<tfoot>";
+                AddParameter += "<tr>";
+                AddParameter += "<td colspan='1'>Total </td>";
+                AddParameter += "<td class='font-weight-5'>&nbsp;</td>";
+                AddParameter += "<td>&nbsp;</td>";
+                AddParameter += "<td class='font-weight-5' colspan='3'>" + highAndDrugTotalamount + "</td>";
+                AddParameter += " </tr>";
+                AddParameter += "</tfoot>";
+                AddParameter += "</table>";
+                AddParameter += "</div>";
+                AddParameter += "</div>";
+                AddParameter += "</div>";
+                AddParameter += "</div>";
+                AddParameter += "</div>";
+                AddParameter += "</td>";
+                AddParameter += "</tr>";
+                $("#packageDetailsbody").append(AddParameter);
+            }
+            $("#ViewDetails").modal("show");
+        },
+        complete: function () {
+            $("#loader").hide();
+        },
+        error: function (error) {
+            console.log(error.responseText);
+        }
+    });
+}
+
+function UnBlockpackageslip(ele) {
+    var DischargeSlip = [];
+    var dataRow = $('#example2').DataTable().row($(ele).closest('tr')).data();
+    if (localStorage.getItem('InsertedUnbloackData') != null) {
+        localStorage.removeItem('InsertedUnbloackData');
+    }
+    DischargeSlip.push(JSON.stringify({
+        URN: dataRow.urn,
+        MemberId: dataRow.memberID,
+        HospitalCode: hospitalcode,
+        Invoiceno: dataRow.unblockedinvoice
+    }));
+    localStorage.setItem('InsertedUnbloackData', DischargeSlip);
+    windowUnblockPackageSlipPopUp();
+}
+
+function windowUnblockPackageSlipPopUp() {
+    var url = "UnBlockSlip"; /*'@Url.Action("UnBlockSlip", "UnblockPackage")';*/
+    var width = 1200;
+    var height = 700;
+    var left = (screen.width - width) / 2;
+    var top = (screen.height - height) / 2;
+    var params = 'width=' + width + ', height=' + height;
+    params += ', top=' + top + ', left=' + left;
+    params += ', directories=no';
+    params += ', location=no';
+    params += ', menubar=no';
+    params += ', resizable=no';
+    params += ', scrollbars=yes';
+    params += ', status=no';
+    params += ', toolbar=no';
+    newwin = window.open(url, 'windowname5', params);
+    if (window.focus) { newwin.focus() }
+    return false;
+}
+
+function UnBlockHospitalSlip(ele) {
+    var DischargeSlip = [];
+    var dataRow = $('#example2').DataTable().row($(ele).closest('tr')).data();
+    if (localStorage.getItem('InsertedUnbloackData') != null) {
+        localStorage.removeItem('InsertedUnbloackData');
+    }
+    DischargeSlip.push(JSON.stringify({
+        URN: dataRow.urn,
+        MemberId: dataRow.memberID,
+        HospitalCode: hospitalcode,
+        Invoiceno: dataRow.unblockedinvoice
+    }));
+    localStorage.setItem('InsertedUnbloackData', DischargeSlip);
+    windowUnblockHospitalSlipPopUp();
+}
+
+function windowUnblockHospitalSlipPopUp() {
+    var url = "UnBlockHospitalSlip";/*'@Url.Action("UnBlockHospitalSlip", "UnblockPackage")';*/
+    var width = 1200;
+    var height = 700;
+    var left = (screen.width - width) / 2;
+    var top = (screen.height - height) / 2;
+    var params = 'width=' + width + ', height=' + height;
+    params += ', top=' + top + ', left=' + left;
+    params += ', directories=no';
+    params += ', location=no';
+    params += ', menubar=no';
+    params += ', resizable=no';
+    params += ', scrollbars=yes';
+    params += ', status=no';
+    params += ', toolbar=no';
+    newwin = window.open(url, 'windowname5', params);
+    if (window.focus) { newwin.focus() }
+    return false;
+}
+</script>
+@*@Scripts.Render("~/bundles/viewunblockpackagedetails")*@

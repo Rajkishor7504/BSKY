@@ -1,0 +1,174 @@
+﻿
+@{
+    ViewBag.Title = "adminHospitalDetailsReport";
+    Layout = "~/Views/Shared/_CommonLayout.cshtml";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="clearfix"></div>
+
+                    <!-- Family Verification info -->
+                    <div class="form-box-bg mb-4">
+
+                        <ul class="nav nav-tabs custom-tab mb-4">
+                            @*<li class="nav-item">
+                                    <a class="nav-link" href="@Url.Action(" ViewBlockPackage","BlockPackage")">Add</a>
+                                </li>*@
+                            <li class="nav-item">
+                                <a class="nav-link active" href="@Url.Action("HospitalDetailsReport","IPReports")">View</a>
+                            </li>
+                        </ul>
+                        <div class="col-md-12 p-0">
+                            <div class="form-row">
+                                <div class="col-lg-3">
+                                    <div class="mb-2">
+
+                                        <label class="pkg-label mb-1">Admission From Date :</label>
+                                        <input type="text" id="fromdate" class="form-control datepicker" />
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-3">
+                                    <div class="mb-2">
+                                        <label class="pkg-label mb-1">Admission To Date :</label>
+                                        <input type="text" id="todate" class="form-control datepicker" />
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="mb-2">
+                                        <label class="pkg-label mb-1">Gender :</label>
+                                        <select id="ddPatientGender" class="form-control form-group">
+                                            <option value="A">All</option>
+                                            <option value="M">Male</option>
+                                            <option value="F">Female</option>
+                                            <option value="O">Others</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="mb-2">
+                                        <label class="pkg-label mb-1">Type :</label>
+                                        <select id="ddAdmissionDateType" class="form-control form-group">
+                                            <option value="A">Admission Date</option>
+                                            <option value="B">Blocking Date</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="mb-2">
+                                        <label class="pkg-label mb-1">State :</label>
+                                        <select id="ddState" class="form-control form-group bindStates" onchange="bindDistricts(this, ddDistrict, ddHospital);">
+                                            <option value="0">-Select-</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="mb-2">
+                                        <label class="pkg-label mb-1">District :</label>
+                                        <select id="ddDistrict" class="form-control form-group" onchange="bindHospitals(ddState, this, ddHospital);">
+                                            <option value="0">-Select-</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="mb-2">
+                                        <label class="pkg-label mb-1">Hospital :</label>
+                                        <select id="ddHospital" class="form-control form-group">
+                                            <option value="0">-Select-</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-2 d-flex justify-content-start align-items-center">
+                                    <input class="btn btn-outline-success" type="button" value="Search" id="btnSearch">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive mt-2">
+                            <table id="example2" class="table table-striped" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">SL No</th>
+                                        <th scope="col">Hospital Name</th>
+                                        <th scope="col">Hospital Code</th>
+                                        <th scope="col">Admission</th>
+                                        <th scope="col">Blocking</th>
+                                        <th scope="col">Unblocking</th>
+                                        <th scope="col">Discharge</th>
+                                        <th scope="col">Pre-Auth Pending</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <!-- modal start -->
+                        <div class="modal fade wow fadeInUp animated" id="popModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-xl modal-dialog-scrollable" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <div class="row heading-pkg">
+                                            <h5 class="mb-0">@Session["HospitalName"]</h5>
+                                        </div>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="row">
+                                            <div class="col-9 heading-pkg">
+                                                <h5 id="popModalTitle" class="pkg-label mb-1"></h5>
+                                            </div>
+                                            <div class="col-3">
+                                                <button id="btnExcel" type="button" class="btn btn-outline-success btn-sm float-right" data-toggle="tooltip" title="Export To Excel">
+                                                    <i class="fa fa-file-excel-o"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <p></p>
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <table id="grdReportDetails" class="table table-striped" style="width:100%;">
+                                                    <thead>
+                                                        <tr>
+                                                            <th scope="col">SL No</th>
+                                                            <th scope="col">Member Name</th>
+                                                            <th scope="col">Admission</th>
+                                                            <th scope="col">Blocking</th>
+                                                            <th scope="col">Unblocking</th>
+                                                            <th scope="col">Discharge</th>
+                                                            <th scope="col">Pre-Auth</th>
+                                                        </tr>
+                                                    </thead>
+                                                </table>
+                                                <table id="exlReportDetails"></table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- modal end -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/js/dtButtons.min.js"></script>
+<script src="~/js/jszip.min.js"></script>
+<script src="~/js/buttonsHtml5.min.js"></script>
+
+<script>
+    document.mynamespace = {};
+    document.mynamespace.hospitalcode = '@HttpContext.Current.Session["HospitalCode"]';
+    document.mynamespace.groupid = '@HttpContext.Current.Session["groupid"]';
+   // var hospitalcode = document.mynamespace.hospitalcode;
+    var groupid = document.mynamespace.groupid;
+</script>
+
+@Scripts.Render("~/bundles/AdminUtility")
+@Scripts.Render("~/bundles/adminHospitalDetailsReport")

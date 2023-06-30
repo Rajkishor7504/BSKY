@@ -1,0 +1,254 @@
+﻿
+@{
+    ViewBag.Title = "ViewReferalSlip";
+}
+
+@using System.Configuration
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>TreatmentCompletionCertificate</title>
+    <!-- <link rel="stylesheet" href="~/css/style.css" /> -->
+    <link rel="stylesheet" href="~/css/Print.css" />
+
+    <script src="~/js/jquery.min.js" type="text/javascript"></script>
+    <script src="~/js/popper.min.js" type="text/javascript"></script>
+
+</head>
+
+<body class="print_bg">
+
+    <div class="container page">
+        <div class="tm_invoice tm_style1 tm_type1">
+            <div class="tm_invoice_btns tm_hide_print row">
+                <div class="col-md-1 text-align-right">
+                    <a href="javascript:window.print()" class="tm_invoice_btn tm_color1" id="printbutton">
+                        <span class="tm_btn_icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512">
+                                <path d="M384 368h24a40.12 40.12 0 0040-40V168a40.12 40.12 0 00-40-40H104a40.12 40.12 0 00-40 40v160a40.12 40.12 0 0040 40h24" fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="32" />
+                                <rect x="128" y="240" width="256" height="208" rx="24.32" ry="24.32" fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="32" />
+                                <path d="M384 128v-24a40.12 40.12 0 00-40-40H168a40.12 40.12 0 00-40 40v24" fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="32" />
+                                <circle cx="392" cy="184" r="24" fill='currentColor' />
+                            </svg>
+                        </span>
+                        <span class="tm_btn_text">Print</span>
+                    </a>
+                </div>
+            </div>
+
+
+            <div class="tm_invoice_in">
+                <div class=" tm_top_head pr-center">
+                    <div class="tm_invoice_left justify-content-center">
+                        <div class="tm_logo"><img src="~/imgs/logo.png"></div>
+                    </div>
+                </div>
+                <div class="border-total">
+                    <div class="patent-brd">
+                        <table class="table brd_new">
+                            <thead>
+                                <tr>
+                                    <td colspan="5" style="padding:0;">
+                                        <h3 class="pt_txt"> Patient referral Form </h3>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="p-0 border-right" width="50%">
+                                        <table border="0">
+                                            <tr>
+                                                <td class="font-weight-normal" width="50%"> Patient Name </td>
+                                                <td width="50%" id="patientName"></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="font-weight-normal">Age</td>
+                                                <td id="Age"> </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="font-weight-normal">Gender</td>
+                                                <td id="Gender">Male </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="font-weight-normal">Regd. No </td>
+                                                <td id="Regd"> REGD25254 </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="font-weight-normal">NFSA/SFSS Card or BSKY Card No </td>
+                                                <td id="Urn"> 23423423423424 </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="font-weight-normal">Referral Code &amp; Date </td>
+                                                <td id="ReferralCodeAndDate">876659 & 05-Jan-23 </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    <td class="p-0 border-top" valign="top">
+                                        <table class="border_none" id="vitalParameter">
+                                            <thead>
+                                                <tr colspan="2">
+                                                    <h4 class="vt_txt">  Vitals at the time of Referring </h4>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="vitalParameterBody">
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="p-0 border-right">
+                                        <table border="0">
+                                            <th>
+                                                <div class="ref_class"> Referral Form </div>
+                                            </th>
+                                            <tr>
+                                                <td class="font-weight-normal" width="50%"> Patient Name </td>
+                                                <td width="50%" id="FormPatientName"> Binod Rout  </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="font-weight-normal">Age</td>
+                                                <td id="FormPatientAge"> <span class="dot-p">:</span>  35 </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="font-weight-normal">Gender</td>
+                                                <td id="FormGender"> <span class="dot-p">:</span> Male </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="font-weight-normal">Regd. No </td>
+                                                <td id="FormRegd"> <span class="dot-p">:</span> REGD25254 </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="font-weight-normal">NFSA/SFSS Card or BSKY Card No </td>
+                                                <td id="FormUrn"> <span class="dot-p">:</span> 23423423423424 </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="font-weight-normal">Referral Code &amp; Date </td>
+                                                <td id="FormReferralCodeAndDate"> <span class="dot-p">:</span> 05-Jan-23 </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+
+                                    <td class="p-0 border-bottom">
+                                        <table border="0">
+                                            <th>
+                                                <div class="ref_class"> Referral To </div>
+                                            </th>
+                                            <tr>
+                                                <td width="25%">Name of hospital(s)/ Any BSKY Empanelled Hospital) </td>
+                                                <td width="25%"><span class="dot-p">:</span> <label id="Tohospital"></label> </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Reason of Refferring  </td>
+                                                <td><span class="dot-p">:</span> <label id="reasonforrefer"></label></td>
+                                            </tr>
+                                            <tr>
+                                                <td> Date &amp; Time </td>
+                                                <td> <span class="dot-p">:</span><label id="fromreferraldate"></label></td>
+                                            </tr>
+
+                                        </table>
+                                    </td>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+
+                    <div class="body-part">
+                        <div class="head-slip">
+                            <u> Provisinal / Final Diagnosis : </u>
+                            <p id="diagnosis">
+
+                            </p>
+
+                        </div>
+
+                        <div class="head-slip">
+                            <u>Brief History & Details of the Patient : </u>
+                            <p id="briefhistory">
+
+                            </p>
+                        </div>
+                        <div class="head-slip">
+                            <u>Treatment Given : </u>
+                            <p id="treatmentgiven">
+
+                            </p>
+                        </div>
+                        @*<div class="head-slip">
+                            <u> Investigation Done : </u>
+                            <div id="document"> (Reports Attached) </div>
+                        </div>*@
+                        <div class="head-slip">
+                            <u> Treatment Advised : </u>
+                            <p id="treatmentadvised">
+
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="footer-body">
+                        <div class="w-40">
+                            <div class="ft_font">
+                                Seal and Signature of<br> Specialist, DHH/SDH OR HOD, MCH
+                            </div>
+                            <div class="d-time"> Date & Time - </div>
+                        </div>
+                        <div class="w-60">
+                            <div class="ft_font" align="left">
+                                Seal & Sign of CDM & PHO /<br> Superintendent, DHH/SDH/MCH
+                            </div>
+                            <div class="d-time" align="left"> Date & Time - </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        $("#printbutton").click(function () {
+            $("#printbutton").css("display", "none");
+        });
+    </script>
+
+</body>
+</html>
+<script>
+    $(document).ready(function () {
+        if (localStorage.getItem('ReferralSlipData') != null) {
+            var PackageInfo = JSON.parse(localStorage.getItem('ReferralSlipData'));
+            console.log(PackageInfo);
+            $('#patientName').text(PackageInfo[0].patientName);
+            $('#Age').text(PackageInfo[0].age);
+            $('#Gender').text(PackageInfo[0].gender);
+            $('#Regd').text(PackageInfo[0].regdNo);
+            $('#Urn').text(PackageInfo[0].urn);
+            $('#ReferralCodeAndDate').text(PackageInfo[0].referralcodeanddate);
+            $('#FormPatientName').text(PackageInfo[0].patientName);
+            $('#FormPatientAge').text(PackageInfo[0].age);
+            $('#FormGender').text(PackageInfo[0].gender);
+            $('#FormRegd').text(PackageInfo[0].regdNo);
+            $('#FormUrn').text(PackageInfo[0].urn);
+            $('#FormReferralCodeAndDate').text(PackageInfo[0].referralcodeanddate);
+            $('#Tohospital').text(PackageInfo[0].tohospital);
+            $('#reasonforrefer').text(PackageInfo[0].reasonforrefer);
+            $('#fromreferraldate').text(PackageInfo[0].fromreferraldate);
+            $('#diagnosis').text(PackageInfo[0].diagnosis);
+            $('#briefhistory').text(PackageInfo[0].briefhistory);
+            $('#treatmentgiven').text(PackageInfo[0].treatmentgiven);
+            $('#treatmentadvised').text(PackageInfo[0].treatmentadvised);
+            $('#document').text(PackageInfo[0].document);
+        };
+        for (var i = 0; i < PackageInfo.length; i++) {
+            console.log("tr", PackageInfo[i]);
+            if (PackageInfo[i].vitalsign != null) {
+                var AddParameter = "<tr><td class='font-weight-normal' width='50%'> " + PackageInfo[i].vitalsign + " </td><td width='50%'> " + PackageInfo[i].vitalvalue + "</td></tr>";
+                $("#vitalParameterBody").append(AddParameter);
+            }
+        }
+    });
+</script>

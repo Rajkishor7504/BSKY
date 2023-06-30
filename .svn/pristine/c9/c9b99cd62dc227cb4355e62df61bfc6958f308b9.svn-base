@@ -1,0 +1,235 @@
+﻿
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+
+<html>
+<head>
+    <script type="text/javascript">
+        function preventBack() { window.history.forward(); }
+        setTimeout("preventBack()", 0);
+        window.onunload = function () { null };
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>HPSBYS:: Login</title>
+    <link rel="stylesheet" href="~/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="~/css/style.css" />
+    <link rel="stylesheet" href="~/css/icon.css" />
+    <script src="~/js/jquery.min.js" type="text/javascript"></script>
+    <script src="~/js/popper.min.js" type="text/javascript"></script>
+    <script src="~/js/bootstrap.min.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(document).keydown(function (event) {
+            event = (event || window.event);
+            if (event.keyCode == 13) {
+                loginClick();
+            }
+        });
+        $(document).ready(function () {
+            $('#name').focus();
+            $('#btnLogin').click(function () {
+                loginClick();
+                });
+            $('#imgbtnRefresh').click(function () {
+                showRandomText();
+            });
+            $('#name').bind("cut copy paste", function (e) {
+                e.preventDefault();
+            });
+            $('#password').bind("cut copy paste", function (e) {
+                e.preventDefault();
+            });
+            $('#captcha').bind("cut copy paste", function (e) {
+                e.preventDefault();
+            });
+        });
+        function gettoken() {
+        var token = '@Html.AntiForgeryToken()';
+        token = $(token).val();
+        return token;
+        }
+          function loginClick() {
+               if (validate()) {
+                    var Logindata = new FormData();
+                    Logindata.append("__RequestVerificationToken", gettoken());
+                    Logindata.append("UserID", $('#name').val());
+                    Logindata.append("Password", $('#password').val());
+                    Logindata.append("Captcha", $('#captcha').val());
+                    $.ajax({
+                        url: '@Url.Action("ValidateLogin", "Dashboard")',
+                        type: "POST",
+                        data: Logindata,
+                        processData: false,
+                        contentType: false,
+                        success: function (data) {
+                            if (data == "InvalidCaptcha") {
+                                alert("InValid Captcha!!");
+                                $('#captcha').focus();
+                            }
+                            else if (data == "404") {
+                                alert("Invalid username and password!!");
+                                window.location.reload();
+                            }
+                            else if (data == "100") {
+                                window.location.href = '@Url.Action("Index", "Dashboard")';
+                            }
+                            else if (data == "105") {
+                                alert("Your password is expired.Please Change your password!");
+                                window.location.href = '@Url.Action("ChangePassword", "Dashboard")';
+                            }
+                            // console.log(data);
+                        },
+
+                        error: function (error) {
+                            console.log(error.statusText);
+                        }
+                    });
+               }
+          }
+        function showRandomText() {
+            var ImgUrl = '@Url.Content("~/captcha.ashx?random=")' + Math.random();
+            $('#imgCapcha').attr("src", ImgUrl);
+            $('#captcha').val('');
+        }
+        function validate() {
+            if ($('#name').val() == "") {
+                alert('Please Enter Username!!');
+                $('#name').focus();
+                return false;
+            }
+            else if ($('#password').val() == "") {
+                alert('Please Enter Password!!');
+                $('#password').focus();
+                return false;
+            }
+            else if ($('#captcha').val() == "") {
+                alert('Please Enter Captcha!!');
+                $('#captcha').focus();
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
+        function inputLimiter(e, allow) {
+            var AllowableCharacters = '';
+            if (allow == 'NameCharactersymbol') {
+                AllowableCharacters = ' ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz./&';
+            }
+            if (allow == 'NameCharacters') {
+                AllowableCharacters = ' ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-.\'';
+            }
+            if (allow == 'NameCharactersAndNumbers') {
+                AllowableCharacters = '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_';
+            }
+            if (allow == 'Description') {
+                AllowableCharacters = '1234567890 ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-,./\&(){}[]#$:';
+            }
+            if (allow == 'Numbers') {
+                AllowableCharacters = '1234567890';
+            }
+            if (allow == 'Decimal') {
+                AllowableCharacters = '1234567890.';
+            }
+            var k;
+            k = document.all ? parseInt(e.keyCode) : parseInt(e.which);
+            if (k != 13 && k != 8 && k != 0) {
+                if ((e.ctrlKey == false) && (e.altKey == false)) {
+                    return (AllowableCharacters.indexOf(String.fromCharCode(k)) != -1);
+                }
+                else {
+                    return true;
+                }
+            }
+            else {
+                return true;
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <div class="container-fluid loginBg">
+        <div class="row align-items-center">
+            <div class="col">
+                <div class="logoInfo py-4">
+                    <ul>
+                        <li>
+                            <img src="~/imgs/hpsbys-logo.png" alt="">
+                            <div>
+                                <h2>Himachal Pradesh Swasthya Bima Yojna Society</h2>
+                                <p>Department of Health & Family Welfare<br />Government of Himachal Pradesh</p>
+                            </div>
+                        </li>
+                    </ul>
+                    <!-- <img src="imgs/adsys_logo.png" class="logImg" alt=""> -->
+                </div>
+                <div class="card m-auto">
+                    <div class="card-body">
+                        <h5 class="text-center mb-4">Portal Login</h5>
+                        <form class="mt-3" autocomplete="off">
+                            <div class="form-group">
+                                <!-- <label for="exampleFormControlInput1">Email address</label> -->
+                                <input type="text" class="form-control" id="name" placeholder="Username" maxlength="20" autocomplete="off" onkeypress="return inputLimiter(event,'NameCharactersAndNumbers')">
+                            </div>
+                            <div class="form-group">
+                                <input type="password" class="form-control" id="password" placeholder="Password" maxlength="20" autocomplete="off">
+                            </div>
+                            <div class="row">
+                                <div class="col-6"><input type="text" class="form-control" id="captcha" placeholder="Captcha" maxlength="6"></div>
+                                <div class="col-6">                                
+                                        <img alt="Captcha" id="imgCapcha" height="40" width="86" src="~/captcha.ashx">
+                                        <button class="btn refresh-btn" type="button" id="imgbtnRefresh"><i class="icon-refresh"></i></button>
+                                </div>
+                                @*<div class="col-2">
+                                    <button class="btn refresh-btn" type="button" id="imgbtnRefresh"><i class="icon-refresh"></i></button>
+                                </div>*@
+                            </div>
+                            <input type="button" id="btnLogin" value="LOGIN" class="btn btn-block btn-link my-4 loginBtn" name="login" />
+                        </form>
+                        <button type="button" class="btn btn-block btn-link btn-link">Forgot your password?</button>
+                    </div>
+                </div>
+
+
+                <div class="row my-row">
+                    <div class="back">
+                        <div class="container custum-pannel">
+                            <p class="Queries"> <strong>For any Queries, Please Contact </strong></p>
+                            <div class="clearfix"></div>
+                            <div class="row">
+                                <div class="offset-sm-2 col-sm-10">
+                                    <div class="row">
+                                        <div class="col-sm-3 col-xs-12 mrgn">
+                                            <p class="icon"><i class="fa fa-user-o" aria-hidden="true"></i></p>
+                                            <strong>Rishi Thakur</strong><br>
+
+                                        </div>
+                                        <div class="col-sm-3 col-xs-12 mrgn">
+                                            <p class="icon"><i class="fa fa-phone" aria-hidden="true"></i></p>
+                                            <strong> +91-8091773886</strong><br>
+
+                                        </div>
+                                        <div class="col-sm-5 col-xs-12 mrgn">
+                                            <p class="icon"><i class="fa fa-envelope-o" aria-hidden="true"></i></p>
+                                            <strong>rishi.thakur@csm.co.in</strong><br>
+
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

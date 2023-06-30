@@ -1,0 +1,759 @@
+body {
+    background-color: #F5F5F5;
+    font-size: 16px;
+}
+
+h1, h2, h3, h4, h5, h6, p {
+    font-family: 'Montserrat', sans-serif;
+}
+
+img {
+    max-width: 100%;
+}
+
+.custom-tab {
+    position: relative;
+    border-bottom: 0px;
+    z-index: 9;
+}
+
+a {
+    color: #00bcd4;
+}
+
+    a:hover {
+        color: #017d8d;
+    }
+
+label input[type="checkbox"] {
+    position: relative;
+    top: 2px;
+    margin-right: 5px;
+}
+
+.form-control {
+    border: 0px;
+    border-bottom: 1px solid #ced4da;
+    border-radius: 0px;
+    position: relative;
+}
+
+    .form-control:after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 0px;
+        width: 100%;
+        height: 1px;
+        background: #27455b;
+    }
+
+    .form-control:focus {
+        box-shadow: none;
+    }
+
+.input-group-append .input-group-text {
+    background: transparent;
+    border-top: 0px;
+    border-right: 0px;
+    border-radius: 0px;
+}
+
+.input-group-prepend .input-group-text {
+    background: transparent;
+    border-top: 0px;
+    border-left: 0px;
+    border-radius: 0px;
+}
+
+.loginBg {
+    position: relative;
+    background-color: #f2f2f2;
+    background-image: url(../imgs/pattern.jpg);
+    overflow: hidden;
+}
+
+    .loginBg > .row {
+        height: 100vh;
+        position: relative;
+    }
+
+        .loginBg > .row .col {
+            height: 100%;
+        }
+
+        .loginBg > .row .logoInfo {
+            z-index: 9;
+        }
+
+            .loginBg > .row .logoInfo ul {
+                margin: 0px;
+                padding: 0px;
+                list-style: none;
+            }
+
+                .loginBg > .row .logoInfo ul li {
+                    position: relative;
+                    display: flex;
+                    align-items: center;
+                }
+
+                    .loginBg > .row .logoInfo ul li img {
+                        width: 76px;
+                        margin-right: 16px;
+                    }
+
+                    .loginBg > .row .logoInfo ul li h2 {
+                        color: #000;
+                        font-size: 0.8em;
+                        font-weight: bold;
+                        margin: 0px 0px 5px;
+                    }
+
+                    .loginBg > .row .logoInfo ul li p {
+                        color: rgba(0, 0, 0, 0.7);
+                        font-size: 0.8em;
+                        margin: 0px;
+                    }
+
+            .loginBg > .row .logoInfo .logImg {
+                width: 300px;
+                max-width: 80%;
+                position: relative;
+                animation: animate-in 1.8s;
+            }
+
+        .loginBg > .row .card {
+            border: 0px;
+            box-shadow: none;
+            position: relative;
+            min-height: 550px;
+            background-color: transparent;
+            background-image: url(../imgs/login-bg.png);
+            background-repeat: no-repeat;
+            background-position: bottom center;
+            background-size: 600px;
+        }
+
+            .loginBg > .row .card .card-body {
+                width: 336px;
+                margin: 0px auto;
+            }
+
+                .loginBg > .row .card .card-body > h5 {
+                    color: #27455b;
+                    font-weight: bold;
+                    text-transform: uppercase;
+                    margin-top: -20px;
+                }
+
+            .loginBg > .row .card input.form-control {
+                border-width: 0px;
+                border-bottom-width: 1px;
+                border-radius: 0px;
+            }
+
+            .loginBg > .row .card .btn {
+                color: #02b4be;
+            }
+
+                .loginBg > .row .card .btn:hover {
+                    color: #27455b;
+                }
+
+                .loginBg > .row .card .btn.loginBtn {
+                    border: 1px solid #02b4be;
+                    display: block;
+                    background: #fff;
+                }
+
+                    .loginBg > .row .card .btn.loginBtn:hover {
+                        text-decoration: none;
+                        color: #000;
+                        background-color: #02b4be;
+                    }
+
+.navbar {
+    background-color: #27455b;
+}
+
+    .navbar .row {
+        width: 100%;
+    }
+
+        .navbar .row .navbar-toggler {
+            border: 0px;
+            padding-left: 0px;
+        }
+
+            .navbar .row .navbar-toggler:hover {
+                color: #fff;
+            }
+
+            .navbar .row .navbar-toggler:focus {
+                outline: 0px;
+            }
+
+        .navbar .row .header-logo {
+            margin: 0px;
+            padding: 0px;
+            list-style: none;
+        }
+
+            .navbar .row .header-logo li {
+                position: relative;
+                display: flex;
+                align-items: center;
+            }
+
+                .navbar .row .header-logo li img {
+                    width: 56px;
+                    margin-right: 16px;
+                }
+
+                .navbar .row .header-logo li h2 {
+                    color: #fff;
+                    font-size: 0.8em;
+                    margin: 0px 0px 5px;
+                    font-weight: bold;
+                }
+
+                .navbar .row .header-logo li p {
+                    color: rgba(255, 255, 255, 0.7);
+                    font-size: 0.8em;
+                    margin: 0px;
+                }
+
+        .navbar .row .header-menu > li > a {
+            color: #fff;
+        }
+
+            .navbar .row .header-menu > li > a.active {
+                background: #fff;
+                color: #27455b;
+                border-radius: 3px;
+            }
+
+        .navbar .row .site-title {
+            color: #fff;
+            margin: 0px;
+            font-size: 1.2em;
+            position: relative;
+            top: -2px;
+        }
+
+        .navbar .row .action-area .header-btn-wrapper {
+            display: inline-block;
+            position: relative;
+        }
+
+            .navbar .row .action-area .header-btn-wrapper .card {
+                position: absolute;
+                top: 100%;
+                right: 0px;
+                min-width: 350px;
+                max-height: 450px;
+                overflow: hidden;
+                border: 0px;
+                border-radius: 0px;
+                box-shadow: 0px 1px 4px #999;
+                z-index: 999;
+            }
+
+                .navbar .row .action-area .header-btn-wrapper .card:hover {
+                    overflow-y: auto;
+                }
+
+                .navbar .row .action-area .header-btn-wrapper .card::-webkit-scrollbar-track {
+                    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+                    background-color: #F5F5F5;
+                }
+
+                .navbar .row .action-area .header-btn-wrapper .card::-webkit-scrollbar {
+                    width: 6px;
+                    background-color: #F5F5F5;
+                }
+
+                .navbar .row .action-area .header-btn-wrapper .card::-webkit-scrollbar-thumb {
+                    background-color: #000000;
+                }
+
+                .navbar .row .action-area .header-btn-wrapper .card .list-group .list-group-item {
+                    border-left: 0px;
+                    border-right: 0px;
+                    font-size: 0.84em;
+                }
+
+                    .navbar .row .action-area .header-btn-wrapper .card .list-group .list-group-item h5 {
+                        font-size: 1.2em;
+                        color: #000;
+                    }
+
+                    .navbar .row .action-area .header-btn-wrapper .card .list-group .list-group-item small {
+                        color: #999;
+                    }
+
+            .navbar .row .action-area .header-btn-wrapper > button {
+                color: rgba(255, 255, 255, 0.9);
+                position: relative;
+                padding-top: 14px;
+            }
+
+                .navbar .row .action-area .header-btn-wrapper > button i {
+                    font-size: 1.6em;
+                }
+
+                .navbar .row .action-area .header-btn-wrapper > button .badge {
+                    position: absolute;
+                    right: 0px;
+                    top: 6px;
+                    font-size: 0.7em;
+                }
+
+                .navbar .row .action-area .header-btn-wrapper > button:hover {
+                    text-decoration: none;
+                }
+
+        .navbar .row .action-area .logedUser button:after {
+            display: none;
+        }
+
+        .navbar .row .action-area .logedUser button img {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+        }
+
+        .navbar .row .action-area .logedUser .dropdown-menu {
+            left: auto;
+            right: 0px;
+        }
+
+            .navbar .row .action-area .logedUser .dropdown-menu .dropdown-item {
+                padding: .25rem 1rem;
+            }
+
+.secondary-menu-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-right: 16px;
+    background-color: #e9ecef;
+}
+
+    .secondary-menu-bar .secondary-menu {
+        margin: 0px;
+        padding: 0px;
+        list-style: none;
+        display: flex;
+        justify-content: flex-end;
+    }
+
+        .secondary-menu-bar .secondary-menu li a {
+            display: block;
+            margin-left: 10px;
+        }
+
+            .secondary-menu-bar .secondary-menu li a img {
+                transition: all .2s ease-in-out;
+                width: 30px;
+                height: 30px;
+            }
+
+            .secondary-menu-bar .secondary-menu li a:hover img, .secondary-menu-bar .secondary-menu li a.active img {
+                transform: scale(1.1);
+            }
+
+.breadcrumb-item + .breadcrumb-item::before {
+    color: #9E9E9E !important;
+}
+
+.hospital-name {
+    color: #27455b;
+    font-size: 1.6em;
+    text-transform: uppercase;
+}
+
+    .hospital-name img {
+        display: block;
+        width: 56px;
+        margin: 0px auto 16px;
+    }
+
+.dashboard-menu .col a {
+    display: block;
+    text-align: center;
+}
+
+    .dashboard-menu .col a img {
+        width: 100px;
+        transition: all .2s ease-in-out;
+    }
+
+    .dashboard-menu .col a p {
+        transition: all .2s ease-in-out;
+        text-transform: uppercase;
+        margin-top: 16px;
+        color: #666;
+        font-size: 1.2em;
+    }
+
+    .dashboard-menu .col a:hover {
+        text-decoration: none;
+    }
+
+        .dashboard-menu .col a:hover img {
+            transform: scale(1.2);
+        }
+
+        .dashboard-menu .col a:hover p {
+            color: #000;
+        }
+
+.data-report .col > div {
+    padding: 10px 12px;
+    border-radius: 4px;
+    min-height: 90px;
+}
+
+    .data-report .col > div.col1 {
+        background: #1BBC9D;
+    }
+
+    .data-report .col > div.col2 {
+        background: #2FCC71;
+    }
+
+    .data-report .col > div.col3 {
+        background: #3598DC;
+    }
+
+    .data-report .col > div.col4 {
+        background: #9C59B8;
+    }
+
+    .data-report .col > div.col5 {
+        background: #34495E;
+    }
+
+    .data-report .col > div.col6 {
+        background: #F1C40F;
+    }
+
+    .data-report .col > div.col7 {
+        background: #E77E23;
+    }
+
+    .data-report .col > div p {
+        margin: 0px;
+        line-height: 26px;
+        font-size: 0.9em;
+        color: #fff;
+    }
+
+        .data-report .col > div p strong {
+            font-size: 1.5em;
+            font-weight: normal;
+            text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.4);
+        }
+
+        .data-report .col > div p i {
+            vertical-align: middle;
+            margin-right: 5px;
+        }
+
+        .data-report .col > div p label {
+            margin: 0px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9em;
+            font-style: italic;
+        }
+
+#availabelCover {
+    display: none;
+}
+
+.filter-wrapper {
+    background: #f5f5f5;
+    padding: 10px 12px;
+    box-shadow: 0px 1px 2px #ccc;
+    border-radius: 3px;
+    margin-bottom: 22px;
+}
+
+    .filter-wrapper .form-group {
+        margin-bottom: 0px !important;
+    }
+
+.registerInput input {
+    width: 136px !important;
+}
+
+.custom-tab-content .tab-pane {
+    min-height: 200px;
+    padding: 20px;
+}
+
+.doc-action {
+    position: relative;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+    .doc-action.has-tab {
+        border-bottom: 0px;
+    }
+
+        .doc-action.has-tab .wrapper {
+            position: absolute;
+            right: 0px;
+            bottom: 0px;
+            width: 50%;
+            max-width: 100%;
+            z-index: 9;
+        }
+
+    .doc-action .wrapper {
+        position: static;
+    }
+
+        .doc-action .wrapper * {
+            display: inline;
+        }
+
+        .doc-action .wrapper .btn {
+            font-size: 1.2em;
+        }
+
+            .doc-action .wrapper .btn.pdfBtn {
+                color: #F44336;
+            }
+
+            .doc-action .wrapper .btn.excelBtn {
+                color: #4CAF50;
+            }
+
+            .doc-action .wrapper .btn.printBtn {
+                color: #607D8B;
+            }
+
+            .doc-action .wrapper .btn.backBtn {
+                color: #27455b;
+            }
+
+            .doc-action .wrapper .btn:hover, .doc-action .wrapper .btn:focus {
+                text-decoration: none;
+            }
+
+.data-info {
+    background-color: #e9ecef;
+    padding: 12px;
+    border-bottom: 1px solid #d9dfe4;
+    margin: 20px 20px 0px;
+}
+
+    .data-info h2 {
+        font-size: 1.2em;
+        margin-bottom: 16px;
+        color: #FF9800;
+    }
+
+    .data-info h3 {
+        font-size: 0.9em;
+        font-weight: bold;
+        margin: 0px;
+        line-height: 26px;
+    }
+
+    .data-info p {
+        color: #666;
+        margin: 0px;
+        font-size: 0.9em;
+        line-height: 22px;
+    }
+
+.tbl-srch .btn {
+    background: none;
+    border-bottom: 1px solid #ccc !important;
+    font-size: 1.2em;
+    padding-top: 0px;
+    color: #999;
+}
+
+    .tbl-srch .btn:hover {
+        color: #27455b;
+    }
+
+.table td .tbl-userimg {
+    width: 56px;
+}
+
+.table td .optionBtns .btn {
+    color: #999;
+}
+
+    .table td .optionBtns .btn:hover {
+        text-decoration: none;
+        color: #000;
+    }
+
+.jsgrid-table .activeRow .jsgrid-cell {
+    background: #c4e2ff;
+    border-color: #c4e2ff;
+}
+
+.jsgrid-table .activeRow .jsgrid-cell {
+    background: #c4e2ff;
+    border-color: #c4e2ff;
+}
+
+.btn-outline-success:focus {
+    color: #fff;
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.btn-outline-danger:focus {
+    color: #fff;
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.posRel {
+    position: relative;
+}
+
+.ds-infoBtn {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+}
+
+    .ds-infoBtn button {
+        color: #000;
+    }
+
+    .ds-infoBtn .dropdown-menu {
+        width: 250px;
+        left: auto;
+        right: 0px;
+        border: 0px;
+        box-shadow: 0px 1px 2px #ccc;
+    }
+
+        .ds-infoBtn .dropdown-menu .badge {
+            background-color: #17a2b8;
+        }
+
+.logedUser > button {
+    color: #fff;
+    font-size: 1.4em;
+}
+
+    .logedUser > button:after {
+        display: none;
+    }
+
+.logedUser .dropdown-menu {
+    width: 250px;
+    left: auto;
+    right: 0px;
+    border: 0px;
+    box-shadow: 0px 1px 2px #ccc;
+    padding: 16px;
+}
+
+    .logedUser .dropdown-menu h3 {
+        font-size: 1.2em;
+        margin: 0px;
+    }
+
+    .logedUser .dropdown-menu p {
+        color: #999;
+        font-size: 0.9em;
+    }
+
+.loader {
+    position: fixed;
+    z-index: 999;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    background-color: rgba(0,0,0,0.5);
+    display: none;
+}
+
+.center {
+    z-index: 1000;
+    margin: 50px auto;
+    padding: 10px;
+    width: 200px;
+    position: relative;
+    top: calc(50% - 100px);
+    background: #fff;
+}
+
+@keyframes animate-in {
+    /* You could think of as "step 1" */
+    0% {
+        opacity: 0;
+    }
+    /* You could think of as "step 2" */
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes animate-left {
+    /* You could think of as "step 1" */
+    0% {
+        left: -100px;
+        opacity: 0;
+    }
+    /* You could think of as "step 2" */
+    100% {
+        opacity: 1;
+        left: 0px;
+    }
+}
+
+@keyframes animate-bottom {
+    /* You could think of as "step 1" */
+    0% {
+        bottom: -100px;
+        opacity: 0;
+    }
+    /* You could think of as "step 2" */
+    100% {
+        opacity: 1;
+        bottom: 0px;
+    }
+}
+/*# sourceMappingURL=style.css.map */
+.back {
+    background-color: rgba(0, 0, 0, 0.45);
+    color: #fff;
+    width: 100%;
+    height: 108px;
+    text-align: center;
+    padding-top: 20px;
+}
+.Queries {
+    text-align: center;
+    margin-bottom: 6px;
+    margin-top: -10px;
+    font-size: 17px;
+}
+.my-row {
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+}
+@media print {
+    @page {
+        size: auto;
+    }
+    #btnPrint {
+        display: none;
+    }
+}
+

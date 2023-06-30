@@ -1,0 +1,671 @@
+﻿
+@{
+    ViewBag.Title = "AddOnPackage";
+    Layout = "~/Views/Shared/_CommonLayout.cshtml";
+}
+
+@Scripts.Render("~/bundles/blockpackage")
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        //$('.datepicker').datepicker({
+        //    format: 'dd M yyyy',
+        //    endDate: 'today',
+        //    autoclose: true
+        //}); //code for datepicker
+        //$(".datepicker").datepicker("setDate", (new Date().toDateString()));
+        //$('.datepicker').datepicker('remove');
+        //$('#blockingDt').attr('readonly', true);
+        $('#DocInfo').hide();
+        $('#fuValText').hide();
+        $('#CurBlkHeader').hide();
+        $('#jsGrid').hide();
+        $('#PrevBlkHeader').hide();
+        $('#jsGridPrev').hide();
+        $('#divWardDtls').hide();
+        $('#lblWardDtls').hide();
+        $('#ChkList').hide();
+        $('#TrId').html('@ViewBag.TrId');
+       // BindPackageHeader();
+        getHospitalInfo();
+
+         var arrPackageInfo = [];
+        $('#PApackageHeader').change(function () {
+            PackageSubCategoryChangeAddOn();
+        });
+
+        $('#PApackageSubPackageDetail').change(function () {
+            PackageHeaderChange();
+        });
+
+        if (localStorage.getItem('BlockPackageInfo') != null) {
+            var PackageInfo = JSON.parse(localStorage.getItem('BlockPackageInfo'));
+            $('#divPageStatus').html(PackageInfo[0].PageBackStatus);
+            if ($('#divPageStatus').text() == 'M') {
+                $('#btnBack').hide();
+                $('#path').html('<a href="@Url.Action("ViewPackageChange", "BlockPackage")">Package Change List</a> / Block Package');
+            }
+            else {
+                $('#btnBack').show();
+                 $('#path').html('<a href="@Url.Action("ViewBlockPackage", "BlockPackage")">Block Package List</a> / Block Package');
+            }
+            var BlockPackageParams = {
+                HospitalCode: sessionHospitalCode,
+                Action: 'C',
+                URN: PackageInfo[0].urn,
+                BlockingINVOICENO: PackageInfo[0].invoiceNo,
+                TransactionID: PackageInfo[0].TransactionID
+            };
+            $.ajax({
+                url: ServiceURL + "/api/Registration/GetRegistrationInformationByInvoiceNo",
+                type: "GET",
+                data: BlockPackageParams,
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    if (data.length > 0) {
+                        arrPrevPackageInfo = [];
+                        var TotalBlkAmnt = 0;
+                        for (var i = 0; i < data.length-1; i++) {
+                            TotalBlkAmnt += parseInt(data[i].amoutBlocked);
+                            arrPrevPackageInfo.push({
+                                IsMedSergical: data[i].isMedSergical,
+                                procedureCode: data[i].procedureCode,
+                                ProcedureName: data[i].procedureName,
+                                PackageName: data[i].packageName,
+                                PackageCode: data[i].packageCode,
+                                PackageCost: data[i].packageCost,
+                                AmoutBlocked: data[i].amoutBlocked,
+                                NoofDays: data[i].noofDays,
+                                InvoiceNo: data[i].invoiceNo,
+                                BlockingUserDate: data[i].blockingUserDate,
+                                Category: data[i].category,
+                                CategoryCode: data[i].categoryCode
+                            });
+                        }
+                        if (arrPrevPackageInfo.length > 0) {
+                            $('#ChkList').show();
+                            $('#CurTraBlockAmnt').html(TotalBlkAmnt);
+                        }
+                        else {
+                            $('#CurTraBlockAmnt').html(0)
+                        }
+                        if ($('#divPageStatus').text() == 'N') {
+                            $('#PrevBlkHeader').hide();
+                            $('#jsGridPrev').hide();
+                        }
+                        else {
+                            $('#PrevBlkHeader').show();
+                            $('#jsGridPrev').show();
+                        }
+                        bindPrevBlockPackageGrid();
+                        // console.log(data);
+                        $('#urnNum').html(data[0].urn);
+                        $('#headOfFamily').html(data[0].headMemberName);
+                        $('#headOfFamilyID').html(data[0].headMemberID);
+                        $('#regDate').html(data[0].registrationDate);
+                        $('#benefName').html(data[0].memberName);
+                        $('#state').html(data[0].memberStateName);
+                        $('#stateCode').html(data[0].memberStateCode);
+                        $('#district').html(data[0].memberDistrictName);
+                        $('#districtCode').html(data[0].memberDistrictCode);
+                        $('#memberBlockCode').html(data[0].memberBlockCode);
+                        $('#panchayatCode').html(data[0].panchayatCode);
+                        $('#villageCode').html(data[0].villageCode);
+                        $('#invNo').html(data[0].invoiceNo);
+                        $('#BlkInvName').html(data[0].invoiceNo);
+                        $('#IsMedSergical').html(data[0].isMedSergical);
+                        $('#divSchCode').html(data[0].schemeCode);
+                        $('#SchName').html(data[0].schemeName);
+                        $('#familyID').html(data[0].familyID);
+                        var date1_ms = new Date(data[0].blockingUserDate).getTime();
+                        var date2_ms = new Date().getTime();
+                        var difference_ms = date2_ms - date1_ms;
+                        difference_ms = difference_ms / 1000;
+                        difference_ms = difference_ms / 60;
+                        difference_ms = difference_ms / 60;
+                        var days = Math.floor(difference_ms / 24);
+                        $('.datepicker').datepicker({
+                            format: 'dd-M-yy',
+                            startDate: '-' + days + 'd',
+                            endDate: 'today',
+                            autoclose: true
+                        }); //code for datepicker
+                        $(".datepicker").datepicker("setDate", (new Date().toDateString()));
+                        if (data[0].urn != "") {
+                            var BalanceParams = {
+                                Action: 'R',
+                                URN: data[0].urn,
+                                FamilyId: $('#familyID').text()
+                            };
+                            $.ajax({
+                                url: ServiceURL + "/api/Common/GetAvailBalance",
+                                type: "GET",
+                                data: BalanceParams,
+                                dataType: "json",
+                                contentType: "application/json; charset=utf-8",
+                                success: function (result) {
+                                    if (result != null) {
+                                        $('#AvlCover').html(result.availableBalance);
+                                    }
+                                    else {
+                                        $('#AvlCover').html('NA');
+                                    }
+                                },
+                                error: function (error) {
+                                    console.log(error.responseText);
+                                }
+                            });
+                        }
+                        if (data[0].memberDistrictCode != "") {
+                            var PolicyParams = {
+                                //MemberDistrictCode: data[0].memberDistrictCode,
+                                //SchemeCode: $('#divSchCode').text()
+                                URN: $('#urnNum').text()
+                            };
+                            $.ajax({
+                                url: ServiceURL + "/api/Common/GetPolicy",
+                                type: "GET",
+                                data: PolicyParams,
+                                dataType: "json",
+                                contentType: "application/json; charset=utf-8",
+                                success: function (data) {
+                                    if (data.length > 0) {
+                                        // console.log(data);
+                                        $('#IPNumber').html(data[0].policynumber)
+                                        $('#StartDt').html(data[0].policyStartDate)
+                                        $('#EndDt').html(data[0].policyEnddate)
+                                    }
+                                },
+                                error: function (error) {
+                                    console.log(error.responseText);
+                                }
+                            });
+                        }
+                        BindPackageHeader_PackageChange(data[0].isMedSergical,'A');
+                    }
+                },
+                error: function (error) {
+                    console.log(error.responseText);
+                }
+            });
+        }
+        $('#btnAddPackage').click(function () {
+
+                AddPackage_MedicalToSurgical();
+
+        });
+         $('#btnBack').click(function () {
+            if ($('#divPageStatus').text() == 'M') {
+                 window.location.href = '@Url.Action("ViewMultipleBlockPackage", "BlockPackage")';
+            }
+            else if ($('#divPageStatus').text() == 'N') {
+                 window.location.href = '@Url.Action("ViewBlockPackage", "BlockPackage")';
+            }
+         });
+        $('#PApackageDetail').change(function () {
+            PackageDetailsChangeMtoS();
+        });
+        $('#ddlWardDtls').change(function () {
+            if (arrWardDtls.length > 0) {
+                arrWardDtls.forEach(function (entry) {
+                    if (entry.childid == $('#ddlWardDtls').val()) {
+                        $('#PAtreatmentCost').val(entry.amount);
+                    }
+                    else {
+                        //$('#PAtreatmentCost').val('');
+                    }
+                });
+            }
+        });
+        $('#btnBlock').click(function () {
+            var confirm = checkconfirmReq();
+            if (confirm == true) {
+                $('#divLoader').show();
+                var CappedAmnt;
+                if ($('#CapAmnt').text() == '') {
+                    CappedAmnt = 0;
+                }
+                else {
+                    CappedAmnt = $('#CapAmnt').text();
+                }
+                var gridPackageInfo = $("#jsGrid").jsGrid("option", "data");
+                if (gridPackageInfo.length > 0) {
+                    var fileUpload = $("#DocFile").get(0);
+                    var files = fileUpload.files;
+                    var BlockPackageParams = new FormData();
+                    if (files.length > 0) {
+                        BlockPackageParams.append("VchFile", files[0]);
+                    }
+                    BlockPackageParams.append("__RequestVerificationToken", gettoken());
+                    BlockPackageParams.append("ACTIONCODE", 'A');
+                    BlockPackageParams.append("TranId", $('#TrId').text());
+                    BlockPackageParams.append("URN", $('#urnNum').text());
+                    BlockPackageParams.append("ProcedureCode", gridPackageInfo[0].ProcedureCode);
+                    BlockPackageParams.append("CategoryCode", gridPackageInfo[0].CategoryCode);
+                    BlockPackageParams.append("PackageCode", gridPackageInfo[0].PackageCode);
+                    BlockPackageParams.append("PreAuthStatus", $('#AuthStatus').text());
+                    BlockPackageParams.append("AmoutBlocked", gridPackageInfo[0].AmountBlocked);
+                    BlockPackageParams.append("BlockingUserDate", gridPackageInfo[0].BlockingDate);
+                    BlockPackageParams.append("IsMedSergical", gridPackageInfo[0].Type);
+                 
+
+                     $.ajax({
+                       url: '@Url.Action("AddOnPackageType", "BlockPackage")',
+                       type: "POST",
+                       data: BlockPackageParams,
+                       processData: false,
+                       contentType: false,
+                       success: function (data) {
+                           $('#divLoader').hide();
+                            if (data == "3") {
+                                alert('Cannot Block AddOnPackage. Please Check Previous AddOnPackage Blocked Details!!');                                
+                            }
+                            else if (data == "2") {
+                                alert('Package Blocked Successfully!!');
+                                window.location.href = '@Url.Action("ViewPackageChange", "BlockPackage")';
+                            }
+                            else if (data == "1") {
+                                alert('Package Request Raised Successfully for Approval!!');
+                                window.location.href = '@Url.Action("AddOnPreAuthorizationDetails", "PreAuthorization")';
+                            }
+                       },
+                       error: function (error) {
+                              $('#divLoader').hide();
+                                console.log(error.statusText);
+                       }
+                     });
+                     
+                }
+            }
+        });
+        $('#DocFile').on('change', function (e) {
+            if (!ValidateFile('DocFile', 'Valid Document')) {
+                return false;
+            };
+            if (!CheckFileType('DocFile', '1')) {
+                return false;
+            };
+        });
+        $('#aAddOn').click(function () {
+          
+          window.open('../BlockPackage/ViewAddOnPackageDetails?InvNo=' + PackageInfo[0].invoiceNo, '_blank', 'location=yes,height=570,width=1250,scrollbars=yes,status=yes');
+        });
+    });
+</script>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12 pb-3">
+            <div class="card" id="viewTable">
+                <div class="data-info noPrint">
+                    <div class="row">
+                        <div class="col-sm-5 noPrint">
+                            <h2>Hospital Details</h2>
+                            <div class="row">
+                                <div class="col-sm-3 noPrint" hidden="hidden">
+                                    <p>State</p>
+                                    <h3 id="hdState"></h3>
+                                </div>
+                                <div class="col-sm-3 noPrint" hidden="hidden">
+                                    <p>District</p>
+                                    <h3 id="hdDistrict"></h3>
+                                </div>
+                                <div class="col-sm-4">
+                                    <p>Hospital Code</p>
+                                    <h3 id="hdHospitalCode"></h3>
+                                </div>
+                                <div class="col-sm-4">
+                                    <p>Name</p>
+                                    <h3 id="HdName"></h3>
+                                </div>
+                                <div class="col-sm-4">
+                                    <p>Blocking Invoice No.</p>
+                                    <h3 id="BlkInvName"></h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-2 noPrint">
+                            <h2>Member Info</h2>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <p>URN Number</p>
+                                    <h3 id="urnNum"></h3>
+                                    <div id="memberBlockCode" hidden></div>
+                                    <div id="invNo" hidden></div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <p>Head of Family</p>
+                                    <h3 id="headOfFamily"></h3>
+                                    <h3 id="headOfFamilyID" hidden></h3>
+                                    <div id="familyID" hidden></div>
+                                </div>
+                                <div class="col-sm-3 noPrint" hidden="hidden">
+                                    <p>State</p>
+                                    <h3 id="state"></h3>
+                                    <h3 id="stateCode" hidden></h3>
+                                    <div id="panchayatCode" hidden></div>
+                                </div>
+                                <div class="col-sm-3" hidden="hidden">
+                                    <p>District</p>
+                                    <h3 id="district"></h3>
+                                    <h3 id="districtCode" hidden></h3>
+                                    <div id="villageCode" hidden></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5 noPrint">
+                            <h2>Insurance Policy Details</h2>
+                            <div class="row pb-3">
+                                <div class="col-sm-4">
+                                    <p>Scheme Name</p>
+                                    <h3 id="SchName"></h3>
+                                    <div id="divSchCode" hidden></div>
+                                </div>
+                                <div class="col-sm-3" hidden="hidden">
+                                    <p>Policy Number</p>
+                                    <h3 id="IPNumber"></h3>
+                                </div>
+                                <div class="col-sm-3" hidden="hidden">
+                                    <p>Start Date</p>
+                                    <h3 id="StartDt"></h3>
+                                </div>
+                                <div class="col-sm-3" hidden="hidden">
+                                    <p>End Date</p>
+                                    <h3 id="EndDt"></h3>
+                                </div>
+                                <div class="col-sm-4">
+                                    <p>Current Transaction Blocked Amount</p>
+                                    <h3 id="CurTraBlockAmnt"></h3>
+                                </div>
+                                <div class="col-sm-4">
+                                    <p>Available Cover</p>
+                                    <h3 id="AvlCover"></h3>
+                                </div>
+                                <div id="divPageStatus" hidden></div>
+                            </div>
+                        </div>
+                    </div>
+                    @*<hr>
+                    <div class="row noPrint">
+                        <div class="col noPrint">
+                            <h2>Insurance Policy Details</h2>
+                            <div class="row pb-3">
+                                <div class="col-sm-3">
+                                    <p>Scheme Name</p>
+                                    <h3 id="SchName"></h3>
+                                    <div id="divSchCode" hidden></div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <p>Policy Number</p>
+                                    <h3 id="IPNumber"></h3>
+                                </div>
+                                <div class="col-sm-3">
+                                    <p>Start Date</p>
+                                    <h3 id="StartDt"></h3>
+                                </div>
+                                <div class="col-sm-3">
+                                    <p>End Date</p>
+                                    <h3 id="EndDt"></h3>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col noPrint">
+                            <h2>&nbsp;</h2>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <p>Current Transaction Blocked Amount</p>
+                                    <h3 id="CurTraBlockAmnt"></h3>
+                                </div>
+                                <div class="col-sm-3">
+                                    <p>Available Cover</p>
+                                    <h3 id="AvlCover"></h3>
+                                </div>
+                                <div id="divPageStatus" hidden></div>
+                            </div>
+                        </div>
+                    </div>*@
+                </div>
+                <div class="custom-tab-content px-3">
+                    <div>
+                        <form>
+                            <div class="form-group row noPrint">
+                                <label for="beneficiaryNm" class="col-sm-2 col-form-label noPrint">Beneficiary Name</label>
+                                <div class="col-sm-2 noPrint">
+                                    <p class="form-control noPrint"><strong id="benefName"></strong></p>
+                                </div>
+                                <label for="blockingDt" class="col-sm-2 col-form-label noPrint" id="lblBlockingDt">Blocking Date <b><span style="color:red">*</span></b></label>
+                                <div class="col-sm-2 noPrint">
+                                    <div class="input-group mb-3">
+                                        <input type="text" id="blockingDt" class="form-control datepicker" placeholder="dd mmm yyyy" aria-label="Username" aria-describedby="basic-addon1" maxlength="11" autofocus readonly>
+                                        <div class="input-group-prepend">
+                                            <label for="blockingDt" class="input-group-text"><i class="icon-calendar"></i></label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <label for="regDt" class="col-sm-2 col-form-label noPrint">Registration Date</label>
+                                <div class="col-sm-2 noPrint">
+                                    <p class="form-control noPrint"><strong id="regDate"></strong></p>
+                                </div>
+                            </div>
+                            <div class="form-group row noPrint">
+                                <label for="packageHeader" class="col-sm-2 col-form-label noPrint">Package Header <b><span style="color:red">*</span></b></label>
+                                <div class="col-sm-2 noPrint">
+                                    <select name="" id="PApackageHeader" class="form-control noPrint"></select>
+                                </div>
+
+                                <label for="packageSubPackageDetail" class="col-sm-2 col-form-label noPrint">Category<b><span style="color:red">*</span></b></label>
+                                <div class="col-sm-2 noPrint">
+                                    <select name="" id="PApackageSubPackageDetail" class="form-control noPrint"></select>
+                                </div>
+
+
+                                <label for="packageDetail" class="col-sm-2 col-form-label noPrint">Package Detail <b><span style="color:red">*</span></b></label>
+                                <div class="col-sm-2 noPrint">
+                                    <select name="" id="PApackageDetail" class="form-control noPrint"></select>
+                                </div>
+                                <label for="WardDetail" class="col-sm-2 col-form-label noPrint" id="lblWardDtls">Ward Detail <b><span style="color:red">*</span></b></label>
+                                <div class="col-sm-2 noPrint" id="divWardDtls">
+                                    <select name="" id="ddlWardDtls" class="form-control noPrint"></select>
+                                </div>
+                                <label for="treatmentCost" class="col-sm-2 col-form-label noPrint">Treatment Cost (Rs.) <b><span style="color:red">*</span></b></label>
+                                <div class="col-sm-2 noPrint">
+                                    <input type="text" class="form-control" id="PAtreatmentCost" placeholder="Enter here" onkeypress="return checkDec(event)" maxlength="15" readonly="readonly" />
+                                    <div id="PackageCost" hidden="hidden"></div>
+                                    <div id="Days" hidden="hidden"></div>
+                                    <div id="AuthStatus" hidden="hidden"></div>
+                                    <div id="MedSer" hidden="hidden"></div>
+                                    <div id="CapAmnt" hidden="hidden"></div>
+                                    <div id="TrId" hidden="hidden"></div>
+                                </div>
+                            </div>
+                            <div class="form-group row noPrint" id="DocInfo">
+                                <label for="packageDetail" class="col-sm-2 col-form-label noPrint">Clinical Doc</label>
+                                <div id="divDoc" class="col-sm-2 noPrint"></div>
+                                <label for="packageHeader" class="col-sm-2 col-form-label noPrint">Document <b><span style="color:red">*</span></b></label>
+                                <div class="col-sm-2 noPrint">
+                                    <input type="file" class="form-control noPrint" id="DocFile" />
+                                </div>
+                            </div>
+                            <div class="form-group row noPrint" id="fuValText">
+                                <label for="packageDetail" class="col-sm-2 col-form-label"></label>
+                                <div class="col-sm-2"></div>
+                                <label class="col-sm-2 col-form-label"></label>
+                                <div class="col-sm-3 noPrint">
+                                    <span style="font-weight: bold; color: Green">Max file size is 200KB</span>
+                                    <br />
+                                    <span style="font-weight: bold; color: Green">Only pdf/jpg/jpeg document allowed</span>
+                                </div>
+                            </div>
+                            <div class="text-right py-3 noPrint">
+                                <input class="btn btn-outline-primary my-2 my-sm-0" type="button" id="btnAddPackage" value="Add Package" title="Add Package" />
+                                <button type="button" id="ChkList" value="Check List" class="btn btn-outline-secondary" title="Generate Treatment Check List" hidden>Generate Addmission Slip</button>
+
+                            </div>
+                            <div class="">
+                                <h5 style="color:darkorange" id="CurBlkHeader" class="noPrint">Current Selected Package Details</h5>
+                                <div class="table table-striped table-bordered noPrint" id="jsGrid">
+                                </div>
+                                <h5 style="color:darkorange" id="PrevBlkHeader"><span class="noPrint">Previous Blocked Package Details<a id="aAddOn" style="color:green;font-size:large"> (<u>Click here to view AddOn Details</u>)</a></span></h5>
+
+
+                                <div class="table table-striped table-bordered packageTable" id="jsGridPrev">
+                                </div>
+
+                            </div>
+                            <div class="text-right py-3 noPrint">
+                                <input type="button" value="Back" class="btn btn-outline-danger my-2 my-sm-0" id="btnBack" />
+                                <input class="btn btn-outline-success my-2 my-sm-0" type="button" value="Block" id="btnBlock" style="visibility:hidden">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="loader" id="divLoader" style="display:none">
+    <div class="center">
+        <img src="~/imgs/DataLoading.gif" alt="Loader..." />
+    </div>
+</div>
+<!-- Body content Ends here -->
+<!-- START HERE: Registration confirmation modal content -->
+<div class="modal fade" id="admissionConfirmation" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="alert text-info" role="alert">
+                    Are you sure want to Register ?
+                </div>
+                <div class="text-right">
+                    <button type="button" class="btn btn-outline-secondary btn-sm" data-dismiss="modal">NO</button>
+                    <a href="javascript: void(0);" class="btn btn-outline-success btn-sm ml-1">YES</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- END HERE: Registration confirmation modal content -->
+    <style type="text/css">
+        .yesPrint {
+            display: none;
+        }
+
+        @@media print {
+            @@page {
+                size: landscape
+            }
+        }
+
+        .jsgrid-grid-header,
+        .jsgrid-grid-body {
+            overflow: auto;
+        }
+    </style>
+    <script type="text/javascript">
+        $(function () {
+            $('.secondary-menu li a').tooltip();
+        });
+    </script>
+    <script type="text/javascript">
+        $(function () {
+            $('#ChkList').click(function () {
+                ////debugger;
+                var printHeader = "<h5>Admission Slip</h5>";
+                var printHeaderSlip = "<h6>Blocking slip - Hospital copy</h6>"
+                var AvlClaimCardBalance = $('#AvlCover').text();
+                var TotalAmountBlocked = $('#CurTraBlockAmnt').text();
+
+                //Date.prototype.toShortFormat = function () {
+                //    var month_names = ["Jan", "Feb", "Mar",
+                //        "Apr", "May", "Jun",
+                //        "Jul", "Aug", "Sep",
+                //        "Oct", "Nov", "Dec"];
+                //    var day = this.getDate();
+                //    var month_index = this.getMonth();
+                //    var year = this.getFullYear();
+                //    return "" + day + " " + month_names[month_index] + " " + year;
+                //}
+
+                var windowName = "PrintPage";
+                var wOption = "width=1000,height=650,menubar=yes,scrollbars=yes,location=no,left=100,top=100";
+                var cloneTable = $("#viewTable").clone();
+                cloneTable.find('input[type=text],select,textarea').each(function () {
+                    var elementType = $(this).prop('tagName');
+                    if (elementType == 'SELECT')
+                        var textVal = $(this).find("option:selected").text();
+                    else
+                        var textVal = $(this).val();
+                    $(this).replaceWith('<label>' + textVal + '</label>');
+                });
+                cloneTable.find('a').each(function () {
+                    var anchorVal = $(this).text();
+                    $(this).replaceWith('<label>' + anchorVal + '</label>');
+                });
+                cloneTable.find('.packageTable').each(function () {
+                    var hdrData = $(this).find('.jsgrid-grid-header .jsgrid-header-row').clone();
+                    $(this).find('.jsgrid-grid-header .jsgrid-header-row').remove();
+                    $(this).find('.jsgrid-grid-body table').prepend("<thead>" + hdrData.html() + "</thead>");
+                });
+
+
+                var wWinPrint = window.open("", windowName, wOption);
+                wWinPrint.document.open();
+                wWinPrint.document.write("<html><head><link href='../css/Print.css' rel='stylesheet'><link href='../css/bootstrap.min.css' rel='stylesheet'><link href='../css/style.css' rel='stylesheet'><title></title></head><body @*onload='window.print();'*@ class='border'>");
+                //wWinPrint.document.write('<div class="prntlogo"><img src=@Url.Content("~/imgs/hpsbys-logo.png") width=70><span><h2>Himachal Pradesh Swasthya Bima Yojna Society</h2><p>Department of Health &amp; Family Welfare<br>Government of Himachal Pradesh</p></span></div>');
+                wWinPrint.document.write("<div align='center'><button style='background: url(@Url.Content("~/imgs/document_print.gif")); width: 20px; height: 20px' onclick='window.print();' id='btnPrint'/></div>");
+                wWinPrint.document.write("<div id='printHeader' align='center'>" + printHeader + "</div>");
+                wWinPrint.document.write("<div align='center'><b>" + printHeaderSlip + "</b></div>");
+                wWinPrint.document.write("<div class='form-group row'></div>");
+                wWinPrint.document.write("<div class='form-group row'></div>");
+                wWinPrint.document.write("<div class='form-group row'>");
+                wWinPrint.document.write("<div class='col-sm-3'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Slip Date :</div>");
+                wWinPrint.document.write("<div class='col-sm-3'><b>" + new Date().toLocaleDateString() + "</b></div>");
+                wWinPrint.document.write("<div class='col-sm-3'>Hospital Code :</div>");
+                wWinPrint.document.write("<div class='col-sm-3'><b>" + sessionHospitalCode+ "</b></div>");
+                wWinPrint.document.write("</div>");
+                wWinPrint.document.write("<div class='form-group row'>");
+                wWinPrint.document.write("<div class='col-sm-3'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;URN :</div>");
+                wWinPrint.document.write("<div class='col-sm-3'><b>" + $('#urnNum').text() + "</b></div>");
+                wWinPrint.document.write("<div class='col-sm-3'>Hospital Name :</div>");
+                wWinPrint.document.write("<div class='col-sm-3'><b>" + "@Session["HospitalName"]"+ "</b></div>");
+                wWinPrint.document.write("</div>");
+                 wWinPrint.document.write("<div class='form-group row'>");
+                wWinPrint.document.write("<div class='col-sm-3'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;State :</div>");
+                wWinPrint.document.write("<div class='col-sm-3'><b>" + $('#state').text() + "</b></div>");
+                wWinPrint.document.write("<div class='col-sm-3'>Dist :</div>");
+                wWinPrint.document.write("<div class='col-sm-3'><b>" + $('#district').text()+ "</b></div>");
+                wWinPrint.document.write("</div>");
+                 wWinPrint.document.write("<div class='form-group row'>");
+                wWinPrint.document.write("<div class='col-sm-3'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Beneficiary Name :</div>");
+                wWinPrint.document.write("<div class='col-sm-3'><b>" + $('#benefName').text() + "</b></div>");
+                wWinPrint.document.write("<div class='col-sm-3'>Registration Date :</div>");
+                wWinPrint.document.write("<div class='col-sm-3'><b>" + $('#regDate').text()+ "</b></div>");
+                wWinPrint.document.write("</div>");
+                wWinPrint.document.write("<div class='form-group row'></div>");
+                wWinPrint.document.write("<div class='form-group row'></div>");
+                wWinPrint.document.write("<div align='center'>Available claim(Card Balance): <b>" + AvlClaimCardBalance + "</b></div>");
+                wWinPrint.document.write("<div id='printContent'>" + cloneTable.html() + "</div>");
+                wWinPrint.document.write("<div align='center'>Total Amount Blocked : <b>" + TotalAmountBlocked + "</b></div>");
+                wWinPrint.document.write("<div align='center'>Insufficient amount : <b>0.00</b></div>");
+                wWinPrint.document.write("</body></html>");
+                wWinPrint.document.close();
+                wWinPrint.focus();
+                return wWinPrint;
+            });
+        });
+    </script>
+
+    <script>
+        // breadcrumb active & menu active
+        $(document).ready(function () {
+            loadNavigation('AddOnPackage', 'Mlblockpackage', 'pl', 'Block Package', 'Addon Package', '');
+        });
+    </script>
+
+
+
+
+
+
+

@@ -1,0 +1,27 @@
+﻿using HPSBYS.Web.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+
+namespace HPSBYS.Web.Controllers
+{
+    [SessionTimeOutFilter]
+    [Authorize]
+   
+    public class UnblockPackageController : Controller
+    {
+        // GET: UnblockPackage
+        [HttpGet]
+        public ViewResult AddUnblockPackage()
+        {
+            return View();
+        }
+        [HttpGet]
+        public ViewResult ViewUnblockPackage()
+        {
+            return View();
+        }
+    }
+}

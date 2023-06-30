@@ -1,0 +1,206 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace HPSBYS.Data.Model
+{
+
+    public class PatientRegistrationInformation
+    {
+        public int WardLogId { get; set; }
+        public int RejectCount { get; set; }
+        public string PreAuthDt { get; set; }
+        public string URN { get; set; }
+        public string CardNo { get; set; }
+        public string MemberName { get; set; }
+        public int MemberID { get; set; }
+        public string PatientContactNumber { get; set; }
+        public string InvoiceNo { get; set; }
+        public string RegistrationDate { get; set; }
+        public string WardBlockingDate { get; set; }
+        public string TransactionID { get; set; }
+        public string PreAuthStatus { get; set; }
+        public string ProcedureName { get; set; }
+        public string PackageName { get; set; }
+        public string Category { get; set; }
+        public string Ward { get; set; }
+
+        public string PackageCost { get; set; }
+        public string Amount { get; set; }
+        public string AmoutBlocked { get; set; }
+        public string HeadMemberName { get; set; }
+        public string MemberDistrictName { get; set; }
+        public string MemberStateName { get; set; }
+        public string TPARemarks { get; set; }
+        public string PreAuthDoc { get; set; }
+        public int AddOnStatus { get; set; }
+
+    }
+
+
+
+
+
+    public class Registration
+    {
+        public string SchemeCode { get; set; }
+        public string SchemeName { get; set; }
+        public string URN { get; set; }
+        public string CardNo { get; set; }
+        public string MemberName { get; set; }
+        public string PatientContactNumber { get; set; }
+        public int MemberID { get; set; }
+        public string InvoiceNo { get; set; }
+        public string RegistrationDate { get; set; }
+        public int HeadMemberID { get; set; }
+        public string HeadMemberName { get; set; }
+        public string MemberDistrictName { get; set; }
+        public string MemberDistrictCode { get; set; }
+        public string MemberStateName { get; set; }
+        public string MemberStateCode { get; set; }
+        public string MemberBlock { get; set; }
+        public string MemberBlockCode { get; set; }
+        public string PanchayatCode { get; set; }
+        public string MemberPanchayatName { get; set; }
+
+        public string MemberVillageName { get; set; }
+        public string VillageCode { get; set; }
+        public string PreAuthStatus { get; set; }
+        public string ProcedureCode { get; set; }
+        public string ProcedureName { get; set; }
+
+        public string PackageName { get; set; }
+        public string PackageCode { get; set; }
+        public string NoofDays { get; set; }
+        public string AmoutBlocked { get; set; }
+        public string BlockingUserDate { get; set; }
+        public string PackageCost { get; set; }
+        public string TransactionID { get; set; }
+        public string IsMedSergical { get; set; }
+        public string FamilyID { get; set; }
+        public int WardId { get; set; }
+        public string Ward { get; set; }
+        public int WardLevel { get; set; }
+        public string Category { get; set; }
+        public string CategoryCode { get; set; }
+        public int WordChangeCount { get; set; }
+        public int AddOnStatus { get; set; }
+
+    }
+    //Used For Unblocking Page
+    public class UnblockingInfo : Registration
+    {
+        //public string ProcedureCode { get; set; }
+        ////public string ProcedureName { get; set; }
+        //public string PackageCode { get; set; }
+        //// public string PackageName { get; set; }
+        //public string AmoutBlocked { get; set; }
+        public string DATEOFADMISSION { get; set; }
+        public string BlockingInvoiceNo { get; set; }
+
+
+    }
+
+    public class DischargeSummary
+    {
+        public string id { get; set; }
+        public string URN { get; set; }
+        public string PatientName { get; set; }
+        public string BlockingInvoiceNo { get; set; }
+        public string RegistrationUserDate { get; set; }
+        public string PatientContactNumber { get; set; }
+        public int ReferalStatus { get; set; }
+
+    }
+    public class DischargeInformation : Registration
+    {
+        //public string ProcedureCode { get; set; }
+        //// public string ProcedureName { get; set; }
+        //public string PackageCode { get; set; }
+        ////public string PackageName { get; set; }
+        //public string AmoutBlocked { get; set; }
+        public string DATEOFADMISSION { get; set; }
+        // public string BlockingInvoiceNo { get; set; }
+        public string PackageMode { get; set; }
+        public string CappedAmount { get; set; }
+        public string ISExtensionofstay { get; set; }
+        public string dtmNextRequestdate { get; set; }
+        public string SumAmountBlocked { get; set; }
+        public int PackageChangeStatus { get; set; }
+        public string TemporaryDischargeDate { get; set; }
+        public string TemporaryDiscargeAmount { get; set; }
+        public string LastPackageBlockingDate { get; set; }
+
+    }
+
+    public class PreAuth
+    {
+        public string Action { get; set; }
+        public string intPreAuthId { get; set; }
+        public string VCHURNNO { get; set; }
+        public string intMemberId { get; set; }
+        public string vchMemberName { get; set; }
+        public string vchPackageCategory { get; set; }
+        public string VchPackageDetail { get; set; }
+        public string dtmDate { get; set; }
+        public string VchFile { get; set; }
+        public string VchRemarks { get; set; }
+        public string INT_SH_ID { get; set; }
+        public string INT_PHASE_ID { get; set; }
+        public string DEC_AMOUNT { get; set; }
+        public string INT_SCHEME_ID { get; set; }
+        public string vchActionRemarks { get; set; }
+        public string intAprovedBy { get; set; }
+        public string dtmAction { get; set; }
+        public string INT_CREATED_BY { get; set; }
+        public string DTM_CREATED_ON { get; set; }
+        public string INT_STATUS_FLAG { get; set; }
+        public string BlockingInvoiceNo { get; set; }
+
+    }
+
+
+    public class PreAuthApprovedPackageBlock
+    {
+        public string ACTION { get; set; }
+        public string URN { get; set; }
+        public string TransactionID { get; set; }
+        public string BlockingInvoiceNo { get; set; }
+        public string BlockinguserDate { get; set; }
+        public string HospitalAuthorityCode { get; set; }
+        public string HospitalCode { get; set; }
+        public string VchFileName { get; set; }
+        public int WardLogId { get; set; }
+        public string Amount { get; set; }
+
+    }
+
+    public class PackageExtension
+    {
+
+        public string URN { get; set; }
+        public string PatientName { get; set; }
+        public string PackageName { get; set; }
+        public string PackageCost { get; set; }
+        public string DATEOFADMISSION { get; set; }
+        public string HospitalCode { get; set; }
+        public string BlockingInvoiceNo { get; set; }
+        public string NoofextendDays { get; set; }
+        public string INT_CREATED_BY { get; set; }
+        public int TransactionId { get; set; }
+        public string Gender { get; set; }
+        public string VchFile { get; set; }
+    }
+    public class CancelPackage
+    {
+        public string Action { get; set; }
+        public string BlockingINVOICENO { get; set; }
+        public int TransactionID { get; set; }
+        public string CancelReason { get; set; }
+        public string CancelDate { get; set; }
+        public int WardLogId { get; set; }
+    }
+
+}

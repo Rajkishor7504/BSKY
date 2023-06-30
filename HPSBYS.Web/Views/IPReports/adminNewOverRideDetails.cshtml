@@ -1,0 +1,167 @@
+﻿
+@{
+    ViewBag.Title = "adminNewOverRideDetails";
+    Layout = "~/Views/Shared/_CommonLayout.cshtml";
+}
+
+<style>
+    .new-width.dataTable .fix-width1 {
+        width: 80px !important;
+    }
+
+    .new-width.dataTable .fix-width {
+        width: 130px !important;
+    }
+</style>
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="clearfix"></div>
+                    <!-- Family Verification info -->
+                    <div class="form-box-bg mb-4">
+                        <ul class="nav nav-tabs custom-tab mb-4">
+                            <li class="nav-item">
+                                <a class="nav-link active" href="@Url.Action("NewOverRideDetails","IPReports")">View</a>
+                            </li>
+                        </ul>
+                        <div class="col-md-12 p-0">
+                            <div class="form-row">
+                                <div class="col-lg-4">
+                                    <div class="mb-2">
+                                        <label class="pkg-label mb-1">Authentication From Date :</label>
+                                        <input type="text" id="fromdate" class="form-control datepicker" />
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-2">
+                                        <label class="pkg-label mb-1">Authentication To Date :</label>
+                                        <input type="text" id="todate" class="form-control datepicker" />
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-2">
+                                        <label class="pkg-label mb-1">State <b><span style="color:red">*</span></b> </label>
+                                        <div>
+                                            <select id="ddState" class="form-control form-group bindStates" onchange="bindDistricts(this, ddDistrict, ddHospital);">
+                                                <option value="0">-Select-</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-2">
+                                        <label class="pkg-label mb-1">District <b><span style="color:red">*</span></b> </label>
+                                        <div>
+                                            <select id="ddDistrict" class="form-control form-group" onchange="bindHospitals(ddState, this, ddHospital);">
+                                                <option value="0">-Select-</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-2">
+                                        <label class="pkg-label mb-1">Hospital <b><span style="color:red">*</span></b> </label>
+                                        <div>
+                                            <select id="ddHospital" class="form-control form-group">
+                                                <option value="0">-Select-</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-2">
+                                        <label class="pkg-label mb-1"> &nbsp; </label>
+                                        <div>
+                                            <input class="btn btn-outline-success" type="button" value="Search" id="btnSearch">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-responsive mt-2">
+                            <table id="example2" class="table table-striped new-width" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th class="fix-width1" scope="col">SL NO</th>
+                                        <th scope="col">PURPOSE</th>
+                                        <th class="fix-width" scope="col">OTP</th>
+                                        <th class="fix-width" scope="col">IRIS</th>
+                                        <th class="fix-width" scope="col">POS</th>
+                                        <th class="fix-width" scope="col">OVERRIDE</th>
+                                        <th class="fix-width" scope="col">VIEW</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+
+                        <!-- modal start -->
+                        <div class="modal fade wow fadeInUp animated" id="popModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-xl modal-dialog-scrollable" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <div class="row heading-pkg">
+                                            <h5 class="mb-0">@Session["HospitalName"]</h5>
+                                        </div>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="row">
+                                            <div class="col-6 heading-pkg">
+                                                <h5 id="popModalTitle" class="pkg-label mb-1"></h5>
+                                            </div>
+                                            <div class="col-6">
+                                                <button id="btnExcel" type="button" class="btn btn-outline-success btn-sm float-right" data-toggle="tooltip" title="Export To Excel">
+                                                    <i class="fa fa-file-excel-o"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <p></p>
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <table id="grdReportDetails" class="table table-stripped" style="width:100%;">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="fix-width1" scope="col">SL No</th>
+                                                            <th class="fix-width" scope="col">URN</th>
+                                                            <th scope="col">MEMBER NAME</th>
+                                                            <th class="fix-width" scope="col">MEMBER ID</th>
+                                                            <th class="fix-width" scope="col">DATE & TIME</th>
+                                                            <th class="fix-width" scope="col">PURPOSE</th>
+                                                            <th class="fix-width" scope="col">VERIFICATION Type</th>
+                                                            <th class="fix-width" scope="col">STATUS</th>
+                                                        </tr>
+                                                    </thead>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- modal end -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/js/dtButtons.min.js"></script>
+<script src="~/js/jszip.min.js"></script>
+<script src="~/js/buttonsHtml5.min.js"></script>
+<script>
+    // breadcrumb active & menu active
+    document.mynamespace = {};
+    document.mynamespace.hospitalcode = '@HttpContext.Current.Session["HospitalCode"]';
+    document.mynamespace.groupid = '@HttpContext.Current.Session["groupid"]';
+    var hospitalcode = document.mynamespace.hospitalcode;
+    var groupid = document.mynamespace.groupid;
+</script>
+
+@Scripts.Render("~/bundles/AdminUtility")
+@Scripts.Render("~/bundles/adminNewOverRideDetails")

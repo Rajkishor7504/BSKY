@@ -1,0 +1,85 @@
+﻿
+@{
+    ViewBag.Title = "PatientMobileVerificationReport";
+    Layout = "~/Views/Shared/_CommonLayout.cshtml";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="clearfix"></div>
+                    <div class="form-box-bg mb-4">
+                        <ul class="nav nav-tabs custom-tab mb-4">
+                            <li class="nav-item">
+                                <a class="nav-link active" href="@Url.Action("PatientMobileVerificationReport","IPReports")">View</a>
+                            </li>
+                        </ul>
+                        <div class="col-md-12 p-0">
+                            <div class="form-row pkg_grey">
+                                <div class="col-lg-2">
+                                    <div class="mb-2">
+                                        <label class="pkg-label mb-1">From Date :</label>
+                                        <input type="text" id="txtFromDate" class="form-control datepicker" />
+                                    </div>
+                                </div>
+                                <div class="col-lg-2">
+                                    <div class="mb-2">
+                                        <label class="pkg-label mb-1">To Date :</label>
+                                        <input type="text" id="txtToDate" class="form-control datepicker" />
+                                    </div>
+                                </div>
+                                <div class="col-lg-2">
+                                    <div class="mb-2">
+                                        <label class="pkg-label mb-1">State :</label>
+                                        <select id="ddState" class="form-control form-group bindStates" onchange="bindDistricts(this, ddDistrict, ddHospital);">
+                                            <option value="0">-Select-</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-2">
+                                    <div class="mb-2">
+                                        <label class="pkg-label mb-1">District :</label>
+                                        <select id="ddDistrict" class="form-control form-group" onchange="bindHospitals(ddState, this, ddHospital);">
+                                            <option value="0">-Select-</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-2">
+                                    <div class="mb-2">
+                                        <label class="pkg-label mb-1">Hospital :</label>
+                                        <select id="ddHospital" class="form-control form-group"> <option value="0">-Select-</option> </select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-1 d-flex justify-content-start align-items-center mt-3">
+                                    <input id="btnSearch" type="button" onclick="getPMobileVerificationReport();" class="btn btn-sm btn-outline-success" value="Search">
+                                </div>
+                                <div class="col-lg-1 d-flex justify-content-end align-items-center mt-3">
+                                    <button id="btnExcel" type="button" class="btn btn-outline-success btn-sm float-right" data-toggle="tooltip" title="Export To Excel">
+                                        <i class="fa fa-file-excel-o"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-responsive mt-2">
+                            <table id="grdPMobileVerificationReport" class="table table-striped" style="width:100%"></table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/js/dtButtons.min.js"></script>
+<script src="~/js/jszip.min.js"></script>
+<script src="~/js/buttonsHtml5.min.js"></script>
+
+<script>
+    document.mynamespace = {};
+    document.mynamespace.hospitalcode = '@HttpContext.Current.Session["HospitalCode"]';
+</script>
+
+@Scripts.Render("~/bundles/AdminUtility")
+@Scripts.Render("~/bundles/adminPMobileVerificationReport")

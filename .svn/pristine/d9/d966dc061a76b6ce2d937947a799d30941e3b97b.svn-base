@@ -1,0 +1,170 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_DashboardLayout1.cshtml";
+}
+<script src="../js/jquery.vticker.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        var NotParams = {
+            Action: 'A'
+        };
+        $.ajax({
+            url: ServiceURL + "/api/Common/getNotices",
+            type: "GET",
+            data: NotParams,
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            success: function (data) {
+                if (data.length > 0) {
+                    // console.log(data);
+                    $('#sp1').html(data[0].startDate);
+                    $('#sp2').html(data[1].startDate);
+                    $('#sp3').html(data[2].startDate);
+                    $('#sp4').html(data[3].startDate);
+                    $('#sp5').html(data[4].startDate);
+                    $('#p1').html(data[0].notices);
+                    $('#p2').html(data[1].notices);
+                    $('#p3').html(data[2].notices);
+                    $('#p4').html(data[3].notices);
+                    $('#p5').html(data[4].notices);
+                }
+            },
+            error: function (error) {
+                console.log(error.responseText);
+            }
+        });
+    });
+    </script>
+<!-- Dashboard Body content part starts -->
+<div class="posRel">
+    <div class="dropdown ds-infoBtn">
+        <button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="icon-info"></i>
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    Extension Of Stay
+                    <span class="badge badge-primary badge-pill">F2</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    Registration
+                    <span class="badge badge-primary badge-pill">F4</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    Block Package
+                    <span class="badge badge-primary badge-pill">F7</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    UnBlock Package
+                    <span class="badge badge-primary badge-pill">F8</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    Discharge
+                    <span class="badge badge-primary badge-pill">F9</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="container">
+    <h1 class="text-center pt-4 pb-5 hospital-name"><img src="~/imgs/medicine.png" alt="">@Session["HospitalName"], @Session["HospitalDistName"]</h1>
+    <div class="row dashboard-menu mt-5">
+        <div class="col">
+            <a href="@Url.Action("AdmissionList", "Registration")" class="col1">
+                <img src="~/imgs/reg.png" alt="">
+                <p>Registration</p>
+            </a>
+        </div>
+        <div class="col">
+            <a href="@Url.Action("ViewBlockPackage", "BlockPackage")" class="col2">
+                <img src="~/imgs/block.png" alt="">
+                <p>Block Package</p>
+            </a>
+        </div>
+        <div class="col">
+            <a href="@Url.Action("ViewPackageChange", "BlockPackage")" class="col2">
+                <img src="~/imgs/PackageChange.png" alt="">
+                <p>Package Change</p>
+            </a>
+        </div>
+        <div class="col">
+            <a href="@Url.Action("ViewBlockRoomTypeChange", "BlockPackage")" class="col2">
+                <img src="~/imgs/RoomType.png" alt="">
+                <p>Change Ward Type</p>
+            </a>
+        </div>
+        <div class="col">
+            <a href="@Url.Action("ViewUnblockPackage", "UnblockPackage")" class="col3">
+                <img src="~/imgs/unblock.png" alt="">
+                <p>Unblock Package</p>
+            </a>
+        </div>
+        <div class="col">
+            <a href="@Url.Action("ViewDischarge", "Discharge")" class="col4">
+                <img src="~/imgs/release.png" alt="">
+                <p>Discharge</p>
+            </a>
+        </div>
+    </div>
+	<div class="row mt-5 ulticker">
+		<div class="col">
+		<div class="jumbotron">
+		<h1>Notice</h1>
+			<div class="tictic">
+			<ul>
+				<li><a href="#"><span id="sp1"></span><p id="p1"></p>@*<img src="../imgs/new.gif">*@</a></li>
+				<li><a href="#"><span id="sp2"></span><p id="p2"></p>@*<img src="../imgs/new.gif">*@</a></li>
+				<li><a href="#"><span id="sp3"></span><p id="p3"></p>@*<img src="../imgs/new.gif">*@</a></li>
+				<li><a href="#"><span id="sp4"></span><p id="p4"></p>@*<img src="../imgs/new.gif">*@</a></li>
+				<li><a href="#"><span id="sp5"></span><p id="p5"></p>@*<img src="../imgs/new.gif">*@</a></li>
+			</ul>
+			</div>
+		</div>
+		</div>
+	</div>
+</div>
+<script>
+/*Vticker Start*/
+	$(function() {
+	  $('.tictic').vTicker({
+		  showItems :4,
+		  speed :1000,
+		  pause:1000,
+		  animate:true,
+		  margin:0,
+		  padding:0
+	  });
+	});
+/*Vticker End*/
+</script>
+<!-- Body content Ends here -->
+<style>
+.ulticker{}
+.ulticker .jumbotron{padding:10px;}
+.ulticker .jumbotron h1{margin:0; padding:0; font-size:1.7em; border-bottom:1px solid #ccc; padding-bottom:10px;margin-bottom:5px;}
+.ulticker .jumbotron ul{padding:0;}
+.ulticker .jumbotron ul li{list-style:none;}
+.ulticker .jumbotron ul li a {
+    display: block;
+	padding: 10px 0;
+	color:#333;
+
+}
+.ulticker .jumbotron ul li{    border-bottom: 1px dotted #ccc;    }
+.ulticker .jumbotron ul li:last-child{border:0;}
+.ulticker .jumbotron ul li a span{display:inline-block;width:10%;    vertical-align: top; font-weight:bold}
+.ulticker .jumbotron ul li a p {
+    display: inline-block;
+    width: 86%;
+    vertical-align: top;
+    margin: 0;
+    line-height: 1.5em;
+}
+.ulticker .jumbotron ul li a p img{width:5%;}
+@@media (max-width:1024px){
+.ulticker .jumbotron ul li a span{display:block;width:100%; margin-bottom:10px;}
+.ulticker .jumbotron ul li a p{display:block;width:100%;}
+}
+</style>

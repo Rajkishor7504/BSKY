@@ -1,0 +1,546 @@
+﻿<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.0\build\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props" Condition="Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.0\build\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{F05CEEF9-63A8-4C48-83A5-5DAD46AE08DA}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>HPSBYS.Web</RootNamespace>
+    <AssemblyName>HPSBYS.Web</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <UseIISExpress>false</UseIISExpress>
+    <Use64BitIISExpress />
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+    <UseGlobalApplicationHostFile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Antlr3.Runtime, Version=3.4.1.9004, Culture=neutral, PublicKeyToken=eb42632606e9261f, processorArchitecture=MSIL">
+      <HintPath>..\packages\Antlr.3.4.1.9004\lib\Antlr3.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="BCrypt.Net-Next, Version=4.0.3.0, Culture=neutral, PublicKeyToken=1e11be04b6288443, processorArchitecture=MSIL">
+      <HintPath>..\packages\BCrypt.Net-Next.4.0.3\lib\net35\BCrypt.Net-Next.dll</HintPath>
+    </Reference>
+    <Reference Include="BouncyCastle.Crypto">
+      <HintPath>..\..\Dll_\BouncyCastle.Crypto.dll</HintPath>
+    </Reference>
+    <Reference Include="ECSAsaApiEx20170425">
+      <HintPath>..\..\Dll_\ECSAsaApiEx20170425.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.1\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.1\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="Glimpse.AspNet, Version=1.8.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Glimpse.AspNet.1.8.0\lib\net45\Glimpse.AspNet.dll</HintPath>
+    </Reference>
+    <Reference Include="Glimpse.Core, Version=1.8.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Glimpse.1.8.2\lib\net45\Glimpse.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Glimpse.Mvc5, Version=1.5.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Glimpse.Mvc5.1.5.3\lib\net45\Glimpse.Mvc5.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>..\packages\NLog.4.5.9\lib\net45\NLog.dll</HintPath>
+    </Reference>
+    <Reference Include="NLog.Mvc, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NLog.Mvc.1.0.8\lib\net451\NLog.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.Management" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Net.Http.Formatting, Version=5.2.6.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.6\lib\net45\System.Net.Http.Formatting.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Web.Cors, Version=5.2.6.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Cors.5.2.6\lib\net45\System.Web.Cors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Http, Version=5.2.6.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Core.5.2.6\lib\net45\System.Web.Http.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Http.Cors, Version=5.2.6.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Cors.5.2.6\lib\net45\System.Web.Http.Cors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Optimization">
+      <HintPath>..\..\Dll_\System.Web.Optimization.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.EnterpriseServices" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="WebGrease, Version=1.6.5135.21930, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\WebGrease.1.6.0\lib\WebGrease.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System.Web.Razor">
+      <HintPath>..\packages\Microsoft.AspNet.Razor.3.2.4\lib\net45\System.Web.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Webpages">
+      <HintPath>..\packages\Microsoft.AspNet.Webpages.3.2.4\lib\net45\System.Web.Webpages.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Webpages.Deployment">
+      <HintPath>..\packages\Microsoft.AspNet.Webpages.3.2.4\lib\net45\System.Web.Webpages.Deployment.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Webpages.Razor">
+      <HintPath>..\packages\Microsoft.AspNet.Webpages.3.2.4\lib\net45\System.Web.Webpages.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Helpers">
+      <HintPath>..\packages\Microsoft.AspNet.Webpages.3.2.4\lib\net45\System.Web.Helpers.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Web.Infrastructure">
+      <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Mvc">
+      <HintPath>..\packages\Microsoft.AspNet.Mvc.5.2.4\lib\net45\System.Web.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform">
+      <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.0\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="App_Code\Util.cs" />
+    <Content Include="Content\bootstrap.css" />
+    <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\Site.css" />
+    <Content Include="css\animate.min.css" />
+    <Content Include="css\bootstrap-datepicker.min.css" />
+    <Content Include="css\bootstrap.min.css" />
+    <Content Include="css\dataTables.responsive.css" />
+    <Content Include="css\flaticon.css" />
+    <Content Include="css\font-awesome.min.css" />
+    <Content Include="css\icon.css" />
+    <Content Include="css\jquery-ui.css" />
+    <Content Include="css\jquery.dataTables.min.css" />
+    <Content Include="css\landscape.css" />
+    <Content Include="css\Print.css" />
+    <Content Include="css\Progress_Style.css" />
+    <Content Include="css\style.css" />
+    <Content Include="css\sweetalert.css" />
+    <Content Include="fonts\custom-icomoon.svg" />
+    <Content Include="fonts\flaticon.html" />
+    <Content Include="fonts\flaticon.svg" />
+    <Content Include="fonts\flaticon47a4.svg" />
+    <Content Include="fonts\fontawesome-webfont.svg" />
+    <Content Include="fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="fonts\Helvetica.svg" />
+    <Content Include="fonts\icomoon.svg" />
+    <Content Include="fonts\icons.svg" />
+    <Content Include="fonts\lg.svg" />
+    <Content Include="fonts\Poppins-Regular.svg" />
+    <Content Include="fonts\uicons-regular-rounded.html" />
+    <Content Include="Global.asax" />
+    <Content Include="imgs\403.png" />
+    <Content Include="imgs\500.jpg" />
+    <Content Include="imgs\AddOnPackage.png" />
+    <Content Include="imgs\apollo-logo.png" />
+    <Content Include="imgs\bg_d.jpeg" />
+    <Content Include="imgs\bg_inner.jpg" />
+    <Content Include="imgs\block.png" />
+    <Content Include="imgs\body_bg.png" />
+    <Content Include="imgs\bsky_loader.gif" />
+    <Content Include="imgs\calendar.png" />
+    <Content Include="imgs\captcha.png" />
+    <Content Include="imgs\ChangePackage.png" />
+    <Content Include="imgs\chat-box.png" />
+    <Content Include="imgs\dashboard-logo.png" />
+    <Content Include="imgs\dashboard_bg.png" />
+    <Content Include="imgs\DataLoading.gif" />
+    <Content Include="imgs\document_print.gif" />
+    <Content Include="imgs\document_print.png" />
+    <Content Include="imgs\error.png" />
+    <Content Include="imgs\fade-logo.png" />
+    <Content Include="imgs\favicon.png" />
+    <Content Include="imgs\hospital.png" />
+    <Content Include="imgs\hpsbys-logo-bk.png" />
+    <Content Include="imgs\hpsbys-logo.png" />
+    <Content Include="imgs\icon-sec-pattern.png" />
+    <Content Include="imgs\index-logo.png" />
+    <Content Include="imgs\location.png" />
+    <Content Include="imgs\login-bg.png" />
+    <Content Include="imgs\login-logo.png" />
+    <Content Include="imgs\login-ptrn1.png" />
+    <Content Include="imgs\logo.png" />
+    <Content Include="imgs\logout.png" />
+    <Content Include="imgs\MedicalToMedical.png" />
+    <Content Include="imgs\MedicalToSurgical.png" />
+    <Content Include="imgs\medicine.png" />
+    <Content Include="imgs\new.gif" />
+    <Content Include="imgs\no_user.png" />
+    <Content Include="imgs\PackageChange.png" />
+    <Content Include="imgs\passwod-bg.jpg" />
+    <Content Include="imgs\pattern.jpg" />
+    <Content Include="imgs\profile.png" />
+    <Content Include="imgs\refresh.png" />
+    <Content Include="imgs\reg.png" />
+    <Content Include="imgs\release.png" />
+    <Content Include="imgs\RoomType.jpg" />
+    <Content Include="imgs\RoomType.png" />
+    <Content Include="imgs\session_bg.png" />
+    <Content Include="imgs\stopwatch.png" />
+    <Content Include="imgs\SurgicalToMedical.png" />
+    <Content Include="imgs\SurgicalToSergical.png" />
+    <Content Include="imgs\timeout.png" />
+    <Content Include="imgs\top-pattern.png" />
+    <Content Include="imgs\ui-icons_444444_256x240.png" />
+    <Content Include="imgs\unblock.png" />
+    <Content Include="imgs\user.png" />
+    <Content Include="js\accessibility.js" />
+    <Content Include="js\AddBlockPackage.js" />
+    <Content Include="js\AddDischarge.js" />
+    <Content Include="js\app.js" />
+    <Content Include="js\BlockPackageView\adminViewBlockPackageDetails.js" />
+    <Content Include="js\BlockPackageView\viewblockpackagedetails.js" />
+    <Content Include="js\bootstrap-datepicker.min.js" />
+    <Content Include="js\bootstrap.min.js" />
+    <Content Include="js\buttonsHtml5.min.js" />
+    <Content Include="js\Common\AdminUtility.js" />
+    <Content Include="js\Dashboard\adminDashboard.js" />
+    <Content Include="js\dataTables.responsive.js" />
+    <Content Include="js\commonvalidation.js" />
+    <Content Include="js\DischargePackageView\adminViewReferalDischarge.js" />
+    <Content Include="js\DischargePackageView\viewreferaldischarge.js" />
+    <Content Include="js\dtButtons.min.js" />
+    <Content Include="js\export-data.js" />
+    <Content Include="js\exporting.js" />
+    <Content Include="js\highcharts.js" />
+    <Content Include="js\jquery-ui.css" />
+    <Content Include="js\jquery-ui.js" />
+    <Content Include="js\jquery.dataTables.min.js" />
+    <Content Include="js\jquery.min.js" />
+    <Content Include="js\jquery.vticker.min.js" />
+    <Content Include="js\jsgrid-theme.min.css" />
+    <Content Include="js\jsgrid.min.css" />
+    <Content Include="js\jsgrid.min.js" />
+    <Content Include="js\json3.min.js" />
+    <Content Include="js\jszip.min.js" />
+    <Content Include="js\moment-parseformat.js" />
+    <Content Include="js\moment.min.js" />
+    <Content Include="js\OverRideView\OverRideRequest.js" />
+    <Content Include="js\popper.min.js" />
+    <Content Include="js\ReferralView\patientreferralform.js" />
+    <Content Include="js\ReferralView\patientreferralview.js" />
+    <Content Include="js\Reports\adminHospitalDetailsReport.js" />
+    <Content Include="js\Reports\adminhospitalmortalityreport.js" />
+    <Content Include="js\Reports\adminHospitalPackageReport.js" />
+    <Content Include="js\Reports\adminhospitalpreauthreport.js" />
+    <Content Include="js\Reports\adminHospitalReferralReport.js" />
+    <Content Include="js\Reports\adminknowyourstatusreport.js" />
+    <Content Include="js\Reports\adminNewOverRideDetails.js" />
+    <Content Include="js\Reports\adminPMobileVerificationReport.js" />
+    <Content Include="js\Reports\hospitaldetailsreport.js" />
+    <Content Include="js\Reports\hospitalmortalityreport.js" />
+    <Content Include="js\Reports\HospitalPackageReport.js" />
+    <Content Include="js\Reports\hospitalpreauthreport.js" />
+    <Content Include="js\Reports\hospitalreferralreport.js" />
+    <Content Include="js\Reports\knowyourstatusreport.js" />
+    <Content Include="js\Reports\PMobileVerificationReport.js" />
+    <Content Include="js\ShortcutKey.js" />
+    <Content Include="js\sweetalert.min.js" />
+    <Content Include="js\table2excel.min.js" />
+    <Content Include="js\UnBlockPackageView\adminViewUnblockPackageDetails.js" />
+    <Content Include="js\UnBlockPackageView\viewunblockpackagedetails.js" />
+    <Content Include="PrivacyPolicy.html" />
+    <Content Include="Scripts\bootstrap.js" />
+    <Content Include="Scripts\bootstrap.min.js" />
+    <Content Include="DownLoad.ashx" />
+    <Content Include="fonts\custom-icomoon.eot" />
+    <Content Include="fonts\custom-icomoon.ttf" />
+    <Content Include="fonts\custom-icomoon.woff" />
+    <Content Include="fonts\flaticon.eot" />
+    <Content Include="fonts\flaticon.otf" />
+    <Content Include="fonts\Flaticon.ttf" />
+    <Content Include="fonts\Flaticon.woff" />
+    <Content Include="fonts\Flaticon.woff2" />
+    <Content Include="fonts\flaticon47a4.eot" />
+    <Content Include="fonts\flaticon47a4.ttf" />
+    <Content Include="fonts\flaticon47a4.woff" />
+    <Content Include="fonts\flaticon47a4.woff2" />
+    <Content Include="fonts\Flaticond41d.eot" />
+    <Content Include="fonts\fontawesome-webfont.eot" />
+    <Content Include="fonts\fontawesome-webfont.ttf" />
+    <Content Include="fonts\fontawesome-webfont.woff" />
+    <Content Include="fonts\fontawesome-webfont.woff2" />
+    <Content Include="fonts\FontAwesome.otf" />
+    <Content Include="fonts\Hellix-Regular.ttf" />
+    <Content Include="fonts\Hellix-Regular.woff" />
+    <Content Include="fonts\Helvetica.eot" />
+    <Content Include="fonts\Helvetica.ttf" />
+    <Content Include="fonts\Helvetica.woff" />
+    <Content Include="fonts\Helvetica.woff2" />
+    <Content Include="fonts\icons.eot" />
+    <Content Include="fonts\icons.ttf" />
+    <Content Include="fonts\icons.woff" />
+    <Content Include="fonts\lg.eot" />
+    <Content Include="fonts\lg.ttf" />
+    <Content Include="fonts\lg.woff" />
+    <Content Include="fonts\Poppins-Regular.eot" />
+    <Content Include="fonts\Poppins-Regular.ttf" />
+    <Content Include="fonts\Poppins-Regular.woff" />
+    <Content Include="fonts\Poppins-Regular.woff2" />
+    <Content Include="fonts\selection.json" />
+    <Content Include="fonts\uicons-regular-rounded.eot" />
+    <Content Include="fonts\uicons-regular-rounded.woff" />
+    <Content Include="fonts\uicons-regular-rounded.woff2" />
+    <Content Include="css\_icons.scss" />
+    <None Include="Scripts\jquery-1.10.2.intellisense.js" />
+    <Content Include="js\PackageBlock.js" />
+    <Content Include="Scripts\jquery-1.10.2.js" />
+    <Content Include="Scripts\jquery-1.10.2.min.js" />
+    <Content Include="Scripts\modernizr-2.6.2.js" />
+    <Content Include="Views\BlockPackage\ChangeRoomType.cshtml" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="App_Code\CaptchaImage.cs" />
+    <Compile Include="App_Start\BundleConfig.cs" />
+    <Compile Include="App_Start\FilterConfig.cs" />
+    <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Controllers\BlockPackageController.cs" />
+    <Compile Include="Controllers\DashboardController.cs" />
+    <Compile Include="Controllers\DefaultController.cs" />
+    <Compile Include="Controllers\DischargeController.cs" />
+    <Compile Include="Controllers\ErrorsController.cs" />
+    <Compile Include="Controllers\ExtensionOfStayController.cs" />
+    <Compile Include="Controllers\IPReportsController.cs" />
+    <Compile Include="Controllers\PreAuthorizationController.cs" />
+    <Compile Include="Controllers\RegistrationController.cs" />
+    <Compile Include="Controllers\UnblockPackageController.cs" />
+    <Compile Include="Filters\CustomExceptionFilter.cs" />
+    <Compile Include="Filters\NoDirectAccessAttribute.cs" />
+    <Compile Include="GlimpseSecurityPolicy.cs" />
+    <Compile Include="Global.asax.cs">
+      <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Common.cs" />
+    <Compile Include="Models\CSHtmlViewEngine.cs" />
+    <Compile Include="Models\OtpAuthenticationTest.cs" />
+    <Compile Include="Models\SessionTimeOutFilter.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\web.config" />
+    <Content Include="libman.json" />
+    <Content Include="css\style.css.map" />
+    <Content Include="NLog.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="fonts\icomoon.eot" />
+    <Content Include="fonts\icomoon.ttf" />
+    <Content Include="fonts\icomoon.woff" />
+    <Content Include="fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="fonts\glyphicons-halflings-regular.eot" />
+    <None Include="NLog.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="packages.config" />
+    <Content Include="Views\Shared\_master.cshtml" />
+    <Content Include="Views\Dashboard\Index.cshtml" />
+    <Content Include="Views\Shared\_CommonLayout.cshtml" />
+    <Content Include="Views\Shared\_DashboardLayout1.cshtml" />
+    <Content Include="Views\Registration\AdmissionList.cshtml" />
+    <Content Include="Views\Registration\Admission.cshtml" />
+    <Content Include="Views\BlockPackage\AddBlockPackage.cshtml" />
+    <Content Include="Views\BlockPackage\ViewBlockPackage.cshtml" />
+    <Content Include="Views\UnblockPackage\AddUnblockPackage.cshtml" />
+    <Content Include="Views\UnblockPackage\ViewUnblockPackage.cshtml" />
+    <Content Include="Views\Discharge\AddDischarge.cshtml" />
+    <Content Include="Views\Discharge\ViewDischarge.cshtml" />
+    <Content Include="Views\Dashboard\Login.cshtml" />
+    <Content Include="Views\PreAuthorization\PreAuthorizationDetails.cshtml" />
+    <Content Include="Views\PreAuthorization\AddPreAuthorizationDetails.cshtml" />
+    <Content Include="scss\_common.scss" />
+    <Content Include="scss\_theme.scss" />
+    <Content Include="scss\style.scss" />
+    <Content Include="captcha.ashx" />
+    <Content Include="Views\ExtensionOfStay\ViewExtensionOfStay.cshtml" />
+    <Content Include="Views\ExtensionOfStay\AddExtensionOfStayDetails.cshtml" />
+    <Content Include="Views\Shared\_MembNamePartial.cshtml" />
+    <Content Include="Views\BlockPackage\AddCancellation.cshtml" />
+    <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
+    <Content Include="Views\Dashboard\ChangePassword.cshtml" />
+    <Content Include="Views\Dashboard\SessionRedirect.cshtml" />
+    <Content Include="Views\BlockPackage\ViewMultipleBlockPackage.cshtml" />
+    <Content Include="Views\Discharge\TreatmentCompletionCertificate.cshtml" />
+    <Content Include="Views\Dashboard\ViewLog.cshtml" />
+    <Content Include="Views\IPReports\ViewPatientStatus.cshtml" />
+    <Content Include="Views\Dashboard\AddNotice.cshtml" />
+    <Content Include="Views\Dashboard\ViewNotice.cshtml" />
+    <Content Include="Views\_ViewStart.cshtml" />
+    <Content Include="Views\Shared\_Layout.cshtml" />
+    <Content Include="Scripts\jquery-1.10.2.min.map" />
+    <Content Include="Views\BlockPackage\ViewBlockRoomTypeChange.cshtml" />
+    <Content Include="Views\BlockPackage\ViewPreviousWardDetails.cshtml" />
+    <Content Include="Views\PreAuthorization\WardPreAuthorizationDetails.cshtml" />
+    <Content Include="Views\PreAuthorization\AddWardPreAuthorizationDetails.cshtml" />
+    <Content Include="Views\PreAuthorization\AddWardPreAuthCancellation.cshtml" />
+    <Content Include="Views\BlockPackage\ViewPackageChange.cshtml" />
+    <Content Include="Views\BlockPackage\PackageChange.cshtml" />
+    <Content Include="Views\Dashboard\PackageChangeIndex.cshtml" />
+    <Content Include="Views\PreAuthorization\PackageChangePreAuthorizationDetails.cshtml" />
+    <Content Include="Views\BlockPackage\AddPackageMedicalToSurgical.cshtml" />
+    <Content Include="Views\BlockPackage\AddPackageMedicalToMedical.cshtml" />
+    <Content Include="Views\BlockPackage\AddOnPackage.cshtml" />
+    <Content Include="Views\PreAuthorization\AddOnPreAuthorizationDetails.cshtml" />
+    <Content Include="Views\PreAuthorization\AddAddOnPreAuthorizationDetails.cshtml" />
+    <Content Include="Views\PreAuthorization\AddAddOnPreAuthCancellation.cshtml" />
+    <Content Include="Views\BlockPackage\ViewAddOnPackageDetails.cshtml" />
+    <Content Include="Views\Discharge\AddDownWard.cshtml" />
+    <Content Include="Views\BlockPackage\BlockPreApproval.cshtml" />
+    <Content Include="Views\Shared\_FamilyMemberDetails.cshtml" />
+    <Content Include="Views\BlockPackage\BlockOverrideView.cshtml" />
+    <Content Include="Views\Discharge\ViewReferalDischarge.cshtml" />
+    <Content Include="Views\BlockPackage\BiomatiquesTest.cshtml" />
+    <Content Include="Views\BlockPackage\OverrideRequest.cshtml" />
+    <Content Include="Views\BlockPackage\OverrideView.cshtml" />
+    <Content Include="Views\BlockPackage\ViewBlockPackageDetails.cshtml" />
+    <Content Include="Views\Discharge\ViewReferalSlip.cshtml" />
+    <Content Include="Views\Discharge\ViewDischargeSlip.cshtml" />
+    <Content Include="Views\UnblockPackage\ViewUnblockPackageDetails.cshtml" />
+    <Content Include="Views\BlockPackage\BlockPreApprovalAdd.cshtml" />
+    <Content Include="Views\BlockPackage\ViewBlockingSlip.cshtml" />
+    <Content Include="Views\Discharge\PatientReferalForm.cshtml" />
+    <Content Include="Views\UnblockPackage\UnBlockSlip.cshtml" />
+    <Content Include="Views\BlockPackage\BlockOverrideRequest.cshtml" />
+    <Content Include="Views\Discharge\PatientReferralView.cshtml" />
+    <Content Include="Views\BlockPackage\ViewHospitalSlip.cshtml" />
+    <Content Include="Views\IPReports\HospitalDetailsReport.cshtml" />
+    <Content Include="Views\Discharge\ViewPatientSlip.cshtml" />
+    <Content Include="Views\UnblockPackage\UnBlockHospitalSlip.cshtml" />
+    <Content Include="Views\Default\NoDirectAccess.cshtml" />
+    <Content Include="Views\Shared\Error.cshtml" />
+    <Content Include="Views\IPReports\HospitalReferralReport.cshtml" />
+    <Content Include="Views\Errors\NotFound.cshtml" />
+    <Content Include="UserManual\UserMannual.pdf" />
+    <Content Include="Views\IPReports\KnowYourStatus.cshtml" />
+    <Content Include="Views\IPReports\HospitalPreAuthReport.cshtml" />
+    <Content Include="UserManual\PackageDetails.xlsx" />
+    <Content Include="Views\IPReports\HospitalMortalityReport.cshtml" />
+    <Content Include="Views\IPReports\HospitalPackageReport.cshtml" />
+    <Content Include="Views\BlockPackage\adminViewBlockPackageDetails.cshtml" />
+    <Content Include="Views\Discharge\adminViewReferalDischarge.cshtml" />
+    <Content Include="Views\IPReports\adminHospitalDetailsReport.cshtml" />
+    <Content Include="Views\IPReports\adminHospitalMortalityReport.cshtml" />
+    <Content Include="Views\IPReports\adminHospitalPreAuthReport.cshtml" />
+    <Content Include="Views\IPReports\adminHospitalReferralReport.cshtml" />
+    <Content Include="Views\IPReports\adminKnowYourStatus.cshtml" />
+    <Content Include="Views\IPReports\adminNewOverRideDetails.cshtml" />
+    <Content Include="Views\UnblockPackage\adminViewUnblockPackageDetails.cshtml" />
+    <Content Include="Views\IPReports\PatientMobileVerificationReport.cshtml" />
+    <Content Include="Views\IPReports\adminPatientMobileVerificationReport.cshtml" />
+    <Content Include="Views\IPReports\adminHospitalPackageReport.cshtml" />
+    <Content Include="Views\Dashboard\adminIndex.cshtml" />
+    <Content Include="Views\IPReports\AuthenticationDetails.cshtml" />
+    <None Include="Web.Debug.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+    <None Include="Web.Release.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="App_Data\" />
+    <Folder Include="Scripts\Form_Scripts\" />
+    <Folder Include="UploadDocument\AdmissionSlip\" />
+    <Folder Include="UploadDocument\DischargeDocument\" />
+    <Folder Include="UploadDocument\PrescriptionSlip\" />
+    <Folder Include="UploadDocument\RegisterDocument\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\HPSBYS.Data\HPSBYS.Data.csproj">
+      <Project>{c2dca8a4-dada-4c1f-8ac8-1a3139eae927}</Project>
+      <Name>HPSBYS.Data</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>True</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>55191</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost/HPSBYS.Web</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.0\build\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.0\build\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props'))" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

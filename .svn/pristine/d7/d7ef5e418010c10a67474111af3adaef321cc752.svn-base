@@ -1,0 +1,63 @@
+2020-09-05 09:57:14.2011 DEBUG WebAPI Registered
+2020-09-05 10:44:31.3268 DEBUG WebAPI Registered
+2020-09-05 10:57:43.1660 ERROR System.Data.SqlClient.SqlException (0x80131904): Subquery returned more than 1 value. This is not permitted when the subquery follows =, !=, <, <= , >, >= or when the subquery is used as an expression.
+The statement has been terminated.
+   at System.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+   at System.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, Boolean callerHasConnectionLock, Boolean asyncClose)
+   at System.Data.SqlClient.TdsParser.TryRun(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj, Boolean& dataReady)
+   at System.Data.SqlClient.SqlCommand.FinishExecuteReader(SqlDataReader ds, RunBehavior runBehavior, String resetOptionsString, Boolean isInternal, Boolean forDescribeParameterEncryption, Boolean shouldCacheForAlwaysEncrypted)
+   at System.Data.SqlClient.SqlCommand.RunExecuteReaderTds(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, Boolean async, Int32 timeout, Task& task, Boolean asyncWrite, Boolean inRetry, SqlDataReader ds, Boolean describeParameterEncryptionRequest)
+   at System.Data.SqlClient.SqlCommand.RunExecuteReader(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, String method, TaskCompletionSource`1 completion, Int32 timeout, Task& task, Boolean& usedCache, Boolean asyncWrite, Boolean inRetry)
+   at System.Data.SqlClient.SqlCommand.InternalExecuteNonQuery(TaskCompletionSource`1 completion, String methodName, Boolean sendToPipe, Int32 timeout, Boolean& usedCache, Boolean asyncWrite, Boolean inRetry)
+   at System.Data.SqlClient.SqlCommand.ExecuteNonQuery()
+   at Dapper.SqlMapper.ExecuteCommand(IDbConnection cnn, CommandDefinition& command, Action`2 paramReader)
+   at Dapper.SqlMapper.ExecuteImpl(IDbConnection cnn, CommandDefinition& command)
+   at Dapper.SqlMapper.Execute(IDbConnection cnn, String sql, Object param, IDbTransaction transaction, Nullable`1 commandTimeout, Nullable`1 commandType)
+   at HPSBYS.Data.Services.PatientDataServices.addCancelPackage(CancelPackage obj) in D:\Ram\HPSBYS_1.2.0.0\HPSBYS.Data\Services\PatientDataServices.cs:line 407
+ClientConnectionId:5ec09334-671d-411a-b840-13b38e662e6d
+Error Number:512,State:1,Class:16
+2020-09-05 10:59:47.5801 ERROR System.Data.SqlClient.SqlException (0x80131904): Subquery returned more than 1 value. This is not permitted when the subquery follows =, !=, <, <= , >, >= or when the subquery is used as an expression.
+The statement has been terminated.
+   at System.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+   at System.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, Boolean callerHasConnectionLock, Boolean asyncClose)
+   at System.Data.SqlClient.TdsParser.TryRun(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj, Boolean& dataReady)
+   at System.Data.SqlClient.SqlCommand.FinishExecuteReader(SqlDataReader ds, RunBehavior runBehavior, String resetOptionsString, Boolean isInternal, Boolean forDescribeParameterEncryption, Boolean shouldCacheForAlwaysEncrypted)
+   at System.Data.SqlClient.SqlCommand.RunExecuteReaderTds(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, Boolean async, Int32 timeout, Task& task, Boolean asyncWrite, Boolean inRetry, SqlDataReader ds, Boolean describeParameterEncryptionRequest)
+   at System.Data.SqlClient.SqlCommand.RunExecuteReader(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, String method, TaskCompletionSource`1 completion, Int32 timeout, Task& task, Boolean& usedCache, Boolean asyncWrite, Boolean inRetry)
+   at System.Data.SqlClient.SqlCommand.InternalExecuteNonQuery(TaskCompletionSource`1 completion, String methodName, Boolean sendToPipe, Int32 timeout, Boolean& usedCache, Boolean asyncWrite, Boolean inRetry)
+   at System.Data.SqlClient.SqlCommand.ExecuteNonQuery()
+   at Dapper.SqlMapper.ExecuteCommand(IDbConnection cnn, CommandDefinition& command, Action`2 paramReader)
+   at Dapper.SqlMapper.ExecuteImpl(IDbConnection cnn, CommandDefinition& command)
+   at Dapper.SqlMapper.Execute(IDbConnection cnn, String sql, Object param, IDbTransaction transaction, Nullable`1 commandTimeout, Nullable`1 commandType)
+   at HPSBYS.Data.Services.PatientDataServices.addCancelPackage(CancelPackage obj) in D:\Ram\HPSBYS_1.2.0.0\HPSBYS.Data\Services\PatientDataServices.cs:line 407
+ClientConnectionId:5ec09334-671d-411a-b840-13b38e662e6d
+Error Number:512,State:1,Class:16
+2020-09-05 11:00:56.6364 DEBUG WebAPI Registered
+2020-09-05 11:05:14.2349 ERROR System.Data.SqlClient.SqlException (0x80131904): Subquery returned more than 1 value. This is not permitted when the subquery follows =, !=, <, <= , >, >= or when the subquery is used as an expression.
+The statement has been terminated.
+   at System.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+   at System.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, Boolean callerHasConnectionLock, Boolean asyncClose)
+   at System.Data.SqlClient.TdsParser.TryRun(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj, Boolean& dataReady)
+   at System.Data.SqlClient.SqlCommand.FinishExecuteReader(SqlDataReader ds, RunBehavior runBehavior, String resetOptionsString, Boolean isInternal, Boolean forDescribeParameterEncryption, Boolean shouldCacheForAlwaysEncrypted)
+   at System.Data.SqlClient.SqlCommand.RunExecuteReaderTds(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, Boolean async, Int32 timeout, Task& task, Boolean asyncWrite, Boolean inRetry, SqlDataReader ds, Boolean describeParameterEncryptionRequest)
+   at System.Data.SqlClient.SqlCommand.RunExecuteReader(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, String method, TaskCompletionSource`1 completion, Int32 timeout, Task& task, Boolean& usedCache, Boolean asyncWrite, Boolean inRetry)
+   at System.Data.SqlClient.SqlCommand.InternalExecuteNonQuery(TaskCompletionSource`1 completion, String methodName, Boolean sendToPipe, Int32 timeout, Boolean& usedCache, Boolean asyncWrite, Boolean inRetry)
+   at System.Data.SqlClient.SqlCommand.ExecuteNonQuery()
+   at Dapper.SqlMapper.ExecuteCommand(IDbConnection cnn, CommandDefinition& command, Action`2 paramReader)
+   at Dapper.SqlMapper.ExecuteImpl(IDbConnection cnn, CommandDefinition& command)
+   at Dapper.SqlMapper.Execute(IDbConnection cnn, String sql, Object param, IDbTransaction transaction, Nullable`1 commandTimeout, Nullable`1 commandType)
+   at HPSBYS.Data.Services.PatientDataServices.addCancelPackage(CancelPackage obj) in D:\Ram\HPSBYS_1.2.0.0\HPSBYS.Data\Services\PatientDataServices.cs:line 409
+ClientConnectionId:3b659be4-2407-469d-917b-df81a12c538e
+Error Number:512,State:1,Class:16
+2020-09-05 11:09:36.6097 ERROR System.NullReferenceException: Object reference not set to an instance of an object.
+   at HPSBYS.Data.Services.CommonExtension.ToDynamicParameters(Object[] parameters, String outParameter, DbType dbType) in D:\Ram\HPSBYS_1.2.0.0\HPSBYS.Data\Services\CommonExtension.cs:line 37
+   at HPSBYS.Data.Services.PatientDataServices.addCancelPackage(CancelPackage obj) in D:\Ram\HPSBYS_1.2.0.0\HPSBYS.Data\Services\PatientDataServices.cs:line 408
+2020-09-05 11:09:44.8603 ERROR System.NullReferenceException: Object reference not set to an instance of an object.
+   at HPSBYS.Data.Services.CommonExtension.ToDynamicParameters(Object[] parameters, String outParameter, DbType dbType) in D:\Ram\HPSBYS_1.2.0.0\HPSBYS.Data\Services\CommonExtension.cs:line 37
+   at HPSBYS.Data.Services.PatientDataServices.addCancelPackage(CancelPackage obj) in D:\Ram\HPSBYS_1.2.0.0\HPSBYS.Data\Services\PatientDataServices.cs:line 408
+2020-09-05 11:10:36.8276 ERROR System.NullReferenceException: Object reference not set to an instance of an object.
+   at HPSBYS.Data.Services.CommonExtension.ToDynamicParameters(Object[] parameters, String outParameter, DbType dbType) in D:\Ram\HPSBYS_1.2.0.0\HPSBYS.Data\Services\CommonExtension.cs:line 37
+   at HPSBYS.Data.Services.PatientDataServices.addCancelPackage(CancelPackage obj) in D:\Ram\HPSBYS_1.2.0.0\HPSBYS.Data\Services\PatientDataServices.cs:line 408
+2020-09-05 11:11:54.4528 DEBUG WebAPI Registered
+2020-09-05 16:47:05.9435 DEBUG WebAPI Registered
+2020-09-05 17:55:40.9065 DEBUG WebAPI Registered

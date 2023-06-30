@@ -1,0 +1,51 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <script src="~/js/bootstrap.min.js"></script>
+    <script src="~/js/jquery.min.js"></script>
+    <link href="~/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/css/style.css" rel="stylesheet" />
+    <link href="~/css/animate.min.css" rel="stylesheet" />
+    <script language="Javascript" type="text/javascript">
+        //Disable back button in application
+        //Start
+        window.history.forward();
+            //End
+    </script>
+<style>
+    .navbar {display:none;}
+    footer{display:none;}
+    hr{margin:0; border:none;}
+    .body-content{height:100%;}
+</style>
+</head>
+
+<div class="d-flex align-items-center justify-content-center h-100">
+    <form>
+        <div class="session-page">
+        <div class="text-center wow animated fadeInLeft">  <img src="~/imgs/session_bg.png" alt="Session Error" /> </div>
+
+    <div class="wow animated fadeInRight"> 
+        <div class="timeout_txt">
+              Session Timeout
+        </div>
+
+        <p>  Sorry, your session timed out after a long time of inactivity. </p>
+        <p class="s_bigtxt">  Please, click and sign in again.</p>
+
+    <div class="session-btn session_inner">
+    <div id="slide"></div>
+     <a href="@Url.Action("Login", "Dashboard")"> Log In &nbsp; <i class="fa fa-sign-in"></i></a>
+  </div>
+
+  </div>
+
+                        
+                          
+
+</div>
+    </form>
+</div>
+
+</html>
+

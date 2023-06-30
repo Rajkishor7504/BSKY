@@ -1,0 +1,3069 @@
+﻿@{
+    ViewBag.Title = "ViewBlockPackage";
+    Layout = "~/Views/Shared/_CommonLayout.cshtml";
+}
+<script src="~/js/PackageBlock.js"></script>
+<style>
+    .divdisable {
+        pointer-events: none;
+    }
+
+    tr.row_selected td {
+        background-color: #EFF9F6 !important;
+    }
+
+    .red-tooltip + .tooltip > .tooltip-inner {
+        background-color: #f00;
+    }
+</style>
+@*Code from Registration*@
+
+<script type="text/javascript">
+    //Added on 06-01-2023
+var vitaldata = [];
+var Pacakagedata = [];
+    $(document).ready(function () {
+        $("#btnCapture").hide();
+        $("#btnPrevBooked").attr('style', 'display:none');
+        var dateNow = new Date();
+        //$("#dtActualAdmission").val('31-01-23');
+        $("#dtActualAdmission").datepicker({
+            format: 'dd-M-yy',
+            defaultDate: dateNow
+        });
+        bindPackageHeaderDetils();
+        $('#DvPatientInfo').hide();
+        $('#PatientDetails').hide();
+        $('#AdmissionDetails').hide();
+        $('#Verifieddetails').hide();
+        $('#PackageDetails').hide();
+        $('#PackageGridDetails').hide();
+        $('#AdmissionDetails').hide();
+        $('#Verifieddetails').hide();
+    });
+
+var arrRegData = [];
+var SchemeParams = {
+    Schemecode: '0'
+};
+
+
+function getPrevPackageDetails() {
+        var prevpackparam = {
+            Action: 'B',
+            hoscode: '@Session["HospitalCode"]',
+            urnno: $('#lblURNNo').text(),
+            memid: $('#spnPatientMemberId').text(),
+            trnsid: 183
+        };
+        $.ajax({
+            url: ServiceURL + "/api/Common/AllPrevPackageDetails",
+            type: "GET",
+            data: prevpackparam,
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            success: function (data) {
+                var result = data;
+                console.log(result);
+                if (result != null) {
+                    $("#btnPrevBooked").attr('style', 'display:block');
+                    var defaultmessage = "No Record(s) Found!";
+                    // var thisHtml = "";
+                    var oTable = $('#tblPrevPackageDtls').DataTable({
+                        "language": {
+                            "emptyTable": defaultmessage
+                        },
+                        destroy: true,
+                        lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                    });
+                    //oTable.buttons().container().appendTo('.indicatorslist');
+
+                    oTable.row().clear().draw();
+                    var result = data;
+                    for (var i = 0; i < data.length; i++) {
+                        oTable.row.add([(i + 1),
+                        '<a href="#" data-id="' + result[i].packageheaderid + '">' + result[i].packagename + '</a >', result[i].packagesubcategoryname, result[i].procedurename, '<span class="totblckamt" value="' + result[i].amountblocked + '">' + result[i].amountblocked + '</span>'
+                        ]).draw();
+                    }
+
+                }
+                else {
+                    $("#btnPrevBooked").attr('style', 'display:none');
+                }
+
+            },
+            error: function (error) {
+                console.log(error.responseText);
+                // $('#DvPatientInfo').hide();
+            }
+        });
+        calc_totalView();
+ }
+
+$(document).keydown(function (event) {
+    event = (event || window.event);
+    if ((event.keyCode == 49) && (event.shiftKey === true)) {
+        window.location.href = '@Url.Action("ViewBlockPackage", "BlockPackage")';
+    }
+    else if ((event.keyCode == 50) && (event.shiftKey === true)) {
+        window.location.href = '@Url.Action("ViewMultipleBlockPackage", "BlockPackage")';
+    }
+    else if ((event.keyCode == 51) && (event.shiftKey === true)) {
+        window.location.href = '@Url.Action("PreAuthorizationDetails", "PreAuthorization")';
+    }
+    @*else if ((event.keyCode == 52) && (event.shiftKey === true)) {
+        window.location.href = '@Url.Action("ViewExtensionOfStay", "ExtensionOfStay")';
+    }*@
+   });
+    $(document).ready(function () {
+        $("#loader").addClass("loaderactive");
+        $('#tblImplantDtls').DataTable();
+
+        $('#tblPackageDetails1 tbody').on('click', '.btnDtlPack', function () {
+            //debugger;
+            if (window.confirm('Are you sure？')) {
+                var $tr = $(this).closest('tr');
+                var rowData = $('#tblPackageDetails1').DataTable().row($tr).data();
+                $("#txtSubPackage").val(rowData[2]);
+                $("#txtPackageDetails").val(rowData[3]);
+                $("#txtTreatCost").val(rowData[4]);
+                $("#txtTreatDays").val(parseInt(rowData[5]));
+                var aprvrequrired = $(this).parents('tr').find('.clsIsPreApprove').val();
+                var subpackid = $(this).parents('tr').find('.clssubpackid').val();
+                var packdtlsId = $(this).parents('tr').find('.clsPckdtlId').val();
+                var subcatcode = $(this).parents('tr').find('.clssubpackcode').val();
+                var proccode = $(this).parents('tr').find('.clsProccode').val();
+                var staytype = $(this).parents('tr').find('.clsstaytype').val();
+                var daycare = $(this).parents('tr').find('.clsdaycare').val();
+                //var preauthsts = $(this).parents('tr').find('.clsPckdtlId').val();
+
+                $("#PackageApproveRequired").val(aprvrequrired);
+                $("#hdnSubpackId").val(subpackid);
+                $("#hdnPackDtlsId").val(packdtlsId);
+                $("#popmodalDtls").modal('hide');
+
+                $("#hdnsubpackcode").val(subcatcode);
+                $("#hdnProcCode").val(proccode);
+                $("#hdnstaytype").val(staytype);
+                $("#hdndaycare").val(daycare);
+            }
+        });
+
+        $("#tblpackageheader1").on('click', '.btnHeader', function () {
+            // get the current row
+            // debugger;
+            $("#loader").addClass("loaderactive");
+            var currentRow = $(this).closest("tr");
+            var packageHeader = currentRow.find("td:eq(2)").text();
+            var packageId = $(this).parents('tr').find('.clsPckId').val();
+            $("#txtpackageheader").val(packageHeader);
+            $("#hdnCurrentPackheader").val(packageId);
+            getPackageDetails();
+            $("#loader").addClass("loaderdeactive");
+            $("#popmodal").modal('hide');
+        });
+
+        function getPackageDetails() {
+            //debugger;
+
+            var PackCatagoryParams = {
+                Action: 'C',
+                headerid: $("#hdnCurrentPackheader").val(),
+                hostype: 2
+            };
+            $.ajax({
+                url: ServiceURL + "/api/Common/AllGetPackageDetails",
+                type: "GET",
+                data: PackCatagoryParams,
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    var result = data;
+                    var defaultmessage = "No Record(s) Found!";
+                    // var thisHtml = "";
+                    var oTable = $('#tblPackageDetails1').DataTable({
+                        "language": {
+                            "emptyTable": defaultmessage
+                        },
+                        destroy: true,
+                        lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                    });
+                    //oTable.buttons().container().appendTo('.indicatorslist');
+
+                    oTable.row().clear().draw();
+                    var result = data;
+                    for (var i = 0; i < data.length; i++) {
+                        oTable.row.add([(i + 1),
+                        '<a href="#" data-id="' + result[i].packageheaderid + '">' + result[i].packageheadername + '</a ><input type="hidden" class="clsPckdtlId" value="' + result[i].procedureid + '" /><input type="hidden" class="clssubpackid" value="' + result[i].packagesubcatagoryid + '" /><input type="hidden" class="clssubpackcode" value="' + result[i].packagesubcode + '" /><input type="hidden" class="clsProccode" value="' + result[i].procedurecode + '" /><input type="hidden" class="clsstaytype" value="' + result[i].staytype + '" /><input type="hidden" class="clsdaycare" value="' + result[i].daycare + '" /><input type="hidden" class="clsIsPreApprove" value="' + result[i].mandatorypreauth + '" /><input type="hidden" class="clsIsImplant" value="' + result[i].implantexist + '" />', result[i].subpackagename, result[i].proceduredescription, result[i].amount, result[i].maximumdays, result[i].packagesubcode, result[i].mandatorypreauth, '<input type="button" id="btnselectPack" data-id="' + result[i].procedureid + '" cursor="pointer" value="Select" class="btn btn-sm btn-success btnDtlPack" />'
+                        ]).draw();
+                    }
+                },
+                error: function (error) {
+                    console.log(error.responseText);
+                    // $('#DvPatientInfo').hide();
+                }
+            });
+        }
+
+
+        //var calculated_total_sum = 0;
+        //$("#tblPackageDetails .txtCalc").each(function () {
+        //    var get_textbox_value = $(this).val();
+        //    if ($.isNumeric(get_textbox_value)) {
+        //        calculated_total_sum += parseFloat(get_textbox_value);
+        //    }
+        //});
+        // $("#lblTotalAmountBlocked").html(calculated_total_sum);
+        /* });*/
+        //$("#lblTotalAmountBlocked").html(calculated_total_sum);
+
+        $('#path').html('Block Package List');
+        var arrBlockPackage = [];
+        fillgrid();
+        BindPackageHeader();
+        $('#ddlRows').change(function () {
+            if ($("option:selected", $("#ddlRows")).val() == '1') {
+                $("#jsGrid").jsGrid({ pageSize: 10 });
+            }
+            else if ($("option:selected", $("#ddlRows")).val() == '2') {
+                $("#jsGrid").jsGrid({ pageSize: 20 });
+            }
+            else if ($("option:selected", $("#ddlRows")).val() == '3') {
+                $("#jsGrid").jsGrid({ pageSize: 50 });
+            }
+            else if ($("option:selected", $("#ddlRows")).val() == '4') {
+                $("#jsGrid").jsGrid({ pageSize: 100 });
+            }
+            else if ($("option:selected", $("#ddlRows")).val() == '5') {
+                $("#jsGrid").jsGrid({ pageSize: 200 });
+            }
+            else if ($("option:selected", $("#ddlRows")).val() == '6') {
+                $("#jsGrid").jsGrid({ pageSize: 500 });
+            }
+        });
+        BindVitalParam();
+
+        function BlockAmtCalculate() {
+            $('#tblPackageDtls tr:first td').each(function () {
+                var $td = $(this);
+                var colTotal = 0;
+                $('#tblPackageDtls tr:not(:first,.totalColumn)').each(function () {
+                    colTotal += parseInt($(this).children().eq($td.index()).html(), 10);
+                });
+                alert(colTotal);
+                //$('#tblPackageDtls tr.totalColumn').children().eq($td.index()).html('Total: ' + colTotal);
+            });
+        }
+
+
+        //bindPackageHeaderDetils();
+        $('#btnpackagedtls').click(function () {
+            //alert(1);
+            //bindPackageDetils();
+        });
+    });
+
+    function BindPackageHeader() {
+        var PackCatagoryParams = {
+            Action: 'P'
+        };
+        $.ajax({
+            url: ServiceURL + "/api/Common/GetPackageCategory",
+            type: "GET",
+            data: PackCatagoryParams,
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            success: function (data) {
+                // console.log(data);
+                $('#PApackageHeader').empty().append('<option selected="selected" value="0">--Select--</option>');
+                $.each(data, function () {
+                    $('#PApackageHeader').append($("<option></option>").val(this['packagecategorycode']).text(this['procedures']));
+                });
+            },
+            error: function (error) {
+                console.log(error.statusText);
+            }
+        });
+    }
+    function BindVitalParam() {
+        var PackCatagoryParams = {
+            Action: 'A'
+        };
+        $.ajax({
+            url: ServiceURL + "/api/Common/GetVitalParameter",
+            type: "GET",
+            data: PackCatagoryParams,
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            success: function (data) {
+                // console.log(data);
+                $('#dlVitalParam').empty().append('<option selected="selected" value="0">--Select--</option>');
+                $.each(data, function () {
+                    $('#dlVitalParam').append($("<option></option>").val(this['id']).text(this['vitalsign']));
+                });
+            },
+            error: function (error) {
+                console.log(error.statusText);
+            }
+        });
+    }
+    function fillgrid() {
+       var arrBlockPackage = [];
+          $('#jsGrid').jsGrid({
+           width: "100%",
+           sorting: true,
+           paging: true,
+           autoload: true,
+           pageSize: 10,
+           pagerFormat: "Pages: {first} {prev} {pages} {next} {last} &nbsp;&nbsp; {pageIndex} of {pageCount} &nbsp;&nbsp; Total rows: {itemCount}",
+           pageButtonCount: 10,
+           rowClick: function (args) {
+               //console.log(args)
+               var $row = this.rowByItem(args.item),
+                   selectedRow = $("#jsGrid").find('table tr.highlight');
+               if (selectedRow.length) {
+                   selectedRow.toggleClass('highlight');
+               };
+               $row.toggleClass("highlight");
+           },
+           controller: {
+               loadData: function (filter) {
+                   var d = $.Deferred();
+                   var RegParams = {
+                       HospitalCode: '@Session["HospitalCode"]',
+                       Action: 'A',
+                       URN: $('#urnNo').val(),
+                       BlockingINVOICENO: null,
+                       TransactionID: '0'
+                   };
+                   return $.ajax({
+                       url: ServiceURL + "/api/Registration/GetRegistrationformation",
+                       type: "GET",
+                       data: RegParams,
+                       dataType: "json",
+                       contentType: "application/json; charset=utf-8",
+                       error: function (error) {
+                           console.log(error.statusText);
+                       },
+                   }).done(function (result) {
+                       // console.log(result);
+                       if (result.length > 0) {
+                           $('#divRowCount').show();
+                             d.resolve($.map(result, function (item, itemIndex) {
+                                 return $.extend(item, { "Index": itemIndex + 1 });
+                             }
+                           ));
+                       }
+                       else {
+                           $('#divRowCount').hide();
+                       }
+                   });
+                   return d.promise();
+               }
+           },
+           fields: [
+               { name: "Index", width: 30, type: "number", title: "#Sl", align: "center",filtering: false},
+               { name: "memberID", title: "memberID", type: "number", visible: true },
+               { name: "headMemberName", title: "HeadOfFamily", type: "text", visible: false },
+               { name: "schemeCode", title: "schemeCode", type: "text", visible: false },
+               { name: "headMemberID", title: "headMemberID", type: "text", visible: false },
+               { name: "amoutBlocked", title: "amoutBlocked", type: "text", visible: false },
+               { name: "memberDistrictCode", title: "MemberDistrictCode", type: "number", visible: false },
+               { name: "memberDistrictName", title: "MemberDistrictName", type: "text", visible: false },
+               { name: "memberStateName", title: "MemberStateName", type: "text", visible: false },
+               { name: "memberStateCode", title: "memberStateCode", type: "text", visible: false },
+               { name: "memberBlockCode", title: "memberBlockCode", type: "text", visible: false },
+               { name: "panchayatCode", title: "panchayatCode", type: "text", visible: false },
+               { name: "villageCode", title: "villageCode", type: "text", visible: false },
+               { name: "transactionID", title: "TransactionID", type: "text", visible: false },
+               //{ name: "urn", type: "text", title: "URN No.", align: "center", visible: false },
+               { name: "cardNo", type: "text", title: "Card No.", align: "center",visible: false },
+               { name: "memberName", type: "text", title: "Name", align: "center" },
+               { name: "invoiceNo", type: "text", title: "Invoice No.", align: "center"},
+               { name: "registrationDate", type: "number", title: "Registration Date", align: "center"},
+               { name: "patientContactNumber", type: "number", title: "Contact Number", align: "center"},
+               {
+                   type: "control", editButton: false, deleteButton: false, align: "center",
+                   itemTemplate: function (value, item) {
+                       return $("<button>").attr({ type: "button", class: "btn btn-outline-success focusedBtn btn-sm my-2 my-sm-0" }).text("Block")
+                           .on("click", function () {
+                               var arrBlockPackage = [];
+                               arrBlockPackage.push({
+                                   schemeCode: item.schemeCode,
+                                   urn: item.urn,
+                                   cardNo: item.cardNo,
+                                   memberName: item.memberName,
+                                   patientContactNumber: item.patientContactNumber,
+                                   memberID: item.memberID,
+                                   invoiceNo: item.invoiceNo,
+                                   registrationDate: item.registrationDate,
+                                   headMemberID: item.headMemberID,
+                                   headMemberName: item.headMemberName,
+                                   memberDistrictCode: item.memberDistrictCode,
+                                   memberDistrictName: item.memberDistrictName,
+                                   memberStateName: item.memberStateName,
+                                   memberStateCode: item.memberStateCode,
+                                   memberBlockCode: item.memberBlockCode,
+                                   panchayatCode: item.panchayatCode,
+                                   villageCode: item.villageCode,
+                                   amoutBlocked: item.amoutBlocked,
+                                   TransactionID: item.transactionID,
+                                   PageBackStatus:'N'
+                               })
+                               localStorage.setItem('BlockPackageInfo', JSON.stringify(arrBlockPackage));
+                               window.location.href = '@Url.Action("AddBlockPackage", "BlockPackage")';
+                           });
+                   },
+                   headerTemplate: function () {
+                       return $("<div>").prop("title", "Action").text("Action");
+                   }
+                   //,filterTemplate: function () { return ""; }
+               },
+               {
+                   type: "control", editButton: false, deleteButton: false, align: "center",
+                   itemTemplate: function (value, item) {
+                       return $("<button>").attr({ type: "button", class: "btn btn-outline-danger focusedBtn btn-sm my-2 my-sm-0" }).text("Cancel")
+                           .on("click", function () {
+                               var arrCancellation = [];
+                               arrCancellation.push({
+                                   schemeCode: item.schemeCode,
+                                   urn: item.urn,
+                                   cardNo: item.cardNo,
+                                   memberName: item.memberName,
+                                   patientContactNumber: item.patientContactNumber,
+                                   memberID: item.memberID,
+                                   invoiceNo: item.invoiceNo,
+                                   registrationDate: item.registrationDate,
+                                   headMemberID: item.headMemberID,
+                                   headMemberName: item.headMemberName,
+                                   memberDistrictCode: item.memberDistrictCode,
+                                   memberDistrictName: item.memberDistrictName,
+                                   memberStateName: item.memberStateName,
+                                   memberStateCode: item.memberStateCode,
+                                   memberBlockCode: item.memberBlockCode,
+                                   panchayatCode: item.panchayatCode,
+                                   villageCode: item.villageCode,
+                                   amoutBlocked: item.amoutBlocked,
+                                   PageBackStatus: 'N'
+                               })
+                               localStorage.setItem('CancellationInfo', JSON.stringify(arrCancellation));
+                               window.location.href = '@Url.Action("AddCancellation", "BlockPackage")';
+                           });
+                   },
+                   headerTemplate: function () {
+                       return $("<div>").prop("title", "Action").text("Cancel");
+                   }
+               }
+           ]
+       });
+   }
+
+    function inputLimiter(e, allow) {
+       var AllowableCharacters = '';
+       if (allow == 'NameCharactersymbol') {
+           AllowableCharacters = ' ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz./&';
+       }
+       if (allow == 'NameCharacters') {
+           AllowableCharacters = ' ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-.\'';
+       }
+       if (allow == 'NameCharactersAndNumbers') {
+           AllowableCharacters = '1234567890 ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-,/.\'';
+       }
+       if (allow == 'Description') {
+           AllowableCharacters = '1234567890 ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-,./\&(){}[]#$:';
+       }
+       if (allow == 'Numbers') {
+           AllowableCharacters = '1234567890';
+       }
+       if (allow == 'Decimal') {
+           AllowableCharacters = '1234567890.';
+       }
+       var k;
+       k = document.all ? parseInt(e.keyCode) : parseInt(e.which);
+       if (k != 13 && k != 8 && k != 0) {
+           if ((e.ctrlKey == false) && (e.altKey == false)) {
+               return (AllowableCharacters.indexOf(String.fromCharCode(k)) != -1);
+           }
+           else {
+               return true;
+           }
+       }
+       else {
+           return true;
+       }
+    }
+    function bindPackageHeaderDetils() {
+        // debugger;
+        // var UrNo = $("#urnNo").val() != "" ? $("#urnNo").val():'';
+
+        $.ajax({
+            url: ServiceURL + "/api/Common/GetPackageHeaderList",
+            type: "GET",
+            data: { Action: "A" },
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            success: function (data) {
+                var result = data;
+                var defaultmessage = "No Record(s) Found!";
+                // var thisHtml = "";
+                var oTable = $('#tblpackageheader1').DataTable({
+                    "language": {
+                        "emptyTable": defaultmessage
+                    },
+                    destroy: true,
+                    lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                });
+                //oTable.buttons().container().appendTo('.indicatorslist');
+
+                oTable.row().clear().draw();
+                var result = data;
+                for (var i = 0; i < data.length; i++) {
+                    oTable.row.add([(i + 1),
+                    '<a href="#" onclick="EnumeratorView(this);" data-id="' + result[i].packageheaderid + '">' + result[i].packageheadercode + '</a ><input type="hidden" class="clsPckId" value="' + result[i].packageheaderid + '" />', result[i].packageheader, '<input type="button" id="btnBlockPack" data-id="' + result[i].packageheaderid + '" cursor="pointer" value="Select" class="btn btn-sm btn-success btnHeader" /> '
+                    ]).draw();
+                }
+            },
+            error: function (error) {
+                console.log(error.responseText);
+                // $('#DvPatientInfo').hide();
+            }
+        });
+        $("#loader").addClass("loaderdeactive");
+    }
+    function sweetAlert(stitle, sdata, sparam) {
+        debugger;
+        swal({
+            title: stitle,
+            html: "<div class='row'> <div class='mb-1 col-md-12 text-center'>" + sdata + "</div> </div>",
+            confirmButtonColor: "#36A865",
+            confirmButtonText: "OK"
+        }).then(function (isConfirm) {
+            if (sparam != null) {
+                if (sparam == 'pageReload') {
+                    window.location.reload();
+                }
+                else {
+                    setUserSession(sparam);
+                }
+            }
+        });
+    }
+    function ClearBlockPackages() {
+        window.location.href = '@Url.Action("ViewBlockPackage", "BlockPackage")';
+    }
+    function CloseBlockPackages() {
+        window.location.href = '@Url.Action("Index", "Dashboard")';
+    }
+
+
+</script>
+<!-- Dashboard Body content part starts -->
+<div class="container">
+
+    <input type="hidden" id="hdnscmCode" name="ScmCodeNm" />
+    <input type="hidden" id="hdnCurrentPackheader" name="PckHeader" />
+    <input type="hidden" id="PackageApproveRequired" name="AprvRequr" />
+    <input type="hidden" id="hdnSubpackId" name="subid" />
+    <input type="hidden" id="hdnPackDtlsId" name="dtlId" />
+
+    <input type="hidden" id="hdnsubpackcode" name="subcode" />
+    <input type="hidden" id="hdnProcCode" name="proccode" />
+    <input type="hidden" id="hdnstaytype" name="staytype" />
+    <input type="hidden" id="hdndaycare" name="daycare" />
+    <div class="row">
+        <div class="col-12 pb-3">
+            <div class="card">
+                <div class="card-body">
+                    <div class="clearfix"></div>
+
+                    <!-- Family Verification info -->
+                    <div class="form-box-bg mb-4">
+
+                        <ul class="nav nav-tabs custom-tab mb-4">
+                            <li class="nav-item">
+                                <a class="nav-link active" href="@Url.Action("ViewBlockPackage","BlockPackage")">Add</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="@Url.Action("ViewBlockPackageDetails","BlockPackage")">View</a>
+                            </li>
+
+                        </ul>
+                        <div class="pkg_grey">
+                            <div class="form-row">
+                                <div class="col-lg-10 col-md-12 col-sm-8 col-xs-12 form-row form-designsc">
+
+                                    <label for="packageHeader" class="col-lg-2 col-md-4 col-sm-4 col-xs-12 col-form-label">NFSA/SFSA NO<b><span style="color:red">*</span></b></label>
+
+                                    <div class="col-lg-3 col-md-4 col-sm-4 col-xs-12 mb-2 px-0">
+                                        <input type="text" class="form-control" autofocus id="urnNo" placeholder="Enter here" maxlength="17" onkeypress="return inputLimiter(event,'Numbers')" />
+                                    </div>
+
+                                    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 px-0">
+                                        <input class="btn btn-outline-success my-2 my-sm-0" type="button" value="Search" id="btnSearch">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-box-bg mb-4" id="DvPatientInfo">
+                            <div class="row mb-1 heading-pkg border-bottom ">
+                                <h5>Patient Info </h5>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-3">
+                                    <div class="mb-4">
+                                        <label class="pkg-label font-weight-normal">NFSA/SFSA NO :</label>
+                                        <div class="pkghead-txt" id="lblURNNo">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="mb-4">
+                                        <label class="pkg-label font-weight-normal">Current Policy :</label>
+                                        <div class="pkghead-txt" id="schNm"></div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="mb-4">
+                                        <label class="pkg-label font-weight-normal">Current Policy Period : </label>
+                                        <div class="pkghead-txt"><span id="spnPolFrmDate"></span> to <span id="spnPolToDate"></span></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-3">
+                                    <div class="mb-4">
+                                        <label class="pkg-label font-weight-normal">Claim Amount (<i class="fa fa-rupee"></i>) : </label>
+                                        <div class="pkghead-txt" id="schClaimAmount"></div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="mb-4">
+                                        <label class="pkg-label font-weight-normal">Currently Available Amount (<i class="fa fa-rupee"></i>) : </label>
+                                        <div class="pkghead-txt">
+                                            <span id="AvailB"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="mb-4">
+                                        <label class="pkg-label font-weight-normal">Female Fund (<i class="fa fa-rupee"></i>) : </label>
+                                        <div class="pkghead-txt" id="schFemaleFund"></div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="mb-4">
+                                        <label class="pkg-label font-weight-normal">Blocked Amount (<i class="fa fa-rupee"></i>) :</label>
+                                        <div class="pkghead-txt" id="schBlockedAmount"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="clearfix"></div>
+                            <div class="col-md-12 col-sm-12 col-xs-12 px-0">
+                                <div class="table-responsive">
+                                    <table class="table table-striped jsgrid-table" id="tblFamilyDetails">
+                                        <thead>
+                                            <tr class="jsgrid-header-row">
+                                                <th scope="col" class="jsgrid-header-cell" width="100">Sl No.</th>
+                                                <th scope="col" class="jsgrid-header-cell">Name</th>
+                                                <th scope="col" class="jsgrid-header-cell">Gender</th>
+                                                <th scope="col" class="jsgrid-header-cell">Age</th>
+                                                <th scope="col" class="jsgrid-header-cell">Aadhar Card No</th>
+                                                <th scope="col" class="jsgrid-header-cell">Select Patient</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- patient info -->
+                        <div class="form-box-bg mb-4" id="PatientDetails">
+                            <div class="row  mb-1 heading-pkg border-bottom">
+                                <h5>Patient Details </h5>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-2">
+                                    <label class="pkg-label font-weight-normal">Name :</label>
+                                    <div class="pkghead-txt">
+                                        <span id="spnPatientName"></span>
+                                    </div>
+                                </div>
+                                <div class="col-lg-2">
+                                    <label class="pkg-label font-weight-normal">Member ID :</label>
+                                    <div class="pkghead-txt">
+                                        <span id="spnPatientMemberId"></span>
+                                    </div>
+                                </div>
+                                <div class="col-lg-2">
+                                    <label class="pkg-label font-weight-normal">Gender : </label>
+                                    <div class="pkghead-txt">
+                                        <span id="spnPatientGender"></span>
+                                    </div>
+                                </div>
+                                <div class="col-lg-2">
+                                    <label class="pkg-label font-weight-normal">Age :</label>
+                                    <div class="pkghead-txt">
+                                        <span id="spnPatientAge"></span>
+                                    </div>
+                                </div>
+                                <div class="col-lg-2">
+                                    <label class="pkg-label font-weight-normal">Aadhar Card :</label>
+                                    <div class="pkghead-txt">
+                                        <span id="spnPatAadhar"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="customRadio mt-4" id="TreatmentType">
+                                <div class="customRadio mt-2 mt-4">
+                                    <div class="form-row">
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 d-flex">
+                                            <div class="chkbox-bg">
+                                                <input type="radio" name="radio" id="Surgical" checked onclick="SetSurgical();">
+                                                <label for="Surgical"> Surgical/Pre-Auth </label>
+                                            </div>
+                                            <div class="chkbox-bg">
+                                                <input type="radio" name="radio" id="Emergency" onclick="SetEmergency();">
+                                                <label for="Emergency"> Emergency</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="customRadio mt-4" id="Verifieddetails">
+                                    <div class="row  mb-4 heading-pkg border-bottom">
+                                        <h5> Verified Details </h5>
+                                    </div>
+                                    <div id="verificationBlock">
+                                        <div class="table-responsive">
+                                            <table id="grdFamilyDetails" data-toggle="table" class="table table-bordered" width="100%">
+                                            </table>
+                                        </div><div class="form-box-bg mb-4">
+                                            <div class="row heading-pkg">
+                                            </div>
+                                            <!--<div>
+                                                <div class="form-row">
+                                                    <div class="col-lg-10 col-md-12 col-sm-8 col-xs-12 form-row form-designsc">-->
+                                            @*for="packageHeader"*@
+                                            <!--</div>
+                                                </div>
+                                            </div>-->
+                                            <label class="col-lg-2 col-md-4 col-sm-4 col-xs-12 col-form-label">Over Ride Code:<b><span style="color:red"></span></b></label>
+
+                                            <div class="col-lg-3 col-md-4 col-sm-4 col-xs-12 mb-2 px-0">
+                                                <input type="text" class="form-control" autofocus id="OverRide" placeholder="Enter here" maxlength="17" onkeypress="return inputLimiter(event,'Numbers')" />
+                                            </div>
+
+                                            <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 px-0">
+                                                <input class="btn btn-outline-success my-2 my-sm-0" type="button" value="Generate Override" id="btnOverride">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <!-- patient info -->
+
+                        </div>
+                        <!-- Package info -->
+                        <div class="form-box-bg mb-4" id="PackageDetails">
+                            <div class="row  mb-1 heading-pkg border-bottom">
+                                <h5>Package Details </h5>
+                            </div>
+                            <div class="form-row mt-2 form-designsc">
+                                <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12">
+                                    <div class="form-row">
+                                        <div class="col-lg-11 col-md-9 col-sm-10 col-xs-10 pr-0">
+                                            <div class="col-form-label d-flex">
+                                                Package header <b><span style="color:red">*</span></b>
+                                            </div>
+                                            <div class="d-flex">
+                                                <input type="text" id="txtpackageheader" readonly="readonly" class="form-control" />
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-1 col-md-3 col-sm-2 col-xs-12 view-bt px-0">
+                                            <button type="button" class="btn btn-outline-success my-2 my-sm-0" data-toggle="modal" data-target="#popmodal"> <span class="fa fa-eye"></span> </button>
+                                        </div>
+                                        <!-- modal start -->
+                                        <div class="modal fade wow fadeInUp animated" id="popmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog modal-lg" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="row heading-pkg">
+                                                            <h5> Package Header Information </h5>
+                                                        </div>
+
+                                                        <table id="tblpackageheader1" class="table table-striped table-bordered" style="width:100%">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Sl No</th>
+                                                                    <th>Package Header Code</th>
+                                                                    <th>Package Header Name</th>
+                                                                    <th>Choose</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- modal end -->
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12">
+                                    <div class="form-row">
+                                        <div class="col-md-12">
+                                            <div class="col-form-label">Sub-Package <b><span style="color:red">*</span></b></div>
+                                            <div class="d-flex">
+                                                <input type="text" id="txtSubPackage" readonly="readonly" class="form-control" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 form-designsc">
+
+                                    <div class="form-row">
+                                        <div class="col-lg-11 col-md-9 col-sm-10 col-xs-10 pr-0">
+                                            <div class="col-form-label d-flex">
+                                                Package Details <b><span style="color:red">*</span></b>
+                                            </div>
+                                            <input type="text" id="txtPackageDetails" readonly="readonly" class="form-control" />
+                                        </div>
+                                        <div class="col-lg-1 col-md-3 col-sm-2 col-xs-12 view-bt px-0">
+                                            <button type="button" class="btn btn-outline-success my-2 my-sm-0" data-toggle="modal" data-target="#popmodalDtls" id="btnpackagedtls">
+                                                <span class="fa fa-eye"></span>
+                                            </button>
+                                        </div>
+                                        <!-- modal start -->
+                                        <div class="modal fade wow fadeInUp animated table-modalwidth" id="popmodalDtls" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <div class="col-lg-10 px-0">
+                                                            <div class="form-row">
+                                                                <div class="col-md-6">
+                                                                    <div class="heading-pkg px-0"><h5 class="mb-0"> Package Information </h5> </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="table-responsive">
+                                                            <table class="table" id="tblPackageDetails1">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>SL No </th>
+                                                                        <th>Package Name </th>
+                                                                        <th>Sub Package </th>
+                                                                        <th>Package Details </th>
+                                                                        <th>Amount </th>
+                                                                        <th>Days </th>
+                                                                        <th>Package ID</th>
+                                                                        <th>Pre-Auth</th>
+                                                                        <th>Choose</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- modal end -->
+                                    </div>
+                                </div>
+                                <!-- modal start -->
+                                <div class="modal fade wow fadeInUp animated" id="viewimplant" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <div class="row heading-pkg">
+                                                    <h5 class="mb-0"> Implant Details </h5>
+                                                </div>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="table-responsive">
+                                                    <table class="display" id="tblImplantDtls">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Implant Code </th>
+                                                                <th>Implant Name </th>
+                                                                <th>ProcCode </th>
+                                                                <th>Max.Permissibility </th>
+                                                                <th>Implant Amount </th>
+                                                                <th>Multiple</th>
+                                                                <th>Total Amount </th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- modal end -->
+                                <div class="col-lg-12">
+                                    <div class="form-row">
+                                        <div class="col-lg-4 col-md-6 col-sm-6 col-xs-12">
+                                            <div class="col-form-label"> Treatment Cost <b><span style="color:red">*</span></b></div>
+                                            <input type="number" id="txtTreatCost" readonly="readonly" class="form-control">
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-6 col-xs-12">
+                                            <div class="col-form-label"> Treatment Days <b><span style="color:red">*</span></b></div>
+                                            <input type="number" id="txtTreatDays" readonly="readonly" class="form-control">
+                                        </div>
+                                        <div class="col-lg-2 addmore-sc">
+                                            <input class="btn btn-outline-success my-2 my-sm-0 w-100" type="button" value="Add Package" id="btnAddPackage" />
+
+
+
+
+                                        </div>
+                                        @*<div class="col-lg-2">
+                                            <input class="btn btn-outline-success my-2 my-sm-0 w-100" type="button" value="error alert" id="btnerror" />
+                                            </div>
+
+                                            <div class="col-lg-2">
+                                                <input class="btn btn-outline-success my-2 my-sm-0 w-100" type="button" value="delete alert" id="btninfo" />
+
+
+                                            </div>*@
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="clearfix"></div>
+                            <div id="PackageGridDetails">
+                                <div class="mb-4 heading-pkg border-bottom mt-4 p-0">
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                        </div>
+                                        <div class="col-md-4" align="right">
+                                            <button type="button" id="btnPrevBooked" data-toggle="modal" data-target="#PrevPackageModal" class="btn btn-sm btn-success"> Click Here For Previous Packages &nbsp;<i class="fa fa-gift text-white"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-striped jsgrid-table">
+                                        <thead>
+                                            <tr class="jsgrid-header-row">
+                                                <th scope="col" class="jsgrid-header-cell" width="100">Sl#</th>
+                                                <th scope="col" class="jsgrid-header-cell">Package Header</th>
+                                                <th scope="col" class="jsgrid-header-cell">Sub-Package</th>
+                                                <th scope="col" class="jsgrid-header-cell">Package Details</th>
+                                                <th scope="col" class="jsgrid-header-cell">Treatment Cost</th>
+                                                <th scope="col" class="jsgrid-header-cell">Treatment Days</th>
+                                                <th scope="col" class="jsgrid-header-cell">Approval Require</th>
+                                                <th scope="col" class="jsgrid-header-cell">Action </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tblPackageDtls">
+                                        </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <td colspan="4" style="color:red">Total Amount to be blocked</td>
+                                                <td id="sum" style="font-weight:bold; color:red">&nbsp;</td>
+                                                <td colspan="3">&nbsp;</td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                    <div>
+                                        <div class="row">
+                                            <div class="col-md-12" style="text-align:right">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Package info -->
+                        <!-- html content staic design -->
+                        <div class="col-lg-12 col-mmd-12 col-sm-12 col-xs-12 p-0" hidden>
+                            <div class="row  mb-3 heading-pkg border-bottom">
+                                <h5>Patient Details </h5>
+                            </div>
+                            <div class="table-responsive border mb-3">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col" class="bg-white" width="30" style="background-color:#fff;">Sl#</th>
+                                            <th scope="col" class="bg-white" width="150" style="background-color:#fff;">Package Header</th>
+                                            <th scope="col" class="bg-white" width="150" style="background-color:#fff;">Sub-Package</th>
+                                            <th scope="col" class="bg-white" width="300" style="background-color:#fff;">Package Details</th>
+                                            <th scope="col" class="bg-white text-align-right" width="150" style="background-color:#fff;">Treatment Cost</th>
+                                            <th scope="col" class="bg-white text-align-center" width="150" style="background-color:#fff;">Approval Require</th>
+                                            <th scope="col" class="bg-white text-align-right" width="400" style="background-color:#fff;">Action </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>1</td>
+                                            <td>Burns Management</td>
+                                            <td> Burns Management </td>
+                                            <td>Total Body Surface Area Burns (TBSA) - any(not requiring admission). Needs at least 5-6 dressing</td>
+                                            <td align="right">78,750</td>
+                                            <td class="text-align-center">No</td>
+                                            <td class="text-align-right">
+                                                <button type="button" class="btn btn-outline-danger "><i class="fa fa-trash"></i></button>
+                                                <button type="button" class="btn btn-outline-success " data-toggle="collapse" data-target="#demo1" class="accordion-toggle"><i class="fa fa-eye"></i> </button>
+                                                <button type="button" class="btn btn-outline-success " data-toggle="modal" data-target="#Addimplantmodal"><i class="fa fa-plus"></i> Implant  </button>
+                                                <button type="button" class="btn btn-outline-success " data-toggle="modal" data-target="#Endrugs"><i class="fa fa-plus"></i> HighEndDrugs </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="10" class="m-0 p-0 border-0">
+                                                <div class="accordian-body collapse" id="demo1">
+                                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 mt-3">
+                                                        <div class="headingpkg-bg"> Package Details </div>
+                                                        <div class="row d-flex align-items-center">
+                                                            <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                                                                <div class="impl_head"> Implant Details </div>
+                                                            </div>
+                                                            <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                                                                <div class="row d-flex align-items-center">
+                                                                    <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12">
+                                                                        <div class="impl_head"> HighEndDrugs Details | <span> HDU Implant </span> </div>
+                                                                    </div>
+                                                                    <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12">
+                                                                        <select class="form-control">
+                                                                            <option> Select Implant Name </option>
+                                                                            <option> Burns Management</option>
+                                                                            <option> Cardiology </option>
+                                                                            <option> Burns Management </option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12 mt-3">
+                                                                <div id="table-scroll" class="table-scroll table-responsive mb-3 newpkghd">
+                                                                    <table class="table table-striped">
+                                                                        <thead>
+                                                                            <tr>
+                                                                                <th scope="bg-white text-align-left" style="background-color:#fff !important;"> Implant Name</th>
+                                                                                <th scope="bg-white text-align-center" style="background-color:#fff !important;"> Unit </th>
+                                                                                <th scope="bg-white text-align-right" style="background-color:#fff !important;"> Price </th>
+                                                                                <th scope="bg-white text-align-center" style="background-color:#fff !important;"> Action </th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            <tr class="active brd-left">
+                                                                                <td class="brd-left">HDU</td>
+                                                                                <td>4 </td>
+                                                                                <td> 1,450</td>
+                                                                                <td>
+                                                                                    <button type="button" class="btn btn-outline-danger " id="del"><i class="fa fa-trash"></i></button>
+                                                                                    <button type="button" class="btn btn-outline-success " data-toggle="modal" data-target="#Endrugs"><i class="fa fa-plus"></i> HighEndDrugs </button>
+
+                                                                                </td>
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <td>HDU</td>
+                                                                                <td>4 </td>
+                                                                                <td> 1,450</td>
+                                                                                <td>
+                                                                                    <button type="button" class="btn btn-outline-danger " id="del"><i class="fa fa-trash"></i></button>
+                                                                                    <button type="button" class="btn btn-outline-success " data-toggle="modal" data-target="#Endrugs"><i class="fa fa-plus"></i> HighEndDrugs </button>
+
+                                                                                </td>
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <td>HDU</td>
+                                                                                <td>4 </td>
+                                                                                <td> 1,450</td>
+                                                                                <td>
+                                                                                    <button type="button" class="btn btn-outline-danger " id="del"><i class="fa fa-trash"></i></button>
+                                                                                    <button type="button" class="btn btn-outline-success " data-toggle="modal" data-target="#Endrugs"><i class="fa fa-plus"></i> HighEndDrugs </button>
+
+                                                                                </td>
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <td>HDU</td>
+                                                                                <td>4 </td>
+                                                                                <td> 1,450</td>
+                                                                                <td>
+                                                                                    <button type="button" class="btn btn-outline-danger " id="del"><i class="fa fa-trash"></i></button>
+                                                                                    <button type="button" class="btn btn-outline-success " data-toggle="modal" data-target="#Endrugs"><i class="fa fa-plus"></i> HighEndDrugs </button>
+
+                                                                                </td>
+                                                                            </tr>
+                                                                        </tbody>
+                                                                        <tfoot>
+                                                                            <tr>
+                                                                                <td class="font-weight-5">Total </td>
+                                                                                <td class="font-weight-5">  8 </td>
+                                                                                <td colspan="2" class="font-weight-5"> 5,800  </td>
+                                                                            </tr>
+                                                                        </tfoot>
+                                                                    </table>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12 mt-3">
+                                                                <div id="table-scroll" class="table-scroll table-responsive mb-3">
+                                                                    <table id="main-table" class="main-table table table-striped">
+                                                                        <thead>
+                                                                            <tr>
+                                                                                <th scope=" bg-white  text-align-left" style="background-color:#fff !important;"> HighEndDrugs Name </th>
+                                                                                <th scope=" bg-white text-align-center" style="background-color:#fff !important;"> Unit </th>
+                                                                                <th scope=" bg-white text-align-right" style="background-color:#fff !important;"> Price </th>
+                                                                                <th scope=" bg-white text-align-center" style="background-color:#fff !important;"> Action </th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            <tr>
+                                                                                <td>Recombinant Tissue Plasminogen Activator</td>
+                                                                                <td>4 </td>
+                                                                                <td> 1,450</td>
+                                                                                <td>
+                                                                                    <button type="button" class="btn btn-outline-danger " id="del"><i class="fa fa-trash"></i></button>
+
+                                                                                </td>
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <td>Recombinant Tissue Plasminogen Activator</td>
+                                                                                <td>3 </td>
+                                                                                <td> 1,450</td>
+                                                                                <td>
+                                                                                    <button type="button" class="btn btn-outline-danger " id="del"><i class="fa fa-trash"></i></button>
+
+                                                                                </td>
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <td>Recombinant Tissue Plasminogen Activator</td>
+                                                                                <td>7 </td>
+                                                                                <td> 1,450</td>
+                                                                                <td>
+                                                                                    <button type="button" class="btn btn-outline-danger " id="del"><i class="fa fa-trash"></i></button>
+
+                                                                                </td>
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <td>Recombinant Tissue Plasminogen Activator</td>
+                                                                                <td>7 </td>
+                                                                                <td> 1,450</td>
+                                                                                <td>
+                                                                                    <button type="button" class="btn btn-outline-danger " id="del"><i class="fa fa-trash"></i></button>
+
+                                                                                </td>
+                                                                            </tr>
+                                                                        </tbody>
+                                                                        <tfoot>
+                                                                            <tr>
+                                                                                <td colspan="1"> &nbsp; </td>
+                                                                                <td class="font-weight-5">  8 </td>
+                                                                                <td class="font-weight-5" colspan="2">15,800  </td>
+                                                                            </tr>
+                                                                        </tfoot>
+                                                                    </table>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <!-- The Modal HighEndrugs -->
+                        <div class="modal" id="Endrugs" tabindex="-1" role="dialog" aria-labelledby="Endrugs" aria-hidden="true">
+                            <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
+                                <div class="modal-content">
+                                    <!-- Modal Header -->
+                                    <div class="modal-header">
+                                        <div class="row w-100">
+                                            <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12">
+                                                <div class="impl_head"> HighEndDrugs | <span> HDU </span> </div>
+                                            </div>
+                                            <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12">
+                                                <select class="form-control">
+                                                    <option> Select Implant Name </option>
+                                                    <option> Burns Management</option>
+                                                    <option> Cardiology </option>
+                                                    <option> Burns Management </option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                    </div>
+                                    <!-- Modal body -->
+                                    <div class="modal-body">
+                                        <div class="table-responsive mb-3">
+                                            <div id="table-scroll" class="table-scroll table-responsive">
+                                                <table class="table table-striped">
+                                                    <thead>
+                                                        <tr>
+                                                            <th scope="col" class="bg-white" width="50">Select</th>
+                                                            <th scope="col" class="bg-white" width="100"> HighEndDrugs Name </th>
+                                                            <th scope="col" class="bg-white text-align-right" width="100"> Unit/Cycle Price </th>
+                                                            <th scope="col" class="bg-white text-align-center" width="50"> Unit </th>
+                                                            <th scope="col" class="bg-white text-align-right" width="100"> Total Price </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>
+                                                                <div class="custom-control custom-checkbox">
+                                                                    <input type="checkbox" class="custom-control-input" id="customCheckim1">
+                                                                    <label class="custom-control-label" for="customCheckim1"></label>
+                                                            </td>
+                                                            <td>HDU</td>
+                                                            <td class="text-align-right">7,089</td>
+                                                            <td class="text-align-center"><input type="text" class="form-control" id="num"></td>
+                                                            <td class="text-align-right">
+                                                                7,089
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <div class="custom-control custom-checkbox">
+                                                                    <input type="checkbox" class="custom-control-input" id="customCheckim2">
+                                                                    <label class="custom-control-label" for="customCheckim2"></label>
+                                                            </td>
+                                                            <td>HDU</td>
+                                                            <td class="text-align-right">7,089</td>
+                                                            <td class="text-align-center"><input type="text" class="form-control" id="num"></td>
+                                                            <td class="text-align-right">
+                                                                7,089
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <div class="custom-control custom-checkbox">
+                                                                    <input type="checkbox" class="custom-control-input" id="customCheckim3">
+                                                                    <label class="custom-control-label" for="customCheckim3"></label>
+                                                            </td>
+                                                            <td>HDU</td>
+                                                            <td class="text-align-right">7,089</td>
+                                                            <td class="text-align-center"><input type="text" class="form-control" id="num"></td>
+                                                            <td class="text-align-right">
+                                                                7,089
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <div class="custom-control custom-checkbox">
+                                                                    <input type="checkbox" class="custom-control-input" id="customCheckim4">
+                                                                    <label class="custom-control-label" for="customCheckim4"></label>
+                                                            </td>
+                                                            <td>HDU</td>
+                                                            <td class="text-align-right">7,089</td>
+                                                            <td class="text-align-center"><input type="text" class="form-control" id="num"></td>
+                                                            <td class="text-align-right">
+                                                                7,089
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <div class="custom-control custom-checkbox">
+                                                                    <input type="checkbox" class="custom-control-input" id="customCheckim5">
+                                                                    <label class="custom-control-label" for="customCheckim5"></label>
+                                                            </td>
+                                                            <td>HDU</td>
+                                                            <td class="text-align-right">7,089</td>
+                                                            <td class="text-align-center"><input type="text" class="form-control" id="num"></td>
+                                                            <td class="text-align-right">
+                                                                7,089
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <div class="custom-control custom-checkbox">
+                                                                    <input type="checkbox" class="custom-control-input" id="customCheckim6">
+                                                                    <label class="custom-control-label" for="customCheckim6"></label>
+                                                            </td>
+                                                            <td>HDU</td>
+                                                            <td class="text-align-right">7,089</td>
+                                                            <td class="text-align-center"><input type="text" class="form-control" id="num"></td>
+                                                            <td class="text-align-right">
+                                                                7,089
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <div class="custom-control custom-checkbox">
+                                                                    <input type="checkbox" class="custom-control-input" id="customCheckim7">
+                                                                    <label class="custom-control-label" for="customCheckim7"></label>
+                                                            </td>
+                                                            <td>HDU</td>
+                                                            <td class="text-align-right">7,089</td>
+                                                            <td class="text-align-center"><input type="text" class="form-control" id="num"></td>
+                                                            <td class="text-align-right">
+                                                                7,089
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <div class="custom-control custom-checkbox">
+                                                                    <input type="checkbox" class="custom-control-input" id="customCheckim8">
+                                                                    <label class="custom-control-label" for="customCheckim8"></label>
+                                                            </td>
+                                                            <td>HDU</td>
+                                                            <td class="text-align-right">7,089</td>
+                                                            <td class="text-align-center"><input type="text" class="form-control" id="num"></td>
+                                                            <td class="text-align-right">
+                                                                7,089
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+
+                                                    <tfoot>
+                                                        <tr>
+                                                            <td> &nbsp; </td>
+                                                            <td class="font-weight-5"> Total </td>
+                                                            <td class="font-weight-5" align="right"> 20,200 </td>
+                                                            <td class="font-weight-5" align="center">  15</strong></td>
+                                                            <td class="font-weight-5" colspan="1" align="right"> 50,400 </td>
+
+                                                        </tr>
+                                                    </tfoot>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 p-0" align="right">
+                                            <button type="button" class="btn btn-success"> Submit</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Modal footer -->
+                                <div class="clearfix"></div>
+                            </div>
+                        </div>
+                        <!-- The Modal -->
+                        <!-- The Modal -->
+                        <div class="modal" id="Addimplantmodal" tabindex="-1" role="dialog" aria-labelledby="Addimplantmodal" aria-hidden="true">
+                            <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
+                                <div class="modal-content">
+                                    <!-- Modal Header -->
+                                    <div class="modal-header">
+                                        <div class="row w-100">
+                                            <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12">
+                                                <h4 class="modal-title text-success"> Add Implant Details </h4>
+                                            </div>
+                                            <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12">
+                                                <select class="form-control">
+                                                    <option> Select Implant Name </option>
+                                                    <option> Burns Management</option>
+                                                    <option> Cardiology </option>
+                                                    <option> Burns Management </option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                    </div>
+                                    <!-- Modal body -->
+                                    <div class="modal-body">
+                                        <div class="table-responsive mb-3">
+                                            <div id="table-scroll" class="table-scroll table-responsive">
+                                                <table class="table table-striped">
+                                                    <thead>
+                                                        <tr>
+                                                            <th scope="col" class="bg-white" width="50">Select</th>
+                                                            <th scope="col" class="bg-white" width="100"> Implant Name </th>
+                                                            <th scope="col" class="bg-white text-align-right" width="100"> Unit/Cycle Price </th>
+                                                            <th scope="col" class="bg-white text-align-center" width="50"> Unit </th>
+                                                            <th scope="col" class="bg-white text-align-right" width="100"> Total Price </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>
+                                                                <div class="custom-control custom-checkbox">
+                                                                    <input type="checkbox" class="custom-control-input" id="customCheck1">
+                                                                    <label class="custom-control-label" for="customCheck1"></label>
+                                                            </td>
+                                                            <td>HDU</td>
+                                                            <td class="text-align-right">7,089</td>
+                                                            <td class="text-align-center"><input type="text" class="form-control" id="num"></td>
+                                                            <td class="text-align-right">
+                                                                7,089
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <div class="custom-control custom-checkbox">
+                                                                    <input type="checkbox" class="custom-control-input" id="customCheck2">
+                                                                    <label class="custom-control-label" for="customCheck2"></label>
+                                                            </td>
+                                                            <td>HDU</td>
+                                                            <td class="text-align-right">7,089</td>
+                                                            <td class="text-align-center"><input type="text" class="form-control" id="num"></td>
+                                                            <td class="text-align-right">
+                                                                7,089
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <div class="custom-control custom-checkbox">
+                                                                    <input type="checkbox" class="custom-control-input" id="customCheck3">
+                                                                    <label class="custom-control-label" for="customCheck3"></label>
+                                                            </td>
+                                                            <td>HDU</td>
+                                                            <td class="text-align-right">7,089</td>
+                                                            <td class="text-align-center"><input type="text" class="form-control" id="num"></td>
+                                                            <td class="text-align-right">
+                                                                7,089
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <div class="custom-control custom-checkbox">
+                                                                    <input type="checkbox" class="custom-control-input" id="customCheck4">
+                                                                    <label class="custom-control-label" for="customCheck4"></label>
+                                                            </td>
+                                                            <td>HDU</td>
+                                                            <td class="text-align-right">7,089</td>
+                                                            <td class="text-align-center"><input type="text" class="form-control" id="num"></td>
+                                                            <td class="text-align-right">
+                                                                7,089
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <div class="custom-control custom-checkbox">
+                                                                    <input type="checkbox" class="custom-control-input" id="customCheck5">
+                                                                    <label class="custom-control-label" for="customCheck5"></label>
+                                                            </td>
+                                                            <td>HDU</td>
+                                                            <td class="text-align-right">7,089</td>
+                                                            <td class="text-align-center"><input type="text" class="form-control" id="num"></td>
+                                                            <td class="text-align-right">
+                                                                7,089
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <div class="custom-control custom-checkbox">
+                                                                    <input type="checkbox" class="custom-control-input" id="customCheck6">
+                                                                    <label class="custom-control-label" for="customCheck6"></label>
+                                                            </td>
+                                                            <td>HDU</td>
+                                                            <td class="text-align-right">7,089</td>
+                                                            <td class="text-align-center"><input type="text" class="form-control" id="num"></td>
+                                                            <td class="text-align-right">
+                                                                7,089
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <div class="custom-control custom-checkbox">
+                                                                    <input type="checkbox" class="custom-control-input" id="customCheck7">
+                                                                    <label class="custom-control-label" for="customCheck7"></label>
+                                                            </td>
+                                                            <td>HDU</td>
+                                                            <td class="text-align-right">7,089</td>
+                                                            <td class="text-align-center"><input type="text" class="form-control" id="num"></td>
+                                                            <td class="text-align-right">
+                                                                7,089
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <div class="custom-control custom-checkbox">
+                                                                    <input type="checkbox" class="custom-control-input" id="customCheck8">
+                                                                    <label class="custom-control-label" for="customCheck8"></label>
+                                                            </td>
+                                                            <td>HDU</td>
+                                                            <td class="text-align-right">7,089</td>
+                                                            <td class="text-align-center"><input type="text" class="form-control" id="num"></td>
+                                                            <td class="text-align-right">
+                                                                7,089
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                    <tfoot>
+                                                        <tr>
+                                                            <td> &nbsp; </td>
+                                                            <td class="font-weight-5"> Total </td>
+                                                            <td class="font-weight-5" align="right"> 20,200</td>
+                                                            <td class="font-weight-5" align="center">  15</td>
+                                                            <td class="font-weight-5" colspan="1" align="right"> 50,400  </td>
+
+                                                        </tr>
+                                                    </tfoot>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 p-0" align="right">
+                                            <button type="button" class="btn btn-success"> Submit</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Modal footer -->
+                                <div class="clearfix"></div>
+                            </div>
+                        </div>
+                        <!-- The Modal -->
+                        <!-- html content staic design end -->
+
+                        <div class="clearfix"></div>
+                        <div class="form-box-bg mb-4" id="AdmissionDetails">
+                            <div class="row  mb-1 heading-pkg border-bottom">
+                                <h5> Admission Details </h5>
+                            </div>
+                            <div class="form-row">
+                                <div class="col-lg-3">
+                                    <div class="form-row">
+                                        <div class="col-md-12">
+                                            <div class="col-form-label">Actual Date of Admission </div>
+                                            <input type="text" id="dtActualAdmission" class="form-control" data-date-format="dd-MMM-yy" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="col-form-label">Doctor Name </div>
+                                            <input type="text" id="txtDoctorName" maxlength="100" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-row">
+                                        <div class="col-md-12">
+                                            <div class="col-form-label">Doctor Phone No</div>
+                                            <input type="text" id="txtDrPhoneNo" maxlength="10" class="form-control" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-row">
+                                        <div class="col-md-12">
+                                            <div class="col-form-label">Patient Phone No </div>
+                                            <input type="text" id="txtPatientNo" maxlength="10" class="form-control" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="col-lg-3">
+                                    <div class="form-row">
+                                        <div class="col-md-12">
+                                            <div class="col-form-label">Override Code </div>
+                                            <input type="text" id="txtOverrideCode" maxlength="100" class="form-control" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-row">
+                                        <div class="col-md-12">
+                                            <div class="col-form-label">Referal Code </div>
+                                            <input type="text" id="txtRefCode" maxlength="100" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-row">
+                                        <div class="col-md-12">
+                                            <div class="col-form-label"> Description</div>
+                                            <textarea class="form-control" id="txtDescription" maxlength="1000" placeholder="Enter text Here....">
+                                        </textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="clearfix"></div>
+                            <div class="row  mb-1 heading-pkg border-bottom">
+                                <h5> Vital Parameter </h5>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                    <div class="form-row">
+                                        <div class="col-md-4">
+                                            <div class="col-form-label">Parameter <b><span style="color:red">*</span></b></div>
+                                            <select class="form-control" id="dlVitalParam">
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="col-form-label">Value <b><span style="color:red">*</span></b></div>
+                                            <input type="text" class="form-control" id="txtVtParamValue">
+                                        </div>
+                                        <div class="col-md-4 addmore-sc">
+                                            <button class="btn btn-outline-success" id="addMoreVitalParam"> Add More &nbsp;<i class="fa fa-plus"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                    <div class="table-responsive mt-4">
+                                        <table class="table table-striped jsgrid-table" id="tblVitalParam">
+                                            <thead>
+                                                <tr class="jsgrid-header-row">
+                                                    <th scope="col" class="jsgrid-header-cell" width="100">SL No</th>
+                                                    <th scope="col" class="jsgrid-header-cell">Parameter</th>
+                                                    <th scope="col" class="jsgrid-header-cell"> Value</th>
+                                                    <th scope="col" class="jsgrid-header-cell"> Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 px-0">
+                                <div class="col-form-label">Remark <b><span style="color:red">*</span></b></div>
+                                <textarea class="form-control" rows="4" placeholder="Enter Your Remarks..." id="txtBlockingremarks"></textarea>
+                            </div>
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-left mb-4 mt-4 px-0">
+                                <input class="btn btn-success my-2 my-sm-0" type="button" value="Block" id="btnBlocking" onclick="BlockPackageSava(this);">
+                                <input class="btn btn-primary my-2 my-sm-0" type="reset" value="Clear" id="btnClear" onclick="ClearBlockPackages();">
+                                <input class="btn btn-danger my-2 my-sm-0" type="button" value="Close" id="btnClose" onclick="CloseBlockPackages();">
+                            </div>
+
+                        </div>
+
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--OTP Modal -->
+    <div class="modal fade" id="OTPModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-sm otpmodal" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel"> OTP Verification </h5>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-12" align="center">
+                            <div class="mb-4">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="col-form-label  mb-1"> OTP <b><span style="color:red">*</span></b></div>
+                                        <input type="text" class="form-control mb-2" id="txtopt" placeholder="Enter OTP">
+                                        <input type="hidden" mb-3" id="Uid" />
+                                        <input type="hidden" mb-3" id="txn" />
+                                        <label class="mb-2 text-left">Time Remaining <span id="timer-countdown">05:00 </span></label>
+
+                                        <div>
+                                            <input type="button" class="btn btn-outline-success" value="Verify" onclick="VerifyOTP();">
+                                            <input type="button" class="btn btn-outline-danger" value="Cancel" data-dismiss="modal" aria-label="Close">
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="clearfix"></div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--IRIS Modal -->
+    <div class="modal fade" id="IrisModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Authenticate</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="row justify-content-center  customRadio">
+                        <div class="col-md-3">
+                            <div class="chkbox-bg">
+                                <input type="radio" name="textEditor" id="rdProduction" checked="checked" value="P">
+                                <label for="rdProduction"> Prodouction </label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="chkbox-bg">
+                                <input type="radio" name="textEditor" id="rdStaging" value="S">
+                                <label for="rdStaging"> Staging Server </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col-lg-12">
+                            <div class="mb-3">
+                                <div class="form-row mb-2">
+                                    <div class="col-md-3">
+                                        <input type="hidden" id="getrdresponse" />
+                                        <div class="col-form-label">RD Service Status <b><span style="color:red">*</span></b></div>
+                                        <input type="text" class="form-control" id="rdStatus">
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <div class="col-form-label">Device Info Path <b><span style="color:red">*</span></b></div>
+                                        <input type="text" class="form-control" id="rdinfo">
+                                    </div>
+
+
+
+                                    <div class="col-md-3">
+                                        <div class="col-form-label"> Capture Path <b><span style="color:red">*</span></b></div>
+                                        <input type="text" class="form-control">
+                                    </div>
+
+
+                                    <div class="col-md-3">
+                                        <div class="col-form-label">RD Service Info <b><span style="color:red">*</span></b></div>
+                                        <input type="text" class="form-control">
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="row  mb-3 heading-pkg border-bottom">
+                        <h5> Capture Pid Data </h5>
+                    </div>
+
+                    <div class="form-row mb-3">
+
+                        <div class="col-md-3">
+                            <div class="col-form-label">Error Code <b><span style="color:red">*</span></b></div>
+                            <input type="text" class="form-control" id="errCode">
+                        </div>
+
+
+                        <div class="col-md-3">
+                            <div class="col-form-label">Quality Service <b><span style="color:red">*</span></b></div>
+                            <input type="text" class="form-control">
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="col-form-label"> Error Info <b><span style="color:red">*</span></b></div>
+                            <input type="text" class="form-control" id="errInfo">
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="col-form-label"> dpid <b><span style="color:red">*</span></b></div>
+                            <input type="text" class="form-control" id="dpid">
+                        </div>
+
+
+                        <div class="col-md-3">
+                            <div class="col-form-label"> Red/Id <b><span style="color:red">*</span></b></div>
+                            <input type="text" class="form-control">
+                        </div>
+
+
+                        <div class="col-md-3">
+                            <div class="col-form-label"> Red/info <b><span style="color:red">*</span></b></div>
+                            <input type="text" class="form-control">
+                        </div>
+
+
+                        <div class="col-md-3">
+                            <div class="col-form-label"> do <b><span style="color:red">*</span></b></div>
+                            <input type="text" class="form-control">
+                        </div>
+
+
+                        <div class="col-md-3">
+                            <div class="col-form-label"> mi <b><span style="color:red">*</span></b></div>
+                            <input type="text" class="form-control" id="mi">
+                        </div>
+
+
+                        <div class="col-md-12">
+                            <div class="col-form-label"> mc <b><span style="color:red">*</span></b></div>
+                            <input type="text" class="form-control" id="mc">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="row  mb-3 heading-pkg border-bottom">
+                            <h5> Auth Request </h5>
+                        </div>
+                        <div class="form-row mb-2">
+                            <div class="col-md-3">
+                                <div class="col-form-label">Aadhar UID <b><span style="color:red">*</span></b></div>
+                            </div>
+                            <div class="col-md-3">
+                                <input type="text" class="form-control">
+                            </div>
+                            <div class="col-md-3">
+                                <div class="col-form-label"> Response Result <b><span style="color:red">*</span></b></div>
+                            </div>
+                            <div class="col-md-3">
+                                <input type="text" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-row mb-2">
+                            <div class="col-md-3">
+                                <div class="col-form-label"> Error code <b><span style="color:red">*</span></b></div>
+                            </div>
+                            <div class="col-md-3">
+                                <input type="number" class="form-control">
+                            </div>
+                            <div class="col-md-3">
+                                <div class="col-form-label"> Error Info <b><span style="color:red">*</span></b></div>
+                            </div>
+                            <div class="col-md-3">
+                                <input type="text" class="form-control">
+                            </div>
+                        </div>
+                        <div class="mt-3 mb-3 customCheckbox">
+                            <input type="checkbox" name="checkbox" id="RAW">
+                            <label for="RAW">Lorem Ipsum is simply dummy text of the printing and typesetting industry.</label>
+                        </div>
+
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 px-0" align="left">
+                            <input type="button" class="btn btn-outline-success mb-2" value="Captured" id="btnCapture" onclick="Capture();">
+                            <input type="button" class="btn btn-outline-success mb-2" value="Authentication" id="btnAuthentication">
+                            @*<input type="button" class="btn btn-outline-success mb-2" value="Reset">
+                                <input type="button" class="btn btn-outline-danger mb-2" value="Close">*@
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+
+    <div id="myModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Modal Header</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Some text in the modal.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="PrevPackageModal" class="modal fade table-modalwidth" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    @*<h4 class="modal-title">Modal Header</h4>*@
+                </div>
+                <div class="modal-body">
+                    <table class="table table-striped jsgrid-table " id="tblPrevPackageDtls">
+                        <thead>
+                            <tr class="jsgrid-header-row">
+                                <th scope="col" class="jsgrid-header-cell" width="100">Sl#</th>
+                                <th scope="col" class="jsgrid-header-cell">Package Header</th>
+                                <th scope="col" class="jsgrid-header-cell">Sub-Package</th>
+                                <th scope="col" class="jsgrid-header-cell">Package Details</th>
+                                <th scope="col" class="jsgrid-header-cell">Treatment Cost</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                        @*<tfoot>
+                                <tr>
+                                    <td colspan="4" style="color:red">Total Amount blocked</td>
+                                    <td id="sump" style="font-weight:bold; color:red">&nbsp;</td>
+
+                                </tr>
+                            </tfoot>*@
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).on('click', '#btnerror', function (e) {
+            swal({
+                title: "Oops!",
+                text: " Something Went Wrong",
+                type: "error",
+                confirmButtonColor: "#36A865",
+                confirmButtonText: "Ok"
+            });
+        });
+    </script>
+
+
+    <script>
+        $('#btninfo').click(function () {
+            swal({
+                title: 'Are you sure to Add?',
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#36A865',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, Add it!'
+
+            }).then(function () {
+                swal(
+                    'Added',
+                    'Added Succesfully.',
+                    'success'
+                );
+            });
+        });
+
+    </script>
+
+
+    <script type="text/javascript">
+    var AddPackageHtml = "";
+    var count = 0;
+    var url;
+    var currrentElement;
+    $(function () {
+        $('.secondary-menu li a').tooltip();
+    });
+
+    $(document).ready(function () {
+        $("#btnCapture").hide();
+        $("#btnPrevBooked").attr('style', 'display:none');
+        var dateNow = new Date();
+        $("#dtActualAdmission").datepicker({
+            format: 'dd-M-yy',
+            defaultDate: dateNow
+        });
+        bindPackageHeaderDetils();
+        $('#DvPatientInfo').hide();
+        $('#PatientDetails').hide();
+        $('#AdmissionDetails').hide();
+        $('#Verifieddetails').hide();
+        $('#PackageDetails').hide();
+        $('#PackageGridDetails').hide();
+        $('#AdmissionDetails').hide();
+        $('#Verifieddetails').hide();
+        $('#TreatmentType').hide();
+    });
+
+    // Search Urn
+    $('#btnSearch').click(function () {
+        if (validate()) {
+            $('#btnAuth').hide();
+            $('#TreatmentType').show();
+            $('#DvPatientInfo').show();
+            $('#PatientDetails').hide();
+            GetSchemeList();
+        }
+    });
+
+    function validate() {
+        if ($('#urnNo').val() == '') {
+            //alert('Please Enter NFSA/SFSA NO !!');
+            sweetAlert('Alert', 'Please Enter NFSA/SFSA No. !!');
+            $('#urnNo').focus();
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+
+    function GetSchemeList() {
+        $.ajax({
+            url: ServiceURL + "/api/Common/GetSchemeList",
+            type: "GET",
+            data: SchemeParams,
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            success: function (data) {
+                console.log(data);
+                //$('#DvPatientInfo').show();
+                $.each(data, function () {
+                    $('#schNm').html(this['schemeName']);
+                    $('#hdnscmCode').val(this['schemeCode']);
+                    //if (this['schemeCode'] == "undefined") {
+                    //    $('#DvPatientInfo').hide();
+                    //}
+                    //alert(this['schemeCode']);
+                    SearchAdm();
+                    FamilyMemberDetails();
+                });
+                //$('#schemeName').val('7');
+                //if (localStorage.getItem('schemeURN') != null) {
+                //    var schemeURNInfo = JSON.parse(localStorage.getItem('schemeURN'));
+                //    $('#schemeName').val(schemeURNInfo[0].Scheme);
+                //    $('#urnNo').val(schemeURNInfo[0].URN);
+                //    Search();
+                //    localStorage.removeItem('schemeURN');
+                //}
+            },
+            error: function (error) {
+                console.log(error.responseText);
+                $('#DvPatientInfo').hide();
+            }
+        });
+    }
+
+    function SearchAdm() {
+
+        if (validate()) {
+            //debugger;
+            //$('#schemeCode').html($("option:selected", $("#schemeName")).val());
+            //$('#schNm').html($("option:selected", $("#schemeName")).text());
+            //$('#DivSchemeCode').html($("option:selected", $("#schemeName")).val());
+        }
+    }
+
+    //Surgical Part
+    function SetSurgical() {
+        if ($("#Surgical").is(":checked")) {
+            var urnno = $('#urnNo').val();
+            verificationFamilyData(urnno);
+            $('#Verifieddetails').show();
+            $('#PackageDetails').hide();
+            $('#AdmissionDetails').hide();
+            $('#PackageGridDetails').hide();
+            Pacakagedata = [];
+            $("#tblPackageDtls").empty();
+            AdmissionDetailsReset();
+        }
+    }
+
+    //Emergency Part
+    function SetEmergency() {
+        $('#Verifieddetails').hide();
+        $('#PackageDetails').show();
+    }
+
+    // Display Family Member Verification List
+    function verificationFamilyData(urn) {
+        $.ajax({
+            url: ServiceURL + "/api/URN/GetFamilyMemeberList",
+            type: "GET",
+            data: { 'URN': urn },
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            success: function (response) {
+                console.log("FamilyDetails1 : -", response);
+                $("#grdFamilyDetails").DataTable({
+                    processing: true,
+                    bLengthChange: true,
+                    lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                    bFilter: true,
+                    bSort: true,
+                    bPaginate: false,
+                    searching: false,
+                    bInfo: false,
+                    data: response,
+                    bDestroy: true,
+                    autoWidth: false,
+                    columns: [
+                        { data: 'id', type: "text", title: "Sl#", align: "center", render: function (data, type, row, meta) { return meta.row + meta.settings._iDisplayStart + 1; } },
+                        { data: "memberID", type: "text", title: "Member Id", align: "center" },
+                        { data: "memberName", type: "text", title: "Name", align: "center" },
+                        { data: "memberGender", type: "text", title: "Gender", align: "center" },
+                        { data: "memberAge", type: "text", title: "Age", align: "center" },
+                        { data: "maskAadharnumber", type: "text", title: "Aadhar Card No", align: "center", width:"150px" },
+                        /*{ data: "maskAadharnumber", type: "text", title: " Aadhar Card No ", align: "center", visible: "false" },*/
+                        { data: "rationCardNumber", type: "text", title: " Ration Card No ", align: "center" },
+                    ],
+                    columnDefs: [
+                        {
+                            targets: 7,
+                            data: null,
+                            title: "IRIS",
+                            orderable: false,
+                            defaultContent: "<button type='button'id='btnIris' onclick='IrisVerification(this)' class='btn btn-success focusedBtn btn-sm my-2 my-sm-0'> IRIS</button>"
+                        },
+                        {
+                            targets: 8,
+                            data: null,
+                            title: "POS",
+                            orderable: false,
+                            defaultContent: "<button type='button'id='btnPOS' onclick='POSVerification(this)' class='btn btn-success focusedBtn btn-sm my-2 my-sm-0'> POS </button>"
+                        },
+                        {
+                            targets: 9,
+                            data: null,
+                            title: "OTP",
+                            orderable: false,
+                            defaultContent: "<button type='button'id='btnOTP' onclick='OTPVerification(this)' class='btn btn-success focusedBtn btn-sm my-2 my-sm-0'> OTP </button>"
+                        }
+                    ]
+                });
+            },
+            failure: function (response) {
+                alert(response.d);
+            },
+            error: function (response) {
+                alert(response.d);
+            }
+        });
+    }
+
+     // Display Family Member List
+    function FamilyMemberDetails() {
+        var selectedRow;
+        var arrMembInfo = [];
+        $('#tblFamilyDetails').jsGrid({
+            width: "100%",
+            sorting: true,
+            paging: true,
+            pageSize: 10,
+            autoload: true,
+            controller: {
+                loadData: function () {
+                    var d = $.Deferred();
+                    var params = {
+                        URN: $('#urnNo').val()
+                    };
+
+                    return $.ajax({
+                        url: ServiceURL + "/api/URN/GetFamilyMemeberList",
+                        type: "GET",
+                        data: params,
+                        dataType: "json",
+                        contentType: "application/json; charset=utf-8",
+                        error: function (error) {
+                            console.log(error.statusText);
+                        },
+                    }).done(function (result) {
+                        console.log("GetFamilyMemeberList-", result);
+                        if (!$.trim(result)) {
+                            $('#DvPatientInfo').hide();
+                            swal({
+                                title: "Alert",
+                                text: "No Record Found",
+                                confirmButtonColor: "#36A865",
+                                confirmButtonText: "OK"
+                            });
+                        }
+                        else {
+                            var arrVerMembName = [];
+                            var BalanceParams = {
+                                Action: 'A',
+                                URN: result[0].urn,
+                                FamilyId: result[0].familyID
+                            };
+                            for (i = 0; i < result.length; i++) {
+                                arrVerMembName.push({
+                                    memberName: result[i].memberName,
+                                    memberID: result[i].memberID
+                                });
+                            }
+
+                            $('#lblURNNo').html(result[0].urn);
+                            $('#spnPolFrmDate').html(result[0].policystartdate);
+                            $('#spnPolToDate').html(result[0].policyenddate);
+                            //$('#schClaimAmount').html(result[0].amoutBlocked);
+                            //$('#AvailB').html(result[0].availableBalance);
+                            //$('#schFemaleFund').html(result[0].urn);
+                            //$('#schBlockedAmount').html(result[0].BlockAmtCalculate);
+                            $('#divDesc').show();
+                            $.ajax({
+                                url: ServiceURL + "/api/Common/GetAvailBalance",
+                                type: "GET",
+                                data: BalanceParams,
+                                dataType: "json",
+                                contentType: "application/json; charset=utf-8",
+                                success: function (resultBal) {
+                                    if (resultBal != null) {
+                                        $('#AvailB').html(resultBal.availableBalance);
+                                    }
+                                    else {
+                                        $('#AvailB').html('NA');
+                                    }
+
+                                    if (resultBal != null) {
+                                        $('#schClaimAmount').html(resultBal.claimedamount);
+                                    }
+                                    else {
+                                        $('#schClaimAmount').html('NA');
+                                    }
+
+                                    if (resultBal != null) {
+                                        $('#schFemaleFund').html(resultBal.femalefund);
+                                    }
+                                    else {
+                                        $('#schFemaleFund').html('NA');
+                                    }
+
+                                    if (resultBal != null) {
+                                        $('#schBlockedAmount').html(resultBal.amountBlocked);
+                                    }
+                                    else {
+                                        $('#schBlockedAmount').html('NA');
+                                    }
+                                },
+                                error: function (error) {
+
+                                    console.log(error.responseText);
+                                }
+                            });
+                        }
+                        console.log(result);
+                        d.resolve($.map(result,
+                            function (item, itemIndex) {
+                                return $.extend(item, { "Index": itemIndex + 1 });
+                            }
+                        ));
+                    });
+                }
+            },
+
+            fields: [
+                { name: "Index", width: "30", type: "number", title: "#Sl", align: "center", editing: false },
+                { name: "policystartdate", title: "policystartdate", type: "text", visible: false },
+                { name: "policyenddate", title: "policyenddate", type: "text", visible: false },
+                { name: "memberID", title: "memberID", type: "text", visible: true },
+                { name: "headMemberID", title: "headMemberID", type: "text", visible: false },
+                { name: "hoh", title: "HeadOfFamily", type: "text", visible: false },
+                { name: "memberBlock", title: "memberBlock", type: "text", visible: false },
+                { name: "memberBlockCode", title: "memberBlockCode", type: "text", visible: false },
+                { name: "memberPanchayatCode", title: "memberPanchayatCode", type: "text", visible: false },
+                { name: "memberPanchayatName", title: "memberPanchayatName", type: "text", visible: false },
+                { name: "memberVillageCode", title: "memberVillageCode", type: "text", visible: false },
+                { name: "memberVillageName", title: "memberVillageName", type: "text", visible: false },
+                { name: "memberDistrict", title: "District", type: "text", visible: false },
+                { name: "memberDistrictCode", title: "DistrictCode", type: "number", visible: false },
+                { name: "memberState", title: "State", type: "text", visible: false },
+                { name: "memberStateCode", title: "memberStateCode", type: "number", visible: false },
+                //{ name: "urn", type: "text", title: "URN No.", align: "center", editing: false },
+                { name: "familyID", type: "text", title: "FamilyID", align: "center", editing: false, visible: false },
+                { name: "memberName", type: "text", title: "Name", align: "center", editing: false },
+                { name: "memberGender", type: "text", title: "Gender", align: "center", editing: false },
+                { name: "memberAge", type: "number", title: "Age", align: "center", editing: false },
+                { name: "mobile", type: "text", title: "Mobile", align: "center", editing: false, visible: false },
+                { name: "aadharnumber", type: "text", title: "Aadharcard", align: "center", editing: false, visible: false },
+                { name: "rationCardBackDoc", type: "text", title: "RationCard", align: "center", editing: false, visible: false },
+                {
+                    type: "control", editButton: false, deleteButton: false, align: "center", name: "maskAadharnumber",
+                    itemTemplate: function (value, item) {
+                        return $("<a>").attr("href", "").text(value)
+                            .on("click", function () {
+                                var BaseUrl = item.memberDistrictCode + '/' + item.memberBlockCode + '/' + item.memberPanchayatCode + '/RationCard/' + item.adharcard;
+                                window.open("../Download.ashx?msg=" + encodeURIComponent(BaseUrl), '_blank');
+                                // window.open(AppURL + '/UploadDoc/'+item.memberDistrictCode+'/'+item.memberBlockCode+'/'+item.memberPanchayatCode+'/RationCard/' + item.adharcard, '_blank');
+                                // alert(AppURL + '/UploadDoc/' + item.adharcard);
+                                return false;
+                            });
+                    },
+                    width: 100,
+                    headerTemplate: function () {
+                        return $("<div>").prop("title", "Action").text("Aadhaar Card No.");
+                    },
+                },
+                {
+                    type: "control", editButton: false, deleteButton: false, align: "center", name: "rationCardNumber",
+                    itemTemplate: function (value, item) {
+                        return $("<a>").attr("href", "").text(value)
+                            .on("click", function () {
+                                var BaseUrl = item.memberDistrictCode + '/' + item.memberBlockCode + '/' + item.memberPanchayatCode + '/RationCard/' + item.rationCardBackDoc;
+                                window.open("../Download.ashx?msg=" + encodeURIComponent(BaseUrl), '_blank');
+                                // alert(AppURL + '/UploadDoc/' + item.adharcard);
+                                return false;
+                            });
+                    },
+                    width: 100,
+                    headerTemplate: function () {
+                        return $("<div>").prop("title", "Action").text("Ration Card No.");
+                    },
+                },
+                // { name: "aadharnumber", type: "text", title: "Aadhaar Card Number", align: "center", editing: true },
+                // { name: "rationCardNumber", type: "text", title: "Ration Card Number", align: "center", editing: true, },
+                { type: "control", editButton: true, deleteButton: false, align: "center", visible: false },
+                {
+                    type: "control", editButton: false, deleteButton: false, align: "center",
+                    itemTemplate: function (value, item) {
+                        return $("<button>").attr({ type: "button", class: "btn btn-outline-success focusedBtn btn-sm my-2 my-sm-0" }).text("Select")
+                            .on("click", function () {
+
+                                //#region "For highlighting a particular row by button click"
+                                var $row = $("#jsGrid").jsGrid("rowByItem", item);
+                                selectedRow = $("#jsGrid").find('table tr.highlight');
+                                if (selectedRow.length) {
+                                    selectedRow.toggleClass('highlight');
+                                };
+                                $row.toggleClass("highlight");
+                                //#endregion
+                                $("#PatientDetails").show();
+                                //debugger;
+                                $("#spnPatientName").html(item.memberName);
+                                $("#spnPatientMemberId").html(item.memberID);
+                                $("#spnPatientGender").html(item.memberGender);
+                                $("#spnPatientAge").html(item.memberAge);
+                                $("#spnPatAadhar").html(item.maskAadharnumber);
+
+                                arrMembInfo.push({
+                                    memberID: item.memberID,
+                                    hoh: item.hoh,
+                                    headMemberID: item.headMemberID,
+                                    memberDistrict: item.memberDistrict,
+                                    memberDistrictCode: item.memberDistrictCode,
+                                    memberState: item.memberState,
+                                    memberStateCode: item.memberStateCode,
+                                    memberBlock: item.memberBlock,
+                                    memberBlockCode: item.memberBlockCode,
+                                    memberPanchayatCode: item.memberPanchayatCode,
+                                    memberPanchayatName: item.memberPanchayatName,
+                                    memberVillageCode: item.memberVillageCode,
+                                    memberVillageName: item.memberVillageName,
+                                    urn: item.urn,
+                                    familyID: item.familyID,
+                                    memberName: item.memberName,
+                                    memberGender: item.memberGender,
+                                    memberAge: item.memberAge,
+                                    schemeCode: $('#schemeCode').text(),
+                                    schemeName: $('#schNm').text()
+                                })
+                                // console.log(arrMembInfo);
+                                localStorage.setItem('MembInfo', JSON.stringify(arrMembInfo));
+                                // $('#AuthMode').show();
+                                $('#AuthDocument').show();
+                                $('#OnlineAadhNo').val(item.aadharnumber);
+
+                                $('#btnAuth').show();
+                                $('#divMobile').text(item.mobile);
+                                // clearDocument();
+                                getPrevPackageDetails();
+                            });
+                    },
+                    headerTemplate: function () {
+                        return $("<div>").prop("title", "Action").text("Select Patient");
+                    },
+                }
+            ]
+        });
+        SetSurgical();
+    }
+
+    // Verification member Part
+    function VerificationMember(ele) {
+        var dataRow = $('#grdFamilyDetails').DataTable().row($(ele).closest('tr')).data();
+        if ($("#iris").is(":checked")) {
+            $('#IrisModal').modal('show');
+            $("#btnAuthentication").hide();
+            discoverRDService();
+            //DeviceInfo();
+            currrentElement = ele;
+        }
+        if ($("#pos").is(":checked")) {
+            POSVerification(ele, dataRow.urn, dataRow.memberID);
+        }
+        if ($("#otp").is(":checked")) {
+            $('#txtopt').val('');
+            SendOTP(dataRow.aadharnumber);
+            currrentElement = ele;
+            $('#OTPModal').modal('show');
+            $("#Uid").val(dataRow.aadharnumber);
+        }
+        $('#VerifiedMemberId').val(dataRow.memberID);
+        $('#VerifiedMemberName').val(dataRow.memberName);
+    };
+
+    // Iris Device Ready or not Code
+    function discoverRDService() // Search for the valid RDService from port 11100 to 11120
+    {
+        var primaryUrl = "";
+        if (window.location.protocol != "https:") {
+            primaryUrl = "http://localhost"
+        }
+        else {
+            primaryUrl = "https://localhost"
+        }
+        document.getElementById("getrdresponse").innerHTML = primaryUrl;
+        var tempcount = 0;
+        url = "";
+        for (var i = 11100; i <= 11120; i++) {
+            var verb = "RDSERVICE";
+            var err = "";
+            var res;
+            $.support.cors = true;
+            var httpStaus = false;
+            var jsonstr = "";
+            var data = new Object();
+            var obj = new Object();
+            var xmlstr = '';
+            var RDurl = primaryUrl + ":" + i.toString();
+
+            $.ajax({
+                type: "RDSERVICE",
+                async: false,
+                crossDomain: true,
+                url: RDurl,
+                contentType: "text/xml; charset=utf-8",
+                processData: false,
+                cache: false,
+                async: false,
+                crossDomain: true,
+                success: function (data) {
+                    try {
+                        xmlstr = data.xml ? data.xml : (new XMLSerializer()).serializeToString(data);
+                        data = xmlstr;
+                        var xmlDoc = $.parseXML(data);
+                        console.log("decvice xmldoc-", xmlDoc);
+                        var $xml = $(xmlDoc);
+                        var Name = $xml.find('RDService').attr('status');
+                        var info = $xml.find('RDService').attr('info');
+                        $('#rdStatus').val(Name);
+                        $('#rdinfo').val(info);
+
+                        if ("Biomatiques Iris (Model: EPI-1000)" == info) {
+                            url = RDurl;
+                            i = 11130;;
+                        }
+
+                        if (Name == "READY") {
+                            $("#btnCapture").show();
+                        }
+
+                        httpStaus = true;
+                        res = { httpStaus: httpStaus, data: data };
+                        tempcount++;
+
+                    }
+                    catch (e) {
+                        //alert(e.Message);
+                    }
+                },
+                error: function (jqXHR, ajaxOptions, thrownError) {
+                    //    res = { httpStaus: httpStaus, err: getHttpError(jqXHR) };
+                }
+            });
+        }
+        return res;
+    }
+
+    // Iris Device information
+    function DeviceInfo() {
+        $('#getrdresponse').html('');
+        var urlinfo = url + "/BISPL/info";
+        document.getElementById("getrdresponse").innerHTML = urlinfo;
+        var verb = "DEVICEINFO";
+        var err = "";
+        var res;
+        $.support.cors = true;
+        var httpStaus = false;
+        var jsonstr = "";
+        var data = new Object();
+        var obj = new Object();
+        var xmlstr = '';
+        var RDurl = urlinfo;
+
+        $.ajax({
+            type: "DEVICEINFO",
+            async: false,
+            crossDomain: true,
+            url: RDurl,
+            contentType: "text/xml; charset=utf-8",
+            processData: false,
+            cache: false,
+            async: false,
+            crossDomain: true,
+            success: function (data) {
+                try {
+                    xmlstr = data.xml ? data.xml : (new XMLSerializer()).serializeToString(data);
+                    data = xmlstr;
+                    var xmlDoc = $.parseXML(data);
+                    console.log("xmldoc-", xmlDoc);
+                    var $xml = $(xmlDoc);
+                    var dpid = $xml.find('DeviceInfo').attr('dpId');
+                    var mi = $xml.find('DeviceInfo').attr('mi');
+                    var mc = $xml.find('DeviceInfo').attr('mc');
+                    $('#mi').val(mi);
+                    $('#mc').val(mc);
+                    $('#dpid').val(dpid);
+                    document.getElementById("getrdresponse").innerHTML = data;
+                    httpStaus = true;
+                    res = { httpStaus: httpStaus, data: data };
+                    tempcount++;
+
+                }
+                catch (e) {
+                    //Alert(e.Message);
+                }
+            },
+            error: function (jqXHR, ajaxOptions, thrownError) {
+                //    res = { httpStaus: httpStaus, err: getHttpError(jqXHR) };
+            }
+        });
+
+    }
+
+    // Iris Device Capture information
+    function Capture() {
+        /* alert("Click");*/
+        $('#getrdresponse').html('');
+
+        var val = '';
+        if (document.getElementById('rdProduction').checked) {
+            val = document.getElementById('rdProduction').value
+        }
+        else if (document.getElementById('rdStaging').checked) {
+            val = document.getElementById('rdStaging').value
+        }
+        //else{
+        //	alert("Please Select Option");
+        //}
+        var urlcapture = url + "/BISPL/capture";
+
+        var PIDOPTS = '<PidOptions ver=\"1.0\">' + '<Opts fCount=\"0\" fType=\"\" iCount=\"1\" iType=\"0\" pCount=\"\" pType=\"\" format=\"0\" pidVer=\"2.0\" timeout=\"15000\" otp=\"\" wadh=\"\" posh=\"\" env=\"' + val + '\"/>' + '</PidOptions>';
+        alert(PIDOPTS);
+
+        var verb = "CAPTURE";
+        var err = "";
+        var res;
+        $.support.cors = true;
+        var httpStaus = false;
+        var jsonstr = "";
+        var data = new Object();
+        var obj = new Object();
+        var xmlstr = '';
+        var RDurl = urlcapture;
+
+        $.ajax({
+            type: "CAPTURE",
+            async: false,
+            crossDomain: true,
+            url: RDurl,
+            contentType: "text/xml; charset=utf-8",
+            data: PIDOPTS,
+            processData: false,
+            cache: false,
+            async: false,
+            crossDomain: true,
+            success: function (data) {
+                try {
+                    xmlstr = data.xml ? data.xml : (new XMLSerializer()).serializeToString(data);
+                    data = xmlstr;
+                    var xmlDoc = $.parseXML(data);
+                    console.log("xmlCaptureDoc-", xmlDoc);
+                    var $xml = $(xmlDoc);
+                    var dpid = $xml.find('DeviceInfo').attr('dpId');
+                    var mi = $xml.find('DeviceInfo').attr('mi');
+                    var mc = $xml.find('DeviceInfo').attr('mc');
+                    var errorcode = $xml.find('Resp').attr('errCode');
+                    var errInfo = $xml.find('Resp').attr('errInfo');
+                    $('#mi').val(mi);
+                    $('#mc').val(mc);
+                    $('#dpid').val(dpid);
+                    $('#errCode').val(errorcode);
+                    $('#errInfo').val(errInfo);
+                    if (errInfo == $('#errCode').text()) {
+                        $("#btnAuthentication").show();
+                    }
+                    document.getElementById("getrdresponse").innerHTML = data;
+                    httpStaus = true;
+                    res = { httpStaus: httpStaus, data: data };
+                    tempcount++;
+
+                }
+                catch (e) {
+                    //Alert(e.Message);
+                }
+            },
+            error: function (jqXHR, ajaxOptions, thrownError) {
+                //    res = { httpStaus: httpStaus, err: getHttpError(jqXHR) };
+            }
+        });
+
+    }
+
+    // Iris Authentication
+    function IrisVerification(ele) {
+        var dataRow = $('#grdFamilyDetails').DataTable().row($(ele).closest('tr')).data();
+        $('#IrisModal').modal('show');
+        $("#btnAuthentication").hide();
+        discoverRDService();
+        //DeviceInfo();
+        currrentElement = ele;
+    }
+
+    // Iris Authentication
+    $('#btnAuthentication').click(function (event) {
+        swal({
+            title: "Alert", text: "Authentication Successfully",
+            confirmButtonColor: "#36A865",
+            confirmButtonText: "OK"
+        }).then(function () {
+            $('#IrisModal').modal('hide');
+            displayIRISSelectedRow(currrentElement, "ERROR");
+        });
+    });
+
+    function displayIRISSelectedRow(ele, result) {
+        if (result == "ERROR") {
+            var currentRow = $(ele).closest("tr");
+            currentRow.find("td:eq(7)").find('#btnIris').text("Not Verified");
+        }
+        if (result == "SUCCESS") {
+            var currentRow = $(ele).closest("tr");
+            currentRow.find("td:eq(7)").find('#btnIris').text("Verified");
+            $(ele).closest('tr').addClass('row_selected')
+            $('#verificationBlock').addClass('divdisable')
+        }
+
+    }
+
+    // Pos Verification Part
+    function POSVerification(ele) {
+        var dataRow = $('#grdFamilyDetails').DataTable().row($(ele).closest('tr')).data();
+        POSVerifyOrNot(ele, dataRow.urn, dataRow.memberID);
+    }
+
+    // Pos Verification Part
+    function POSVerifyOrNot(ele, urn, memberid) {
+        $.ajax({
+            url: ServiceURL + "/api/Common/CheckPosVerifyOrNot",
+            type: "get",
+            dataType: "json",
+            data: { urn: urn, memberID: memberid },
+            contentType: "application/json; charset=utf-8",
+            success: function (data) {
+                var currentRow = $(ele).closest("tr");
+                if (data) {
+                    var urnno = currentRow.find("td:eq(8)").find('#btnPOS').text("Verified");
+                    $(ele).closest('tr').addClass('row_selected')
+                    $('#verificationBlock').addClass('divdisable')
+                    $('#PackageDetails').show();
+                    $('#TreatmentType').addClass('divdisable');
+                }
+                else {
+                    currentRow.find("td:eq(8)").find('#btnPOS').text("Not Verified");
+                }
+            },
+            error: function (error) {
+                console.log(error.statusText);
+            }
+        });
+    }
+
+     // Send Otp
+    function OTPVerification(ele) {
+        var dataRow = $('#grdFamilyDetails').DataTable().row($(ele).closest('tr')).data();
+        $('#txtopt').val('');
+        SendOTP(dataRow.aadharnumber);
+        currrentElement = ele;
+        $('#OTPModal').modal('show');
+        $("#Uid").val(dataRow.aadharnumber);
+    }
+
+    // Send Otp Part
+    function SendOTP(aadharnumber) {
+        if (aadharnumber != "") {
+            $.ajax({
+                url: ServiceURL + "/api/Common/SendOTP?AadhaarNo=" + aadharnumber,
+                type: "POST",
+                processData: false,
+                contentType: false,
+                success: function (result) {
+                    console.log("otp", result);
+                    if (result.status == "SUCCESS") {
+                        sweetAlert('Alert', 'OTP Generated & Sent to Registred Mobile No. & e-mail ID!!');
+                        $('#Uid').val(aadharnumber);
+                        $('#txn').val(result.txn);
+                    }
+                    else if (result.status == "ERROR") {
+                        sweetAlert('Alert', 'Invalid Aadhaar Number or Aadhaar Server Not responding.!!');
+                    }
+                    else {
+                    }
+                },
+                error: function (error) {
+                    $('#divLoader').hide();
+                    console.log(error.statusText);
+                }
+            });
+        }
+    };
+
+    // Verification OTP Part
+    function VerifyOTP() {
+        var otpValue = $('#txtopt').val();
+        var Uid = $("#Uid").val();
+        var txn = $("#txn").val();
+        if (otpValue != "") {
+            var model = JSON.stringify({
+                uid: Uid,
+                consent: "",
+                subAuaCode: "",
+                txn: txn,
+                isBio: "",
+                isOTP: "",
+                bioType: "",
+                rdInfo: "",
+                rdData: "",
+                otpValue: otpValue
+            });
+            $.ajax({
+                url: ServiceURL + "/api/Common/OTPVerification",
+                type: "POST",
+                data: model,
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (result) {
+                    if (result == "SUCCESS") {
+                        $('#OTPModal').modal('hide');
+                        swal({
+                            title: "Alert",
+                            text: "OTP verified successfully!!",
+                            confirmButtonColor: "#36A865",
+                            confirmButtonText: "OK"
+                        }).then(function () {
+                            displayOTPSelectedRow(currrentElement, result);
+                        });
+                    }
+                    else if (result == "ERROR") {
+                        $('#OTPModal').modal('hide');
+                        swal({
+                            title: "Alert",
+                            text: "OTP Not verified !!",
+                            confirmButtonColor: "#36A865",
+                            confirmButtonText: "OK"
+                        }).then(function () {
+                            displayOTPSelectedRow(currrentElement, result);
+                        });;
+                    }
+                    else {
+                    }
+                },
+                error: function (error) {
+                    $('#divLoader').hide();
+                    console.log(error.statusText);
+                }
+            });
+        }
+    };
+
+    // Selected Verifiy Row
+    function displayOTPSelectedRow(ele, result) {
+        if (result == "ERROR") {
+            var currentRow = $(ele).closest("tr");
+            currentRow.find("td:eq(9)").find('#btnOTP').text("Not Verified");
+        }
+        if (result == "SUCCESS") {
+            var currentRow = $(ele).closest("tr");
+            currentRow.find("td:eq(9)").find('#btnOTP').text("Verified");
+            $(ele).closest('tr').addClass('row_selected');
+            $('#verificationBlock').addClass('divdisable');
+            $('#TreatmentType').addClass('divdisable');
+            $('#PackageDetails').show();
+        }
+    }
+
+    function ValidateNewPackage() {
+        if ($("#dlPackage").val() == "0") {
+            sweetAlert('Alert', 'Please select package from list!!');
+            $(this).focus();
+            //$("#dlPackage").focus();
+            return false;
+        }
+        else if ($("#txtpackageheader").val() == "") {
+            sweetAlert('Alert', 'Please select package header!!');
+            //$("#txtpackageheader").focus();
+            $(this).focus();
+            return false;
+        }
+        else if ($("#txtSubPackage").val() == "") {
+            sweetAlert('Alert', 'Please enter sub package name!!');
+            //$("#txtSubPackage").focus();
+            $(this).focus();
+            return false;
+        }
+        else if ($("#txtPackageDetails").val() == "") {
+            sweetAlert('Alert', 'Please enter package details!!');
+            //$("#txtPackageDetails").focus();
+            $(this).focus();
+            return false;
+        }
+        else if ($("#txtTreatCost").val() == "") {
+            sweetAlert('Alert', 'Treatment Cost should not be blank!!');
+            //$("#txtTreatCost").focus();
+            $(this).focus();
+            return false;
+        }
+        return true;
+    }
+
+    // Add Package
+    $("#btnAddPackage").click(function () {
+        if (ValidateNewPackage() != false) {
+            //debugger;
+            /* alert($("#tblPackageDtls > tbody > tr").length);*/
+            var recno = parseInt($("#tblPackageDtls > tbody > tr").length, 10) + 1;
+            var PackHeader = $("#txtpackageheader").val();//$('#dlPackage').find(":selected").text();
+            var SubPackage = $('#txtSubPackage').val();
+            var packageDtls = $("#txtPackageDetails").val(); //$('#dlPackageDtls').find(":selected").text();
+            var TreatCost = $("#txtTreatCost").val();
+            var TreatDays = $("#txtTreatDays").val();
+            var IsApprvRqr = $("#PackageApproveRequired").val();
+            var packid = $("#hdnCurrentPackheader").val();
+            var subpackid = $("#hdnSubpackId").val();
+            var packdtlsid = $("#hdnPackDtlsId").val();
+            var subpackcode = $("#hdnsubpackcode").val();
+            var procCode = $("#hdnProcCode").val();
+            var styType = $("#hdnstaytype").val();
+            var daycare = $("#hdndaycare").val();
+            //var packageCode = $('#PApackageHeader').find(":selected").val();
+            AddPackageHtml = "<tr><td>" + recno + "</td><td>" + PackHeader + "</td><td>" + SubPackage + "</td><td data-toggle='tooltip' data-placement='bottom' data-original-title='Tooltip on bottom' class='red-tooltip' title='" + packageDtls + "'>" + procCode + "</td><td class='total'>" + TreatCost + "</td><td>" + TreatDays + "</td><td>" + IsApprvRqr + "</td><td><button type='button' class='btn btn-outline-danger btndeletePck'><i class='fa fa-trash'></i></button><input type='hidden' class='clsPckId' value=" + packid + " /><input type='hidden' class='clsSubPckId' value=" + subpackid + " /><input type='hidden' class='clsPckdtlsId' value=" + packdtlsid + " /></td></tr>";
+
+            $("#tblPackageDtls").append(AddPackageHtml);
+            var d = {
+                "packagesubcategoryid": subpackid,
+                "packagesubcategorycode": subpackcode,
+                "packagesubcategoryname": SubPackage,
+                "procedureid": packdtlsid,
+                "procedurecode": procCode,
+                "procedurename": packageDtls,
+                //"hospitalcategoryid": 2,(From Login)
+                //"packagecategorytype": ,
+                "staytype": styType,
+                "daycare": daycare,
+                "noofdays": TreatDays,
+                "preauthstatus": IsApprvRqr,
+                "amountblocked": TreatCost,
+                //"PackageHeaderCode":,
+                "PackageHeaderName": PackHeader,
+                "PackageHeaderId": packid,
+            };
+            $('#PackageDetails').show();
+            $('#PackageGridDetails').show();
+            $('#AdmissionDetails').show();
+            /*$('#Verifieddetails').show();*/
+            //$("#dtActualAdmission").focus();
+            Pacakagedata.push(d);
+            console.log("parameter add", d);
+            console.log("Pacakagedata new", Pacakagedata);
+            console.log("AddPackageHtml new", AddPackageHtml);
+            calc_total();
+            ClearControls();
+        }
+    });
+
+    //
+    function ClearControls() {
+        $("#txtpackageheader").val('');
+        $('#txtSubPackage').val('');
+        $("#txtPackageDetails").val('');
+        $("#txtTreatCost").val(0);
+        $("#txtTreatDays").val(0);
+        $("#PackageApproveRequired").val('');
+        $("#txtpackageheader").focus();
+    }
+    //
+    function calc_total() {
+        var sum = 0;
+        $(".total").each(function () {
+            sum += parseFloat($(this).text());
+        });
+        $('#sum').text(sum);
+    }
+
+    //
+    function calc_totalView() {
+        var sum = 0;
+        $('.totblckamt').each(function () {
+            sum += parseFloat($(this).text());
+        });
+        $('#sump').text(sum);
+    }
+
+    //Remove selected package
+    $('#tblPackageDtls').on('click', '.btndeletePck', function () {
+        //debugger;
+        if (window.confirm('Are you sure you want to delete selected items？')) {
+            var $tr = $(this).closest('tr');
+            $(this).closest('tr').remove();
+            calc_total();
+        }
+    });
+
+    //Validation Parameter Value
+    function ValidateParamVal() {
+        //debugger;
+        if ($("#dlVitalParam").val() == "0") {
+            sweetAlert('Alert', 'Please select parameter name!!');
+            //$("#dlVitalParam").focus();
+            $(this).focus();
+            return false;
+        }
+        else if ($("#txtVtParamValue").val() == "") {
+            $("#txtVtParamValue").focus();
+            sweetAlert('Alert', 'Parameter value should not be blank!!');
+
+            //$("#txtVtParamValue").focus();
+            // $(this).focus();
+
+            return false;
+        }
+        return true;
+    }
+
+    //Add More VitalParam
+    $("#addMoreVitalParam").click(function () {
+        if (ValidateParamVal() != false) {
+            // debugger;
+            /* alert($("#tblVitalParam > tbody > tr").length);*/
+            var recno = parseInt($("#tblVitalParam > tbody > tr").length, 10) + 1;
+            var vitalname = $('#dlVitalParam').find(":selected").text();
+            var vtlParamVal = $("#txtVtParamValue").val();
+
+            var AddParamVal = "<tr><td>" + recno + "</td><td>" + vitalname + "</td><td>" + vtlParamVal + "</td><td><button type='button' onclick='removeVital(this)' class='btn btn-outline-danger focusedBtn btn-sm my-2 my-sm-0'><i class='fa fa-trash'></i></button></td></tr >";
+            $("#tblVitalParam").append(AddParamVal);
+
+            var d = { "vitalsignid": recno, "vitalsign": vitalname, "vitalvalue": vtlParamVal };
+            vitaldata.push(d);
+            console.log("parameter add", vitaldata)
+            $("#txtVtParamValue").val('');
+            $("#dlVitalParam").val(0);
+        }
+    });
+
+    //Remove Vital
+    function removeVital(ele) {
+        $(ele).closest('tr').remove();
+        var datarow = $(ele).closest('tr').data;
+        console.log(datarow);
+    }
+
+    // Block Package Insert
+    function BlockPackageSava(ele) {
+        if (window.confirm('Are you sure to block the package？')) {
+            var BlockPkgParams = JSON.stringify({
+                ACTIONCODE: 'A',
+                //Hospital Sections
+                HospitalCode: '@Session["HospitalCode"]',
+                HospitalName: '@Session["HospitalName"]',
+                MemberStateName: '@Session["Hospitalstate"]',
+                MemberStateCode: '@Session["HospitalStateCode"]',
+                HospitalAuthorityCode: '@Session["UserID"]',
+                MemberDistrictCode: $('#patientName').val(),
+                MemberDistrictName: $('#patientName').val(),
+                MemberBlockCode: $('#patientName').val(),
+                MemberBlockName: $('#patientName').val(),
+                MemberVillageName: $('#patientName').val(),
+                MemberVillageCode: $('#patientName').val(),
+
+                //Patient Informations
+                URN: $('#lblURNNo').text(),
+                MemberID: $('#spnPatientMemberId').text(),
+                AadhaarNo: $('#spnPatAadhar').text(),
+                policystartdate: $('#spnPolFrmDate').text(),
+                PolicyEndDate: $('#spnPolToDate').text(),
+                PatientName: $('#spnPatientName').text(),
+                PatientContactNumber: $('#txtPatientNo').val(),
+                PatientCardGender: $('#spnPatientGender').text(),
+                PatientCardAge: $('#spnPatientAge').text(),
+                Description: $('#txtDescription').val(),
+                Doctorname: $('#txtDoctorName').val(),
+                Doctorphno: $('#txtDrPhoneNo').val(),
+                // HeadMemberID: $('#patientName').val(),
+                // HeadMemberName: $('#patientName').val(),
+                mortality:'N',
+                mortalitysummary:'Not required',
+                Remarks: $('#txtBlockingremarks').text(),
+                AmoutBlocked: $('#sum').text(),
+                ReferalCode: $('#txtRefCode').val(),
+                OverrideCode: $('#txtOverrideCode').text(),
+                userID: '@Session["UserID"]',
+                DATEOFADMISSION: $('#dtActualAdmission').val(),
+                // IsMedSergical: $('#txtRefCode').text(),
+                // Vital Parameters
+                VitalParams: vitaldata,
+                // Package Parametes
+                Packageparametermodel: Pacakagedata
+
+            });
+            $.ajax({
+                url: ServiceURL + "/api/BlockPackage/addPatientBlockPackageInsertion",
+             type: "POST",
+                data: BlockPkgParams,
+             dataType: "json",
+             contentType: "application/json; charset=utf-8",
+             success: function (data) {
+                 console.log("", data);
+                 if (data == "1") {
+                      swal({title: "Block Package",text: "Save Successfully",type: "success"
+                         }).then(function () {
+                             window.location.href = '@Url.Action("ViewBlockPackage", "BlockPackage")';
+                         });
+                 }
+                 else if (data == "2") {
+                     swal({title: "Block Package", text: "Save Un Successfull", type: "Error"
+                     });
+                 }
+             },
+             error: function (error) {
+                 $('#divLoader').hide();
+                 console.log(error.statusText);
+             }
+        });
+        }
+    };
+
+    function AdmissionDetailsReset() {
+        $('#dtActualAdmission').val("");
+        $('#txtDoctorName').val("");
+        $('#txtDrPhoneNo').val("");
+        $('#txtPatientNo').val("");
+        $('#txtOverrideCode').val("");
+        $('#txtRefCode').val("");
+        $('#txtRefCode').val("");
+        $('#txtDescription').val("");
+        $('#txtBlockingremarks').val("");
+    }
+
+    </script>
+
+    <script>
+        if ($('#timer-countdown').length) {
+            //alert("ita working");
+            function countdown(elementName, minutes, seconds) {
+                var element, endTime, hours, mins, msLeft, time;
+                function twoDigits(n) {
+                    return (n <= 9 ? "0" + n : n);
+                }
+                function updateTimer() {
+                    msLeft = endTime - (+new Date);
+                    if (msLeft < 1000) {
+                        element.innerHTML = "Time is up!";
+                    } else {
+                        time = new Date(msLeft);
+                        hours = time.getUTCHours();
+                        mins = time.getUTCMinutes();
+                        element.innerHTML = (hours ? hours + ':' + twoDigits(mins) : mins) + ':' + twoDigits(time.getUTCSeconds());
+                        setTimeout(updateTimer, time.getUTCMilliseconds() + 500);
+                    }
+                }
+                element = document.getElementById(elementName);
+                endTime = (+new Date) + 1000 * (60 * minutes + seconds) + 500;
+                updateTimer();
+            }
+            countdown("timer-countdown", 5, 0);
+        }
+    </script>
+

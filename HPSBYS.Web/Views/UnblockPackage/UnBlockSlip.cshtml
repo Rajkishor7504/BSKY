@@ -1,0 +1,248 @@
+﻿@{
+    ViewBag.Title = "UnBlockSlip";
+}
+
+@using System.Configuration
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>TreatmentCompletionCertificate</title>
+    <!-- <link rel="stylesheet" href="~/css/style.css" /> -->
+    <link rel="stylesheet" href="~/css/print.css" />
+    <script src="~/js/jquery.min.js" type="text/javascript"></script>
+    <script src="~/js/popper.min.js" type="text/javascript"></script>
+</head>
+<body class="print_bg">
+
+    <div class="container page">
+        <div class="tm_invoice tm_style1 tm_type1">
+            <div class="tm_invoice_btns tm_hide_print row">
+                <div class="col-md-1 text-align-right">
+                    <a href="javascript:window.print()" class="tm_invoice_btn tm_color1" id="printbutton">
+                        <span class="tm_btn_icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512">
+                                <path d="M384 368h24a40.12 40.12 0 0040-40V168a40.12 40.12 0 00-40-40H104a40.12 40.12 0 00-40 40v160a40.12 40.12 0 0040 40h24" fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="32" />
+                                <rect x="128" y="240" width="256" height="208" rx="24.32" ry="24.32" fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="32" />
+                                <path d="M384 128v-24a40.12 40.12 0 00-40-40H168a40.12 40.12 0 00-40 40v24" fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="32" />
+                                <circle cx="392" cy="184" r="24" fill='currentColor' />
+                            </svg>
+                        </span>
+                        <span class="tm_btn_text">Print</span>
+                    </a>
+                </div>
+            </div>
+
+
+            <div class="tm_invoice_head tm_top_head tm_align_center">
+                <div class="tm_invoice_left">
+                    <div class="tm_logo"><img src="/imgs/logo.png"></div>
+                </div>
+            </div>
+
+            <div class="section-box">
+                <div class="section-info">
+                    <div class="hospital-name">
+                        <p style="text-align: center;text-align: center; margin: 0;font-size: 26px;"> Patient Slip </p>
+                    </div>
+
+                    <div style="text-align: center;margin-bottom: 20px;font-weight: 500;" id="Headinghospitalname"></div>
+
+                    <table>
+                        <tr>
+                            <td class="p-0" width="50%">
+                                <table>
+                                   
+                                    <tr>
+                                        <td class="font-weight-normal">
+                                            <h4 class="my-0">Invoice No.</h4>
+                                        </td>
+                                        <td> <span class="dot-p">:</span><label id="unblockinginvoicenumber"></label></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-weight-normal">
+                                            <h4 class="my-0">Case No</h4>
+                                        </td>
+                                        <td> <span class="dot-p">:</span><label id="caseno"></label> </td>
+                                    </tr>
+                                </table>
+                            </td>
+                            <td class="p-0 border-top" valign="top" width="50%">
+                                <table class="border_none">
+                                    <tr>
+                                        <td colspan="2">
+                                            <h4 class="my-0">Unblocking Transaction - <label id="unblockingTransaction"></label></h4>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-weight-normal">
+                                            <h4 class="my-0">Date & Time</h4>
+                                        </td>
+                                        <td> <span class="dot-p">:</span><label id="datetime"></label></td>
+                                    </tr>
+
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="section-box">
+                <div class="patent-brd">
+                    <table class="table brd_new border-bottom-0 p-3">
+                        <tbody border="0">
+                            <tr>
+                                <td class="font-weight-700" width="40%"> URN </td>
+                                <td width="50%" class="font-weight-400" id="urn"> </td>
+                            </tr>
+                            <tr>
+                                <td class="font-weight-700">Admitted Date</td>
+                                <td class="font-weight-400" id="admissiondate"></td>
+                            </tr>
+                            <tr>
+                                <td class="font-weight-700">Patient Name</td>
+                                <td class="font-weight-400" id="membername"></td>
+                            </tr>
+                            <tr>
+                                <td class="font-weight-700">Family Head Name </td>
+                                <td class="font-weight-400" id="headmembername"></td>
+                            </tr>
+                            <tr>
+                                <td class="font-weight-700">Family Relation </td>
+                                <td class="font-weight-400" id="familyrelation"></td>
+                            </tr>
+                            <tr>
+                                <td class="font-weight-700">Verifier Name</td>
+                                <td class="font-weight-400" id="unblockverifiedmembername"></td>
+                            </tr>
+
+
+                            <tr>
+                                <td class="font-weight-700">Verifier Relation</td>
+                                <td class="font-weight-400" id="verifierfamilyrelation"></td>
+                            </tr>
+                            <tr>
+                                <td class="font-weight-700">Package Code</td>
+                                <td class="font-weight-400" id="procedurecode"></td>
+                            </tr>
+                            <tr>
+                                <td class="font-weight-700">Amount Unblocked</td>
+                                <td class="font-weight-400" id="amountblocked"> </td>
+                            </tr>
+                            <tr>
+                                <td class="font-weight-700">Insufficient/Female Fund Amount</td>
+                                <td class="font-weight-400" id="insufficientamount"> </td>
+                            </tr>
+                            <tr>
+                                <td class="font-weight-700">Hospital Code</td>
+                                <td class="font-weight-400" id="hospitalcode"></td>
+                            </tr>
+                            <tr>
+                                <td class="font-weight-700">Hospital Authority Id</td>
+                                <td class="font-weight-400" id="hospitalauthoritycode"> </td>
+                            </tr>
+                            <tr>
+                                <td class="font-weight-700">Ward Name</td>
+                                <td class="font-weight-400" id="wardname"></td>
+                            </tr>
+                            <tr>
+                                <td class="font-weight-700">Implant</td>
+                                <td class="font-weight-400" id="implantdata"></td>
+                            </tr>
+                            <tr>
+                                <td class="font-weight-700">Highend Drug</td>
+                                <td class="font-weight-400" id="hed"></td>
+                            </tr>
+                            <tr>
+                                <td class="font-weight-700">Balance</td>
+                                <td class="font-weight-400" id="availablebalnce"></td>
+                            </tr>
+
+                           
+                        </tbody>
+                    </table>
+
+                    <div class="font-weight-700 auth-bg">
+                        <b class="text-success"> Authenticated By </b>  : <label class="font-weight-500 text-success" id="hospitalname"> </label>
+                    </div>
+                </div>
+            </div>
+
+           
+        </div>
+        </div>
+  
+
+    <script>
+        $("#printbutton").click(function () {
+            $("#printbutton").css("display", "none");
+        });
+    </script>
+
+</body>
+</html>
+<script>
+    ServiceURL = "@ConfigurationManager.AppSettings["ServiceURL"]";
+    console.log("url", ServiceURL);
+    $(document).ready(function () {
+        if (localStorage.getItem('InsertedUnbloackData') != null) {
+            var PackageInfo = JSON.parse(localStorage.getItem('InsertedUnbloackData'));
+            console.log('UnbloackData Data', PackageInfo);
+        }
+        var modeldata = JSON.stringify({
+            Action: 'C',
+            URN: PackageInfo.URN,
+            MemberId: PackageInfo.MemberId,
+            HospitalCode: PackageInfo.HospitalCode,
+            UNBLOCKINGINVOICENUMBER: PackageInfo.Invoiceno,
+        });
+        $.ajax({
+            url: ServiceURL + "/api/UnblockPackage/GetUnblockSlip",
+            type: "POST",
+            data: modeldata,
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            beforeSend: function () {
+                $("#loader").show();
+            },
+            success: function (response) {
+                console.log("Unblockslip", response);
+                $('#admissiondate').text(response[0].admissiondate);
+                $('#amountblocked').text(response[0].amountblocked);
+                $('#availablebalnce').text(response[0].availablebalnce);
+                $('#caseno').text(response[0].caseno);
+                $('#datetime').text(response[0].datetime);
+                $('#familyrelation').text(response[0].familyrelation);
+                $('#headmembername').text(response[0].headmembername);
+                $('#hed').text(response[0].hed);
+                $('#hospitalauthoritycode').text(response[0].hospitalauthoritycode);
+                $('#implantdata').text(response[0].implantdata);
+                $('#insufficientamount').text(response[0].insufficientamount);
+                $('#membername').text(response[0].membername);
+                $('#procedurecode').text(response[0].procedurecode);
+                $('#unblockingTransaction').text(response[0].unblockingTransaction);
+                $('#unblockinginvoicenumber').text(response[0].unblockinginvoicenumber);
+                $('#unblockverifiedmembername').text(response[0].unblockverifiedmembername);
+                $('#urn').text(response[0].urn);
+                $('#verifierfamilyrelation').text(response[0].verifierfamilyrelation);
+                $('#wardname').text(response[0].wardname);
+                $('#hospitalcode').text(response[0].hospitalcode);
+                $('#hospitalname').text(response[0].hospitalname);
+                $('#Headinghospitalname').text(response[0].hospitalname);
+            },
+            complete: function () {
+                $('#loader').hide();
+            },
+            failure: function (response) {
+                alert(response.d);
+            },
+            error: function (response) {
+                alert(response.d);
+            }
+        });
+    });
+</script>

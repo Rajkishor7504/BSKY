@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<configuration>
+  <connectionStrings>
+    <add name="DemoConectionString" connectionString="Integrated Security=SSPI;Persist Security Info=False;Initial Catalog=DemoDB;Data Source=LAPTOP-TD0BLMF2\SQLEXPRESS"/>
+  </connectionStrings>
+</configuration>

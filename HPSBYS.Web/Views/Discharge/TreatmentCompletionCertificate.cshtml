@@ -1,0 +1,511 @@
+﻿@using System.Configuration
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>TreatmentCompletionCertificate</title>
+    <script src="~/js/jquery.min.js" type="text/javascript"></script>
+    <script src="~/js/popper.min.js" type="text/javascript"></script>
+    <script src="~/js/bootstrap.min.js" type="text/javascript"></script>
+    <script src="~/js/jsgrid.min.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="~/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/style.css" />
+    <link rel="stylesheet" href="~/css/print.css" />
+    <link href="~/js/jsgrid-theme.min.css" rel="stylesheet" />
+    <link href="~/js/jsgrid.min.css" rel="stylesheet" />
+
+    <script type="text/javascript">
+        ServiceURL = "@ConfigurationManager.AppSettings["ServiceURL"]";
+    </script>
+    <script type="text/javascript">
+        if (localStorage.getItem('PrevBlockPackageInfo') != null) {
+            var PackageInfo = JSON.parse(localStorage.getItem('PrevBlockPackageInfo'));
+            var BlockPackageParams = {
+                HospitalCode: '@Session["HospitalCode"]',
+                Action: 'F',
+                URN: PackageInfo[0].urn,
+                BlockingINVOICENO: PackageInfo[0].invoiceNo,
+                TransactionID: PackageInfo[0].TransactionID
+            };
+            $.ajax({
+                url: ServiceURL + "/api/Registration/GetRegistrationInformationByInvoiceNo",
+                type: "GET",
+                data: BlockPackageParams,
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    if (data.length > 0) {
+
+                        arrPrevDisPackageInfo = [];
+                        for (var i = 0; i < data.length; i++) {
+                            arrPrevDisPackageInfo.push({
+                                IsMedSergical: data[i].isMedSergical,
+                                procedureCode: data[i].procedureCode,
+                                ProcedureName: data[i].procedureName,
+                                PackageName: data[i].packageName,
+                                PackageCode: data[i].packageCode,
+                                PackageCost: data[i].packageCost,
+                                AmoutBlocked: data[i].amoutBlocked,
+                                NoofDays: data[i].noofDays,
+                                InvoiceNo: data[i].invoiceNo,
+                                BlockingUserDate: data[i].blockingUserDate
+                            });
+                        }
+
+                        $('#jsGridPrevDis').jsGrid({
+                            width: "100%",
+                            sorting: true,
+                            autoload: true,
+                            controller: {
+                                loadData: function () {
+                                    var d = $.Deferred();
+                                    d.resolve($.map(arrPrevDisPackageInfo, function (item, itemIndex) {
+                                        return $.extend(item, { "Index": itemIndex + 1 });
+
+                                    }
+                                    ));
+
+                                    // d.resolve(arrPrevPackageInfo);
+                                    return d.promise();
+                                },
+                            },
+                            fields: [{ name: "Index", type: "text", width: "7%", title: "#Sl", align: "center" },
+                            { name: "ProcedureName", type: "text", width: "16%", title: "Procedure", align: "center" },
+                            { name: "PackageName", title: "Package", width: "auto", type: "text", align: "center" },
+                            //{ name: "PackageCode", title: "Package Code", width: "auto", type: "number", align: "center" },
+                            { name: "PackageCost", title: "Package Cost (Rs.)", width: "auto", type: "text", align: "center" },
+                            { name: "AmoutBlocked", title: "Amount Claimed (Rs.)", width: "auto", type: "text", align: "center" }
+                                //,{ name: "IsMedSergical", title: "Type", type: "80", width: "auto", align: "center" },
+                                // { name: "InvoiceNo", title: "Invoice No", width: "185", type: "text", align: "center" }
+                                , { name: "BlockingUserDate", title: "Blocking Date", width: "12%", type: "text", align: "center" }
+                                , { name: "", title: "Treatment complete or not (YES/NO)", type: "text", width: "auto", align: "center" },
+                            { name: "", title: "Name of the doctor", type: "text", width: "auto", align: "center" },
+                            { name: "", title: "Sign of treating doctor", type: "text", width: "auto", align: "center" },
+                            { name: "", title: "Period of stay in hospital", type: "text", width: "auto", align: "center" },
+                            { name: "", title: "Remarks", type: "text", width: "auto", align: "center" }
+                            ]
+                        });
+                    }
+                    else {
+                        $('#jsGridPrevDis').hide();
+                        $('#PrevBlkHeader').hide();
+                    }
+
+                },
+                error: function (error) {
+                    console.log(error.responseText);
+                }
+            });
+
+            var BlockPackageParams = {
+                HospitalCode: '@Session["HospitalCode"]',
+                Action: 'C',
+                URN: PackageInfo[0].urn,
+                BlockingINVOICENO: PackageInfo[0].invoiceNo,
+                TransactionID: PackageInfo[0].TransactionID
+            };
+            $.ajax({
+                url: ServiceURL + "/api/Registration/GetRegistrationInformationByInvoiceNo",
+                type: "GET",
+                data: BlockPackageParams,
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    if (data.length > 0) {
+                        $('#divBenNm').html("<b>"+data[0].memberName+"</b>");
+                        $('#divRegDt').html("<b>" + data[0].registrationDate + "</b>");
+                        $('#divURN').html("<b>" + data[0].urn + "</b>");
+                        $('#divDistrict').html("<b>" + data[0].memberDistrictName + "</b>");
+                        $('#divState').html("<b>" + data[0].memberStateName + "</b>");
+                        $('#divFamilyID').html(data[0].familyID);
+                        $('#divStatus').html(PackageInfo[0].PageStatus);
+                        $('#divPkgType').html("<b>" +data[0].isMedSergical+"</b>");
+                        $('#divBlkInvNo').html("<b>" +data[0].invoiceNo + "</b>");
+                        if ($('#divStatus').text() == 'A') {
+                            $('#DisSlip').hide();
+                            $('#AdSlip').show();
+                            $('#DisHosCopy').hide();
+                            $('#BlkHosCopy').show();
+                            $('#divDownWard').hide();
+                        }
+                        else {
+                            $('#AdSlip').hide();
+                            $('#DisSlip').show();
+                            $('#DisHosCopy').show();
+                            $('#BlkHosCopy').hide();
+                            $('#divDownWard').show();
+                        }
+                        var BalanceParams = {
+                            Action: 'R',
+                            URN: PackageInfo[0].urn,
+                            FamilyId: $('#divFamilyID').text()
+                        };
+                        $.ajax({
+                            url: ServiceURL + "/api/Common/GetAvailBalance",
+                            type: "GET",
+                            data: BalanceParams,
+                            dataType: "json",
+                            contentType: "application/json; charset=utf-8",
+                            success: function (result) {
+                                if (result != null) {
+                                    $('#divAvlBalance').html(result.availableBalance);
+                                    $('#divTotAmntBlk').html(result.amountBlocked);
+
+                                }
+                                else {
+                                    $('#divAvlBalance').html('NA');
+                                    $('#divTotAmntBlk').html('0');
+                                }
+                            },
+                            error: function (error) {
+                                console.log(error.responseText);
+                            }
+                        });
+                        arrPrevPackageInfo = [];
+                        for (var i = 0; i < data.length - 1; i++) {
+                            arrPrevPackageInfo.push({
+                                IsMedSergical: data[i].isMedSergical,
+                                procedureCode: data[i].procedureCode,
+                                ProcedureName: data[i].procedureName,
+                                PackageName: data[i].packageName,
+                                PackageCode: data[i].packageCode,
+                                PackageCost: data[i].packageCost,
+                                AmoutBlocked: data[i].amoutBlocked,
+                                NoofDays: data[i].noofDays,
+                                InvoiceNo: data[i].invoiceNo,
+                                BlockingUserDate: data[i].blockingUserDate
+                            });
+                        }
+
+                        $('#jsGridPrev').jsGrid({
+                            width: "100%",
+                            sorting: true,
+                            autoload: true,
+                            controller: {
+                                loadData: function () {
+                                    var d = $.Deferred();
+                                    d.resolve($.map(arrPrevPackageInfo, function (item, itemIndex) {
+                                        return $.extend(item, { "Index": itemIndex + 1 });
+
+                                    }
+                                    ));
+
+                                   // d.resolve(arrPrevPackageInfo);
+                                    return d.promise();
+                                },
+                            },
+                            fields: [{ name: "Index", type: "text", width: "7%", title: "#Sl", align: "center" },
+                            { name: "ProcedureName", type: "text", width: "16%", title: "Procedure", align: "center" },
+                            { name: "PackageName", title: "Package", width: "auto", type: "text", align: "center" },
+                            //{ name: "PackageCode", title: "Package Code", width: "auto", type: "number", align: "center" },
+                            { name: "PackageCost", title: "Package Cost (Rs.)", width: "auto", type: "text", align: "center" },
+                                { name: "AmoutBlocked", title: "Amount Claimed (Rs.)", width: "auto", type: "text", align: "center" }
+                            //,{ name: "IsMedSergical", title: "Type", type: "80", width: "auto", align: "center" },
+                                // { name: "InvoiceNo", title: "Invoice No", width: "185", type: "text", align: "center" }
+                            ,{ name: "BlockingUserDate", title: "Blocking Date", width: "12%", type: "text", align: "center" }
+                            ,{ name: "", title: "Treatment complete or not (YES/NO)", type: "text", width: "auto", align: "center"},
+                            { name: "", title: "Name of the doctor", type: "text", width: "auto", align: "center"},
+                            { name: "", title: "Sign of treating doctor", type: "text", width: "auto", align: "center" },
+                            { name: "", title: "Period of stay in hospital", type: "text", width: "auto", align: "center"},
+                                { name: "", title: "Remarks", type: "text", width: "auto", align: "center" }
+                            ]
+                        });
+                    }
+                },
+                error: function (error) {
+                    console.log(error.responseText);
+                }
+            });
+
+            var RegParams = {
+            Action: 'B',
+            InvoiceNo: PackageInfo[0].invoiceNo
+        };
+            $.ajax({
+           url: ServiceURL + "/api/Registration/GetPreviousAddOnPackageDetailsByInvoiceNo",
+           type: "GET",
+           data: RegParams,
+           dataType: "json",
+           contentType: "application/json; charset=utf-8",
+                success: function (data) {
+               arrAddOnPackage = [];
+               if (data.length > 0) {
+                   for (var i = 0; i < data.length; i++) {
+                       arrAddOnPackage.push({
+                           invoiceNo: PackageInfo[0].invoiceNo,
+                           procedureName: data[i].procedureName,
+                           procedureCode: data[i].procedureCode,
+                           categoryName: data[i].categoryName,
+                           categoryCode: data[i].categoryCode,
+                           packageName: data[i].packageName,
+                           packageCode: data[i].packageCode,
+                           blockingDate: data[i].blockingDate,
+                           blockingAmount: data[i].blockingAmount,
+                           actualAmount: data[i].blockingAmount
+
+                       });
+                   }
+                   if ($('#divStatus').text() == 'A') {
+                       $('#AddOnBlkHeader').hide();
+                   }
+                   else {
+                       $('#AddOnBlkHeader').show();
+                       $('#jsGridAddOn').jsGrid({
+                           height: "auto",
+                           width: "100%",
+                           sorting: true,
+                           paging: true,
+                           pageSize: 10,
+                           autoload: true,
+
+                           controller: {
+                               loadData: function () {
+                                   var d = $.Deferred();
+                                   //d.resolve(arrDischargePackageWithActueal);
+                                   //return d.promise();
+                                   d.resolve($.map(arrAddOnPackage, function (item, itemIndex) {
+                                       return $.extend(item, { "Index": itemIndex + 1 });
+                                   }
+                                   ));
+                                   return d.promise();
+                               }
+                           },
+                           fields: [
+                               { name: "Index", width: 50, type: "number", title: "#Sl", align: "center", filtering: false },
+                               { name: "invoiceNo", type: "text", title: "Blocking Invoice No.", align: "center",visible: false },
+                              
+                               { name: "procedureName", type: "text", title: "Procedure", align: "center" },
+                               { name: "procedureCode", type: "text", title: "Procedure Code", align: "center", visible: false },
+                               { name: "categoryName", type: "text", title: "Category", align: "center" },
+                               { name: "categoryCode", type: "text", title: "Category Code", align: "center", visible: false },
+                               { name: "packageName", type: "text", title: "Package Name", align: "center" },
+                               { name: "packageCode", type: "text", title: "Package Code", align: "center", visible: false },
+                               { name: "blockingAmount", type: "text", title: "Blocking Amount(Rs.)", align: "center" },
+                               { name: "actualAmount", type: "text", title: "Actual Amount(Rs.)", align: "center" },
+                                { name: "blockingDate", type: "text", title: "Blocking Date", align: "center" },
+                               { name: "", title: "Treatment complete or not (YES/NO)", type: "text",  align: "center" },
+                               { name: "", title: "Name of the doctor", type: "text", align: "center" },
+                               { name: "", title: "Sign of treating doctor", type: "text", align: "center" },
+                               { name: "", title: "Period of stay in hospital", type: "text", align: "center" },
+                               { name: "", title: "Remarks", type: "text",  align: "center" }
+                           ]
+                       });
+                   }
+
+               }
+               else {
+                   $('#AddOnBlkHeader').hide();
+               }
+           },
+           error: function (error) {
+               console.log(error.statusText);
+           },
+       });
+        }
+    </script>
+    <style type="text/css">
+        .yesPrint {
+            display: none;
+        }
+    </style>
+</head>
+
+<body class="print_bg">
+
+<div class="tm_container">
+   <div class="tm_invoice_btns tm_hide_print row">
+      <div class="col-md-1 text-align-right">
+      <a href="javascript:window.print()" class="tm_invoice_btn tm_color1" id="printbutton">
+        <span class="tm_btn_icon">
+          <svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><path d="M384 368h24a40.12 40.12 0 0040-40V168a40.12 40.12 0 00-40-40H104a40.12 40.12 0 00-40 40v160a40.12 40.12 0 0040 40h24" fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="32"/><rect x="128" y="240" width="256" height="208" rx="24.32" ry="24.32" fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="32"/><path d="M384 128v-24a40.12 40.12 0 00-40-40H168a40.12 40.12 0 00-40 40v24" fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="32"/><circle cx="392" cy="184" r="24" fill='currentColor'/></svg>
+        </span>
+        <span class="tm_btn_text">Print</span>
+      </a>
+      </div>
+    </div>
+   <div class="tm_invoice_wrap">
+     <div class="tm_invoice tm_style1 tm_type1">
+       <div class="tm_invoice_in">
+         <div class="tm_invoice_head tm_top_head tm_align_center">
+           <div class="tm_invoice_left">
+             <div class="tm_logo"><img src="~/imgs/logo.png"></div>
+           </div>
+           <div class="tm_invoice_right">
+           
+         <div class="tm_invoice_info left_sec">
+         <div class="tm_text" id="DisSlip">Discharge Slip </div>
+             <div class="tm_text" id="AdSlip">Admission Slip </div>
+            
+         </div>
+
+           <div class="left_sec">
+             <div class="tm_invoice_info_list ">
+             <div class="tm_invoice_number tm_m0">URN  No: <b id="divURN"> </b></div>
+             <div class="tm_invoice_date tm_m0">Slip Date: <b> @DateTime.Now.ToString("dd/MM/yyyy h:mm tt") </b></div>
+           </div>
+        </div>
+            
+           </div>
+           
+           <div class="tm_shape_bg tm_accent_bg_20"></div>
+         </div>
+
+           <div class="tm_card_note" id="DisHosCopy"><b> Discharge Slip: </b> Hospital Copy </div>
+           <div class="tm_card_note" id="BlkHosCopy"><b> Blocking slip: </b> Hospital copy</div>
+
+         <table class="table table_none">
+            <thead>
+               <tr>
+                  <th class="font-weight-normal" width="20%"> State </th>
+                  <th> <span class="dot_cl mr-3" width="30%"> : </span> <b id="divState"></b> </th>
+                  <th class="font-weight-normal" width="20%"> </span> Patient Name </th>
+                  <th> <span class="dot_cl mr-3" width="30%"> : </span> <b id="divBenNm"> </b> </th>
+                </tr>
+                <tr>
+                  <th class="font-weight-normal"> Hospital Code  </th>
+                  <th> <span class="dot_cl mr-3"> : </span> <b>  @Session["HospitalCode"] </b> </th>
+                  <th class="font-weight-normal"> District </th>
+                  <th><span class="dot_cl mr-3"> : </span> <b id="divDistrict"> </b> </th>
+                </tr>
+                <tr>
+                  <th class="font-weight-normal"> Hospital Name </th>
+                  <th> <span class="dot_cl mr-3"> : </span> <b> @Session["HospitalName"] </b> </th>
+                  <th class="font-weight-normal"> Registration Date  </th>
+                  <th><span class="dot_cl mr-3"> : </span> <b  id="divRegDt"></b> </th>
+                </tr>
+                <tr>
+                  <th class="font-weight-normal"> Package Type </th>
+                  <th> <span class="dot_cl mr-3"> : </span> <b id="divPkgType"> </b> </th>
+                  <th class="font-weight-normal"> Blocking Invoice No </th>
+                  <th> <span class="dot_cl mr-3"> : </span> <b id="divBlkInvNo"> </b> </th>
+                </tr>
+                <tr>
+                  <th class="font-weight-normal"> Download Referal(yes/no) </th>
+                  <th> <span class="dot_cl mr-3"> : </span> <b> (if Yes mention Institution Name) </b> </th>
+                </tr>
+
+                <tr id="divDownWard">
+                <th> <div id="divFamilyID" hidden> </div>  </th>
+                <th> <div id="divStatus" hidden> </div> </th>
+                
+                </tr>
+            </thead>
+            <tbody>
+
+         </tbody>
+         </table>
+         
+
+         <div class="tm_table tm_style1">
+
+          <table class="table table-striped">
+                 <thead>
+                   <tr>
+                     <th > SL No.</th>
+                     <th > Procedure </th>
+                     <th > Package </th>
+                     <th > Package Cost (Rs.)</th>
+                     <th > Amount Claimed </th>
+                     <th > Blocking Date </th>
+                     <th > Treatment Complete or Not(Yes/No) </th>
+                     <th > Name of the Doctor </th>
+                     <th > Sign of Treating Doctor </th>
+                     <th > Period of Stay in Hospital</th>
+                     <th > Remarks </th>
+                   </tr>
+                 </thead>
+                 <tbody>
+                   <tr>
+                     <td >1</td>
+                     <td > General Medicine </td>
+                     <td > Per Day Bed Category </td>
+                     <td >2100</td>
+                     <td > 02-Jan-2023</td>
+                     <td > N/A</td>
+                     <td > N/A</td>
+                     <td > N/A</td>
+                     <td > N/A</td>
+                     <td > N/A</td>
+                     <td > N/A</td>
+                   </tr>
+                   <tr>
+                     <td >1</td>
+                     <td > General Medicine </td>
+                     <td > Per Day Bed Category </td>
+                     <td >2100</td>
+                     <td > 02-Jan-2023</td>
+                     <td > N/A</td>
+                     <td > N/A</td>
+                     <td > N/A</td>
+                     <td > N/A</td>
+                     <td > N/A</td>
+                     <td > N/A</td>
+                   </tr>
+                   <tr>
+                     <td >1</td>
+                     <td > General Medicine </td>
+                     <td > Per Day Bed Category </td>
+                     <td >2100</td>
+                     <td > 02-Jan-2023</td>
+                     <td > N/A</td>
+                     <td > N/A</td>
+                     <td > N/A</td>
+                     <td > N/A</td>
+                     <td > N/A</td>
+                     <td > N/A</td>
+                   </tr>
+                   <tr>
+                     <td >1</td>
+                     <td > General Medicine </td>
+                     <td > Per Day Bed Category </td>
+                     <td >2100</td>
+                     <td > 02-Jan-2023</td>
+                     <td > N/A</td>
+                     <td > N/A</td>
+                     <td > N/A</td>
+                     <td > N/A</td>
+                     <td > N/A</td>
+                     <td > N/A</td>
+                   </tr>
+                 </tbody>
+               </table>
+
+          <!-- <div class="heading-pkg">
+                <h5  id="CurBlkHeader" class="noPrint">Current Active Package</h5>
+            </div>
+            <div class="table table-striped  packageTable" id="jsGridPrev"> </div>
+
+            <div class="heading-pkg">
+            <h5  id="PrevBlkHeader" class="noPrint">Package taken during Current Admission</h5>
+            </div>
+            <div class="table table-striped  packageTable" id="jsGridPrevDis"></div>
+
+          <div class="heading-pkg">
+            <h5  id="AddOnBlkHeader" class="noPrint">AddOn Blocked Package Details</h5>
+          </div>
+            <div class="table table-striped " id="jsGridAddOn"></div> -->
+
+           
+           </div>
+        
+         
+       </div>
+     </div>
+
+   
+   </div>
+ </div>
+
+ <script>
+ $("#printbutton").click(function () {
+    $("#printbutton").css("display", "none");
+});
+</script>
+
+</body>
+</html>

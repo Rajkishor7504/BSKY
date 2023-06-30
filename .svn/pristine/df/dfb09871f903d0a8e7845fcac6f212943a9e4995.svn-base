@@ -1,0 +1,2 @@
+2021-01-21 13:00:19.7763 ERROR System.NullReferenceException: Object reference not set to an instance of an object.
+   at HPSBYS.Web.Controllers.RegistrationController.GenerateOTPRequsetXml(String AadharNo) in D:\Ram\HPSBYS_1.2.0.0\HPSBYS.Web\Controllers\RegistrationController.cs:line 240

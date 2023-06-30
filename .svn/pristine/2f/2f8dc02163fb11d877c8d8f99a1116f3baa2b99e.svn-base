@@ -1,0 +1,26 @@
+﻿using HPSBYS.Data.Model;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Web.Http;
+using HPSBYS.Data.Services;
+using System.Threading.Tasks;
+using HPSBYS.WebAPI.Models;
+
+namespace HPSBYS.WebAPI.Controllers
+{
+    public class UnblockPackageController : ApiController
+    {       
+        [HttpPost]
+        public async Task<string> addPatientUnblockPackage(PatientInfo obj)
+        {
+            using (var PatientDataServices = new PatientDataServices())
+            {
+                return await Task.FromResult(PatientDataServices.addPatientUnblockPackage(obj));
+            }
+
+        }
+    }
+}

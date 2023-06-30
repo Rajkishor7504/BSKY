@@ -1,0 +1,205 @@
+﻿using HPSBYS.Data.Model;
+using HPSBYS.Data.Services;
+using HPSBYS.Web.Models;
+using NLog;
+using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.IO;
+using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Web;
+using System.Web.Mvc;
+using System.Web.Security;
+using System.Web.SessionState;
+
+namespace HPSBYS.Web.Controllers
+{
+    public class DashboardController : Controller
+    {
+
+        HttpClient client;
+        string ServiceURL = ConfigurationManager.AppSettings["ServiceURL"];
+        string WebURL = ConfigurationManager.AppSettings["ShortcutKeyURL"];
+        ILogger log = LogManager.GetCurrentClassLogger();
+        string result = string.Empty;
+        // GET: Dashboard
+        [HttpGet]
+        [SessionTimeOutFilter]
+        [Authorize]
+        public ViewResult Index()
+        {
+            return View();
+        }
+        [HttpGet]
+        public ViewResult PackageChangeIndex()
+        {
+            return View();
+        }
+        [HttpGet]
+        public ActionResult Login()
+        {
+            return View();
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public JsonResult ValidateLogin(FormCollection collection)
+        {
+            Login result = new Login();
+            if (collection["Captcha"] == Convert.ToString(Session["strCode"]))
+            {
+                Login LoginInfo = new Login
+                {
+                    USERNAME = collection["UserID"],
+                    Password = collection["Password"]
+                };
+                using (var obj = new CommonDataServices())
+                {
+                    result = obj.GetLogin(LoginInfo.USERNAME, LoginInfo.Password);
+                }
+
+                //client = new HttpClient();
+                //client.BaseAddress = new Uri(ServiceURL);
+                //client.DefaultRequestHeaders.Clear();
+                //client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));               
+                //    var sucSender = client.PostAsJsonAsync("/api/Common/GetLoginInformation", LoginInfo).Result;            
+                //if (sucSender.IsSuccessStatusCode == true)
+                //{
+                //  result = sucSender.Content.ReadAsAsync<Login>().Result;
+                FormsAuthentication.SetAuthCookie(LoginInfo.USERNAME, false);
+                Session["UserID"] = result.USERID;
+                Session["UserName"] = LoginInfo.USERNAME;
+                Session["HospitalName"] = result.HospitalName;
+                Session["HospitalDistName"] = result.HospitalDistName;
+                Session["HospitalCode"] = result.HospitalCode;
+                Session["RegBackMonth"] = result.RegBackMonth;
+                
+                if (Convert.ToInt32(result.LastUpdateDate) >= 6)
+                {
+                    Session["PwdUpdateStatus"] = true;
+                    return Json(105);
+                }
+                else
+                {
+                    Session["PwdUpdateStatus"] = false;
+                    return Json(result.STATUS);
+                }              
+            }
+            else
+            {
+                return Json("InvalidCaptcha");
+            }
+        }
+        [Authorize]
+        public ActionResult Logout()
+        {
+            LogoutCleanUp();
+            FormsAuthentication.SignOut();
+            return RedirectToAction("Login", "Dashboard");
+        }
+        [HttpGet]
+        public ViewResult ChangePassword()
+        {
+            return View();
+        }
+        [HttpGet]
+        public ViewResult SessionRedirect()
+        {
+            LogoutCleanUp();
+            return View();
+        }
+        [NonAction]
+        public void LogoutCleanUp()
+        {
+            Session.Clear();
+            Session.RemoveAll();
+            Session.Abandon();
+            Response.Cookies.Add(new HttpCookie("ASP.NET_SessionId", ""));
+        }
+        [HttpGet]
+        public ViewResult ViewLog()
+        {
+            return View();
+        }
+        [HttpGet]
+        public FileResult ReadLog(string Date, string Type)
+        {
+            string date = Convert.ToDateTime(Date).ToString("yyyy-MM-dd");
+            string file = string.Empty;
+            string fileNm = string.Empty;
+            string contentType = string.Empty;
+            if (Type == "W")
+            {
+                file = "/logs/" + date + ".txt";
+                fileNm = Server.MapPath("~" + file);
+                contentType = "text/plain";
+            }
+            return File(fileNm, contentType, Path.GetFileName(fileNm));
+        }
+        [HttpGet]
+        public ActionResult AddNotice()
+        {
+            return View();
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public JsonResult AddNotice(FormCollection collection)
+        {
+            string ActFileName = string.Empty;
+            string FileName = string.Empty;
+            if (Request.Files.Count > 0)
+            {
+                try
+                {
+                    HttpFileCollectionBase files = Request.Files;
+                    int Year = DateTime.Now.Year;
+                    string Month = DateTime.Now.ToString("MMMM");
+                   // string HopitalCode = Session["HospitalCode"].ToString();
+                    string dirUrl = "~/UploadDocument/"+ Year + "/" + Month + "/Notices";
+                    string dirPath = Server.MapPath(dirUrl);
+                    if (!Directory.Exists(dirPath))
+                    {
+                        Directory.CreateDirectory(dirPath);
+                    }
+                    var fileName = Path.GetFileName(files[0].FileName);
+                    var newGuid = Guid.NewGuid();
+                    string SubGuid = newGuid.ToString().Substring(0, 15);
+                    ActFileName = SubGuid + "_" + fileName;                   
+                    var path = Path.Combine(Server.MapPath(dirUrl), ActFileName);
+                    files[0].SaveAs(path);
+                }
+                catch (Exception ex)
+                {
+                    log.Error(ex);
+                    return Json("Error");
+
+                }
+            }
+            Notice notice = new Notice
+            {
+                StartDate = collection["StartDate"],
+                EndDate = collection["EndDate"],
+                Notices = collection["Notice"],
+                NoticeDocument = ActFileName,
+            };
+            using (PatientDataServices dataServices = new PatientDataServices())
+            {
+                result = dataServices.addNotice(notice);
+            }
+            if (result == "2")
+            {
+                return Json("sucess");
+            }
+            else
+            {
+                return Json("failed");
+            }
+        }
+        [HttpGet]
+        public ActionResult ViewNotice()
+        {
+            return View();
+        }
+    }
+}

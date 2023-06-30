@@ -1,0 +1,878 @@
+﻿
+@{
+    ViewBag.Title = "AdmissionList";
+    Layout = "~/Views/Shared/_CommonLayout.cshtml";
+}
+<style type="text/css">
+    tr.highlight td.jsgrid-cell {
+        background-color: lightgoldenrodyellow;
+    }
+
+    .jsgrid-grid-header,
+    .jsgrid-grid-body {
+        overflow: auto;
+    }
+</style>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#path').html('Registration');
+        $('#AuthDocumentOnline').hide();
+        $('#AuthDocument').hide();
+        $('#btnAuth').hide();
+        $('#AuthMode').hide();
+        $('#lblEnterOtp').hide();
+        $('#txtEnterOtp').hide();
+        $('#btnAuthenticate').hide();
+        $('#divAuth').hide();
+        $('#divDesc').hide();
+        var arrMembInfo = [];
+        var arrVerMembName = [];
+        var SchemeParams = {
+            Schemecode: '0'
+        };
+        $.ajax({
+            url: ServiceURL + "/api/Common/GetSchemeList",
+            type: "GET",
+            data: SchemeParams,
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            success: function (data) {
+                // console.log(data);
+                $('#schemeName').empty().append('<option selected="selected" value="0">--select--</option>');
+                $.each(data, function () {
+                    $('#schemeName').append($("<option></option>").val(this['schemeCode']).text(this['schemeName']));
+                });
+                $('#schemeName').val('7');
+                if (localStorage.getItem('schemeURN') != null) {
+                    var schemeURNInfo = JSON.parse(localStorage.getItem('schemeURN'));
+                    $('#schemeName').val(schemeURNInfo[0].Scheme);
+                    $('#urnNo').val(schemeURNInfo[0].URN);
+                    Search();
+                    localStorage.removeItem('schemeURN');
+                }
+            },
+            error: function (error) {
+                console.log(error.responseText);
+            }
+        });
+        $('#document').on('change', function (e) {
+            if (!ValidateFile('document', 'Valid Document')) {
+                return false;
+            };
+            if (!CheckFileType('document', '1')) {
+                return false;
+            };
+        });
+        $('#Photo').on('change', function (e) {
+            if (!ValidateFile('Photo', 'Valid Document')) {
+                return false;
+            };
+            if (!CheckFileType('Photo', '2')) {
+                return false;
+            };
+        });
+        $('#btnAuth').click(function () {
+            //if ($('#Offline').is(':checked')) {
+            if (1===1) {
+                if (RegistarionValidate()) {
+                    if (ValidateDoc()) {
+                        if (confirmation()) {
+                            $('#divLoader').show();
+                           // var document = $("#document").get(0);
+                           // var documentfiles = document.files;
+                            var Photo = $("#Photo").get(0);
+                            var Photofiles = Photo.files;
+                           //if (documentfiles.length > 0 && Photofiles.length > 0) {
+                             if (Photofiles.length > 0) {
+                                var fileData = new FormData();
+                                fileData.append("__RequestVerificationToken", gettoken());
+                               // fileData.append("document", documentfiles[0]);
+                                fileData.append("Photo", Photofiles[0]);
+                                fileData.append("URN", $('#urnNum').text());
+                                $.ajax({
+                                    url: '@Url.Action("AddRegisterDocument", "Registration")',
+                                    type: "POST",
+                                    data: fileData,
+                                    processData: false,
+                                    contentType: false,
+                                    success: function (result) {
+                                        $('#divLoader').hide();
+                                        // console.log(result);
+                                        //if (result.length == 2) {
+                                         if (result.length == 1) {
+                                            var arrRegisterInfo = [];
+                                            arrRegisterInfo.push({
+                                                AuthMode: 1,
+                                                //VerMembID: $("option:selected", $("#VerMembName")).val(),
+                                                VerMembID: 0,
+                                               // VerMembName: $("option:selected", $("#VerMembName")).text(),
+                                                VerMembName: 'NA',
+                                                DocType: $("#DocumentType").val(),
+                                               // Doc: result[0].File,
+                                                //Photo: result[1].File
+                                                Doc:'NA',
+                                                Photo: result[0].File,
+                                                Mobile:$('#divMobile').text(),
+                                            })
+                                            localStorage.setItem('RegisterInfo', JSON.stringify(arrRegisterInfo));
+                                            alert('Patient Registered Successfully !!');
+                                            window.location.href = '@Url.Action("Admission", "Registration")';
+                                         }
+                                    },
+                                    error: function (error) {
+                                        $('#divLoader').hide();
+                                        console.log(error.statusText);
+
+                                    }
+                                });
+                             }
+                        }
+                    }
+                }
+            }
+            else if ($('#Online').is(':checked')) {
+                if (confirmation()) {
+                    var arrRegisterInfo = [];
+                    arrRegisterInfo.push({
+                        AuthMode: 2,
+                        VerMembID: $("option:selected", $("#VerMembNameOnline")).val(),
+                        VerMembName: $("option:selected", $("#VerMembNameOnline")).text(),
+                        DocType: 1,
+                        Doc: $('#OnlineAadhNo').val(),
+                        Photo: 'NA'
+                    })
+                    localStorage.setItem('RegisterInfo', JSON.stringify(arrRegisterInfo));
+                    alert('Patient Registered Sucessfully !!');
+                    window.location.href = '@Url.Action("Admission", "Registration")';
+                }
+            }
+
+        });
+        $('#Online').click(function () {
+            $('#AuthDocumentOnline').show();
+            $('#AuthDocument').hide();
+            $('#btnAuth').hide();
+            clearDocument();
+        });
+        $('#Offline').click(function () {
+            $('#AuthDocumentOnline').hide();
+            $('#lblEnterOtp').hide();
+            $('#txtEnterOtp').hide();
+            $('#btnAuthenticate').hide();
+            $('#AuthDocument').show();
+            $('#btnAuth').show();
+        });
+        $('#sendOTP').click(function () {
+            if (validateOnlineAadhaar()) {
+                $('#divLoader').show();
+                $('#sendOTP').val('Resend OTP')
+                var fileData = new FormData();
+                fileData.append("__RequestVerificationToken", gettoken());
+                fileData.append("AadhaarNo", $('#OnlineAadhNo').val());
+                           $.ajax({
+                            url: '@Url.Action("generateOTP", "Registration")',
+                            type: "POST",
+                            data: fileData,
+                            processData: false,
+                            contentType: false,
+                               success: function (result) {
+                                   $('#divLoader').hide();
+                                   if (result == "Sucess") {
+                                       alert("OTP Generated & Sent to Registred Mobile No. & e-mail ID");
+                                       $('#lblEnterOtp').show();
+                                       $('#txtEnterOtp').show();
+                                       $('#txtEnterOtp').val('');
+                                       $('#btnAuthenticate').show();
+                                       $('#txtEnterOtp').show();
+                                   }
+                                   else if (result == "Failed") {
+                                       alert("Invalid Aadhaar Number or Aadhaar Server Not responding.");
+                                       $('#lblEnterOtp').hide();
+                                       $('#txtEnterOtp').hide();
+                                       $('#btnAuthenticate').hide();
+                                   }
+                                   else {
+                                       window.location.href = '@Url.Action("Login", "Dashboard")';
+                                       $('#lblEnterOtp').hide();
+                                       $('#txtEnterOtp').hide();
+                                       $('#btnAuthenticate').hide();
+                                   }
+                               },
+                               error: function (error) {
+                                   $('#divLoader').hide();
+                                   console.log(error.statusText);
+                               }
+                           });
+            }
+        });
+        $('#btnSearch').click(function () {
+            $('#btnAuth').hide();
+            Search();
+        });
+        $('#btnAuthenticate').click(function () {
+            if (ValidateOtp()) {
+            $('#divLoader').show();
+             var fileData = new FormData();
+                fileData.append("__RequestVerificationToken", gettoken());
+                fileData.append("Otp", $('#txtEnterOtp').val());
+                           $.ajax({
+                            url: '@Url.Action("OTPAuthRequest", "Registration")',
+                            type: "POST",
+                               data: fileData,
+                            processData: false,
+                            contentType: false,
+                               success: function (result) {
+                                   $('#divLoader').hide();
+                                   if (result == "Sucess") {
+                                       alert("Aadhaar Number Matched & Verified.");
+                                       $('#btnAuth').show();
+                                       $('#lblEnterOtp').hide();
+                                       $('#txtEnterOtp').hide();
+                                       $('#btnAuthenticate').hide();
+                                   }
+                                   else if (result == "Failed") {
+                                       alert("Aadhaar Number or OTP is mis-matching.");
+                                       $('#btnAuth').hide();
+                                   }
+                                   else {
+                                        window.location.href = '@Url.Action("Login", "Dashboard")';
+                                       $('#btnAuth').hide();
+                                   }
+                               },
+                               error: function (error) {
+                                   $('#divLoader').hide();
+                               console.log(error.statusText);
+                               }
+                           });
+            }
+        });
+        $('#VerMembNameOnline').change(function () {
+            var gridPackageInfo = $("#jsGrid").jsGrid("option", "data");
+            if (gridPackageInfo.length > 0)
+            {
+                for (var i = 0; i < gridPackageInfo.length; i++) {
+                    if ($('#VerMembNameOnline').val() == gridPackageInfo[i].memberID) {
+                        $('#OnlineAadhNo').val(gridPackageInfo[i].aadharnumber);
+                    }
+                }
+            }
+        });
+
+    });
+    function Search() {
+            $('#urnNum').text($('#urnNo').val());
+            var selectedRow;
+            var arrMembInfo = [];
+            if (Validate()) {
+                $('#schemeCode').html($("option:selected", $("#schemeName")).val());
+                $('#schNm').html($("option:selected", $("#schemeName")).text());
+                $('#DivSchemeCode').html($("option:selected", $("#schemeName")).val());
+                $('#jsGrid').jsGrid({
+                    width: "100%",
+                    sorting: true,
+                    paging: true,
+                    pageSize: 10,
+                    autoload: true,
+                    controller: {
+                        loadData: function () {
+                            var d = $.Deferred();
+                            var params = {
+                                Schemecode: $('#schemeName').val(),
+                                URN: $('#urnNo').val()
+                            };
+                            return $.ajax({
+                                url: ServiceURL + "/api/URN/GetURNList",
+                                type: "GET",
+                                data: params,
+                                dataType: "json",
+                                contentType: "application/json; charset=utf-8",
+                                error: function (error) {
+                                    console.log(error.statusText);
+                                },
+                            }).done(function (result) {
+                                if (!$.trim(result)) {
+                                    $('#divDistBlock').hide();
+                                    $('#AuthDocumentOnline').hide();
+                                    $('#AuthDocument').hide();
+                                    $('#btnAuth').hide();
+                                    $('#AuthMode').hide();
+                                    $('#btnAuthenticate').hide();
+                                }
+                                else {
+                                    var arrVerMembName = [];
+                                    var BalanceParams = {
+                                        Action: 'R',
+                                        URN: result[0].urn,
+                                        FamilyId: result[0].familyID
+                                    };
+                                    for (i = 0; i < result.length; i++) {
+                                        arrVerMembName.push({
+                                            memberName: result[i].memberName,
+                                            memberID: result[i].memberID
+                                        });
+                                    }
+                                    $('#VerMembName').empty().append('<option selected="selected" value="0">--select--</option>');
+                                    $.each(arrVerMembName, function () {
+                                        $('#VerMembName').append($("<option></option>").val(this['memberID']).text(this['memberName']));
+                                    });
+                                    $('#VerMembNameOnline').empty().append('<option selected="selected" value="0">--select--</option>');
+                                    $.each(arrVerMembName, function () {
+                                        $('#VerMembNameOnline').append($("<option></option>").val(this['memberID']).text(this['memberName']));
+                                    });
+                                    $('#divDistBlock').show();
+                                    $('#district').html(result[0].memberDistrict);
+                                    $('#block').html(result[0].memberBlock);
+                                    $('#startDt').html(result[0].policystartdate);
+                                    $('#EndDt').html(result[0].policyenddate);
+                                    $('#divDesc').show();
+                                    $.ajax({
+                                        url: ServiceURL + "/api/Common/GetAvailBalance",
+                                        type: "GET",
+                                        data: BalanceParams,
+                                        dataType: "json",
+                                        contentType: "application/json; charset=utf-8",
+                                        success: function (resultBal) {
+                                            if (resultBal != null) {
+                                                $('#AvailB').html(resultBal.availableBalance);
+
+                                            }
+                                            else {
+                                                $('#AvailB').html('NA');
+                                            }
+                                        },
+                                        error: function (error) {
+                                            console.log(error.responseText);
+                                        }
+                                    });
+                                }
+                                console.log(result);
+                                d.resolve($.map(result,
+                                    function (item, itemIndex) {
+                                        return $.extend(item, { "Index": itemIndex + 1 });
+                                    }
+                                ));
+                            });
+                        }
+                    },
+
+                    fields: [
+                        { name: "Index", width: "30", type: "number", title: "#Sl", align: "center", editing: false },
+                        { name: "policystartdate", title: "policystartdate", type: "text", visible: false },
+                        { name: "policyenddate", title: "policyenddate", type: "text", visible: false },
+                        { name: "memberID", title: "memberID", type: "number", visible: false },
+                        { name: "headMemberID", title: "headMemberID", type: "text", visible: false },
+                        { name: "hoh", title: "HeadOfFamily", type: "text", visible: false },
+                        { name: "memberBlock", title: "memberBlock", type: "text", visible: false },
+                        { name: "memberBlockCode", title: "memberBlockCode", type: "text", visible: false },
+                        { name: "memberPanchayatCode", title: "memberPanchayatCode", type: "text", visible: false },
+                        { name: "memberPanchayatName", title: "memberPanchayatName", type: "text", visible: false },
+                        { name: "memberVillageCode", title: "memberVillageCode", type: "text", visible: false },
+                        { name: "memberVillageName", title: "memberVillageName", type: "text", visible: false },
+                        { name: "memberDistrict", title: "District", type: "text", visible: false },
+                        { name: "memberDistrictCode", title: "DistrictCode", type: "number", visible: false },
+                        { name: "memberState", title: "State", type: "text", visible: false },
+                        { name: "memberStateCode", title: "memberStateCode", type: "number", visible: false },
+                        { name: "urn", type: "text", title: "HIMCARE No.", align: "center", editing: false },
+                        { name: "familyID", type: "text", title: "FamilyID", align: "center", editing: false, visible: false },
+                        { name: "memberName", type: "text", title: "Name", align: "center", editing: false },
+                        { name: "memberGender", type: "text", title: "Gender", align: "center", editing: false },
+                        { name: "memberAge", type: "number", title: "Age", align: "center", editing: false },
+                        { name: "mobile", type: "text", title: "Mobile", align: "center", editing: false, visible: false },
+                        { name: "adharcard", type: "text", title: "Aadharcard", align: "center", editing: false, visible: false },
+                        { name: "rationCardBackDoc", type: "text", title: "RationCard", align: "center", editing: false, visible: false },
+                        {
+                            type: "control", editButton: false, deleteButton: false, align: "center", name: "aadharnumber",
+                            itemTemplate: function (value, item) {
+                                return $("<a>").attr("href", "").text(value)
+                                    .on("click", function () {
+                                        var BaseUrl = item.memberDistrictCode + '/' + item.memberBlockCode + '/' + item.memberPanchayatCode + '/RationCard/' + item.adharcard;                                                                    
+                                        window.open("../Download.ashx?msg="+encodeURIComponent(BaseUrl), '_blank');
+                                       // window.open(AppURL + '/UploadDoc/'+item.memberDistrictCode+'/'+item.memberBlockCode+'/'+item.memberPanchayatCode+'/RationCard/' + item.adharcard, '_blank');
+                                       // alert(AppURL + '/UploadDoc/' + item.adharcard);
+                                        return false;
+                                    });
+                            },
+                            width: 100,
+                            headerTemplate: function () {
+                                return $("<div>").prop("title", "Action").text("Aadhaar Card No.");
+                            },
+                        },
+                        {
+                            type: "control", editButton: false, deleteButton: false, align: "center", name: "rationCardNumber",
+                            itemTemplate: function (value, item) {
+                                return $("<a>").attr("href", "").text(value)
+                                    .on("click", function () {
+                                        var BaseUrl = item.memberDistrictCode + '/' + item.memberBlockCode + '/' + item.memberPanchayatCode + '/RationCard/' + item.rationCardBackDoc;  
+                                        window.open("../Download.ashx?msg="+encodeURIComponent(BaseUrl), '_blank');
+                                       // alert(AppURL + '/UploadDoc/' + item.adharcard);
+                                        return false;
+                                    });
+                            },
+                            width: 100,
+                            headerTemplate: function () {
+                                return $("<div>").prop("title", "Action").text("Ration Card No.");
+                            },
+                        },
+                        // { name: "aadharnumber", type: "text", title: "Aadhaar Card Number", align: "center", editing: true },
+                       // { name: "rationCardNumber", type: "text", title: "Ration Card Number", align: "center", editing: true, },
+                        { type: "control", editButton: true, deleteButton: false, align: "center", visible: false },
+                        {
+                            type: "control", editButton: false, deleteButton: false, align: "center",
+                            itemTemplate: function (value, item) {
+                                return $("<button>").attr({ type: "button", class: "btn btn-outline-success focusedBtn btn-sm my-2 my-sm-0" }).text("Select")
+                                    .on("click", function () {
+                                        //#region "For highlighting a particular row by button click"
+                                        var $row = $("#jsGrid").jsGrid("rowByItem", item);
+                                        selectedRow = $("#jsGrid").find('table tr.highlight');
+                                        if (selectedRow.length) {
+                                            selectedRow.toggleClass('highlight');
+                                        };
+                                        $row.toggleClass("highlight");
+                                        //#endregion
+                                        arrMembInfo.push({
+                                            memberID: item.memberID,
+                                            hoh: item.hoh,
+                                            headMemberID: item.headMemberID,
+                                            memberDistrict: item.memberDistrict,
+                                            memberDistrictCode: item.memberDistrictCode,
+                                            memberState: item.memberState,
+                                            memberStateCode: item.memberStateCode,
+                                            memberBlock: item.memberBlock,
+                                            memberBlockCode: item.memberBlockCode,
+                                            memberPanchayatCode: item.memberPanchayatCode,
+                                            memberPanchayatName: item.memberPanchayatName,
+                                            memberVillageCode: item.memberVillageCode,
+                                            memberVillageName: item.memberVillageName,
+                                            urn: item.urn,
+                                            familyID: item.familyID,
+                                            memberName: item.memberName,
+                                            memberGender: item.memberGender,
+                                            memberAge: item.memberAge,
+                                            schemeCode: $('#schemeCode').text(),
+                                            schemeName: $('#schNm').text()
+                                        })
+                                        // console.log(arrMembInfo);
+                                        localStorage.setItem('MembInfo', JSON.stringify(arrMembInfo));
+                                       // $('#AuthMode').show();
+                                        $('#AuthDocument').show();
+                                        $('#OnlineAadhNo').val(item.aadharnumber);
+                                        //if ($('#Offline').is(':checked')) {
+                                        //    $('#AuthDocument').show();
+                                        //    $('#AuthDocumentOnline').hide();
+                                        //    $('#btnAuth').show();
+                                        //}
+                                        //else if ($('#Online').is(':checked')) {
+                                        //    $('#AuthDocument').hide();
+                                        //    $('#AuthDocumentOnline').show();
+                                        //}
+                                        // $("#Offline").prop("checked", true);
+                                        $('#btnAuth').show();
+                                        $('#divMobile').text(item.mobile);
+                                        clearDocument();
+                                    });
+                            },
+                            headerTemplate: function () {
+                                return $("<div>").prop("title", "Action").text("Select Patient");
+                            },
+
+
+                        }
+                    ]
+                });
+                //clearSearch();
+
+        }
+    }
+    function Validate() {
+        if ($('#schemeName').val() == 0) {
+            alert('Please Select Scheme Name!!!');
+            $('#schemeName').focus();
+            return false;
+        }
+        else if ($('#urnNo').val() == "") {
+            alert('Please Enter URN No!!!');
+            $('#urnNo').focus();
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+    function RegistarionValidate() {
+
+        var PolicyEndDate = new Date($('#EndDt').text());//policy end date
+        var todayDate = new Date().toUTCString();//current date
+        var getFullDate = todayDate.split(' ').slice(0, 4).join(' ');
+        var toDate = new Date(getFullDate);
+        if ((toDate - PolicyEndDate)>0) {
+            alert('Your Himcare Policy has been Expired , Please Renew Your Policy !!');
+            $('#EndDt').focus();
+            return false;
+        }
+        else if ($('#AvailB').text() == "0" || $('#AvailB').text() == "NA"||parseInt($('#AvailB').text())<0) {
+            alert('Your Available Card Balance is Zero or Negative, So you can not get Treatment through Himcare !!');
+            $('#AvailB').focus();
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+    function ValidateOtp() {
+        if ($('#txtEnterOtp').val() == "") {
+            alert('Please Enter Otp !!!');
+            $('#txtEnterOtp').focus();
+            return false;
+        }
+        else if ($('#txtEnterOtp').val().length < 6)
+        {
+            alert('Please Enter 6 digit Otp !!!');
+            $('#txtEnterOtp').focus();
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+    function ValidateDoc() {
+        //if ($('#VerMembName').val() == 0) {
+        //    alert('Please Select Verified Member Name!!!');
+        //    $('#VerMembName').focus();
+        //    return false;
+        //}
+       //else if ($('#DocumentType').val() == 0) {
+       //     alert('Please Select Document Type!!!');
+       //     $('#DocumentType').focus();
+       //     return false;
+       // }
+       // else if ($('#document').val() == "") {
+       //     alert('Please Select Document!!!');
+       //     $('#document').focus();
+       //     return false;
+       // }
+         if ($('#Photo').val() == "") {
+            alert('Please Select Photo!!!');
+            $('#Photo').focus();
+            return false;
+         }
+        else {
+            return true;
+         }
+    }
+    function clearSearch() {
+        $('#schemeName').val('0');
+        $('#urnNo').val('');
+    }
+    function clearDocument() {
+        $('#VerMembName').val('0');
+        $('#DocumentType').val('0');
+        $('#document').val('');
+        $('#Photo').val('');
+         var userImg = '@Url.Content("~/imgs/no_user.png")';
+        $("#showPhoto").attr("src", userImg);
+    }
+    function readURL(input) {
+         var userImg = '@Url.Content("~/imgs/no_user.png")';
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                var size = input.files[0].size;
+                if (size <= 200000) {
+                    $('#showPhoto')
+                        .attr('src', e.target.result);
+                }
+                else {
+                    $('#showPhoto')
+                        .attr('src', userImg);
+                }
+
+            };
+
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+    function confirmation() {
+        if (window.confirm("Are you sure for Register?")) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    function ValidateFile(cntr, strText) {
+
+        var strValue = $('#' + cntr).get(0).files.length;
+        if (strValue == "0") {
+            alert("Please upload " + strText);
+            return false;
+        }
+        else
+            return true;
+    }
+    function CheckFileType(cntr, ftype) {
+         var userImg = '@Url.Content("~/imgs/no_user.png")';
+        // Get the file upload control file extension
+        var extn = $('#' + cntr).val().split('.').pop().toLowerCase();
+        if (extn != '') {
+
+            // Create array with the files extensions to upload
+            var fileListToUpload;
+            if (parseInt(ftype) == 1)
+                fileListToUpload = new Array('pdf', 'jpg', 'jpeg');
+            else if (parseInt(ftype) == 2)
+                fileListToUpload = new Array('jpg', 'jpeg');
+            else
+                fileListToUpload = new Array('pdf');
+
+            //Check the file extension is in the array.
+            var isValidFile = $.inArray(extn, fileListToUpload);
+
+            // isValidFile gets the value -1 if the file extension is not in the list.
+            if (isValidFile == -1) {
+                if (parseInt(ftype) == 1) {
+                    alert('Please upload a valid document of type pdf/jpg/jpeg.!!!');
+                    $('#' + cntr).replaceWith($('#' + cntr).val('').clone(true));
+                    $('#' + cntr).focus();
+                }
+                else if (parseInt(ftype) == 2) {
+                    alert('Please upload a valid document of type jpg/jpeg.!!!');
+                    $('#showPhoto').attr('src', userImg);
+                    $('#' + cntr).replaceWith($('#' + cntr).val('').clone(true));
+                    $('#' + cntr).focus()
+                }
+                else {
+                    alert('Please Upload a valid document !!!');
+                    $('#' + cntr).replaceWith($('#' + cntr).val('').clone(true));
+                    $('#' + cntr).focus();
+
+                }
+            }
+            else {
+                // Restrict the file size to 2MB(1024 * 2048;)
+                if ($('#' + cntr).get(0).files[0].size > (200000))  {
+                    alert('Document size should not exceed 200KB.!!!');
+                    $('#' + cntr).replaceWith($('#' + cntr).val('').clone(true));
+                    $('#' + cntr).focus();
+                }
+                if ($('#' + cntr).get(0).files[0].name.length > 100) {
+                    alert('Document Name should be maximum 100 Characters !!!');
+                    $('#' + cntr).replaceWith($('#' + cntr).val('').clone(true));
+                    $('#' + cntr).focus();
+                }
+                else
+                    return true;
+            }
+        }
+        else
+            return true;
+    }
+    function isNumber(evt) {
+        evt = (evt) ? evt : window.event;
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+            return false;
+        }
+        return true;
+    }
+    function validateOnlineAadhaar() {
+        if ($('#VerMembNameOnline').val() == 0) {
+            alert('Please Select Verified Member Name !!');
+            $('#VerMembNameOnline').focus();
+            return false;
+        }
+        else if ($('#OnlineAadhNo').val()=="")
+        {
+            alert('Please Enter Aadhaar Card No. !!');
+            $('#OnlineAadhNo').focus();
+            return false;
+        }
+        else if ($('#OnlineAadhNo').val().length<12)
+        {
+            alert('Please Enter Valid 12 Digit Aadhaar Card No. !!');
+            $('#OnlineAadhNo').focus();
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+</script>
+<!-- Dashboard Body content part starts -->
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12 pb-3">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col">
+                            <form class="filter-wrapper">
+                                <div class="form-group row">
+                                    <label for="schemeName" class="col-sm-2 col-form-label">Scheme Name <b><span style="color:red">*</span></b></label>
+                                    <div class="col-sm-3">
+                                        <select class="form-control" id="schemeName" autofocus></select>
+                                        <span id="schemeCode" style="visibility:hidden"></span>
+                                    </div>
+                                    <label for="cardNo" class="col-sm-2 col-form-label">HIMCARE Number <b><span style="color:red">*</span></b></label>
+                                    <div class="col-sm-3">
+                                        <input type="text" class="form-control" autofocus id="urnNo" placeholder="Enter here" maxlength="17" onkeypress="return isNumber(event)" />
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <input type="button" id="btnSearch" value="Search" class="btn btn-outline-success my-2 my-sm-0" />
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div style="display: none;" id="divDistBlock">
+                        <div class="row py-3">
+                            <div class="col col-sm-1">Scheme Name</div>
+                            <div class="col col-sm-2"><strong id="schNm"></strong></div>
+                            <div id="DivSchemeCode" hidden></div>
+                            <div class="col col-sm-1">District</div>
+                            <div class="col col-sm-2"><strong id="district"></strong></div>
+                            <div class="col col-sm-1">Block</div>
+                            <div class="col col-sm-2"><strong id="block"></strong></div>
+                        </div>
+                        <div class="row py-3">
+                            <div class="col col-sm-1">Start Date</div>
+                            <div class="col col-sm-2"><strong id="startDt"></strong></div>
+                            <div class="col col-sm-1">End Date</div>
+                            <div class="col col-sm-2"><strong id="EndDt"></strong></div>
+                            <div class="col col-sm-1">Available Cover</div>
+                            <div class="col col-sm-2"><strong id="AvailB"></strong></div>
+                        </div>
+                    </div>
+                    <div style="color:red" id="divDesc">Note : Click on Ration Card Or Aadhaar Card Link to View The Document .</div>
+                    <div class="table table-striped table-bordered" id="jsGrid">
+                    </div>
+                        <div class="form-group row" id="AuthMode" hidden="hidden">
+                            <div class="col-sm2">
+                                <label class="form-check-label" for="AuthMode"><strong>Authentication Mode</strong></label>
+                            </div>
+                            <div class="col-sm-10">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="packageType" id="Online" value="Online">
+                                    <label class="form-check-label" for="Online"><strong>Online</strong></label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="packageType" id="Offline" value="Offline" checked>
+                                    <label class="form-check-label" for="Offline"><strong>Offline</strong></label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="alert alert-success" role="alert" hidden="hidden">
+                                <strong>Successfuly Authenticated!!!</strong> for Raghar Sharma, URN No. 02110600114046904
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                        </div>
+                    <div id="AuthDocument">
+                        @*@Html.Partial("_MembNamePartial")*@
+
+                        <div class="form-group row" hidden="hidden">
+                            <div id="urnNum" hidden="hidden"></div>
+                            <label for="packageHeader" class="col-sm-2 col-form-label">Document Type <b><span style="color:red">*</span></b></label>
+                            <div class="col-sm-2">
+                                <select name="" id="DocumentType" class="form-control">
+                                    <option value="0">--select--</option>
+                                    <option value="1">Aadhaar Card</option>
+                                    <option value="2">Pan Card</option>
+                                    <option value="3">Ration Card</option>
+                                    <option value="4">Voter ID</option>
+                                    <option value="5">Passport</option>
+                                    <option value="5">Driving License</option>
+                                </select>
+                            </div>
+                            <label for="packageHeader" class="col-sm-2 col-form-label">Document <b><span style="color:red">*</span></b></label>
+                            <div class="col-sm-2">
+                                <input type="file" id="document" class="" />
+                            </div>
+                        </div>
+                        <div class="form-group row" hidden="hidden">
+                            <div class="col-sm-2"></div>
+                            <div class="col-sm-2"></div>
+                            <div class="col-sm-2"></div>
+                            <div class="col-sm-3">
+                                <span style="font-weight: bold; color: Green">Max file size is 200KB</span>
+                                <br />
+                                <span style="font-weight: bold; color: Green">Only pdf/jpg/jpeg document allowed</span>
+                            </div>
+
+                        </div>
+                        <div class="form-group row">
+                            <label for="packageHeader" class="col-sm-2 col-form-label">Patient Photo <b><span style="color:red">*</span></b></label>
+                            <div class="col-sm-2">
+                                <input type="file" id="Photo" class="" onchange="readURL(this);" /><br />
+                                <span style="font-weight: bold; color: Green">Max file size is 200KB</span>
+                                <br />
+                                <span style="font-weight: bold; color: Green">Only jpg/jpeg document allowed</span>
+                            </div>
+                            <div class="col-sm-2">
+                                <img src="~/imgs/no_user.png" alt="" style="width: 150px;height:160px;" id="showPhoto" />
+                            </div>
+                            <div id="divMobile" hidden="hidden"></div>
+                        </div>
+                    </div>
+                    <div id="AuthDocumentOnline" hidden="hidden">
+                        <div class="form-group row">
+                            <label for="schemeName" class="col-sm-2 col-form-label">Verified Member Name <b><span style="color:red">*</span></b></label>
+                            <div class="col-sm-2">
+                                <select class="form-control" id="VerMembNameOnline"></select>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="Aadhaar" class="col-sm-2 col-form-label">AadhaarCard No <b><span style="color:red">*</span></b></label>
+                            <div class="col-sm-2">
+                                <input type="text" id="OnlineAadhNo" class="form-control" maxlength="12" />
+                            </div>
+                            <div class="col-sm-1">
+                                <input type="button" value="Send OTP" class="btn btn-outline-success btn-sm my-2 my-sm-0" id="sendOTP" />
+                            </div>
+                            <label for="Aadhaar" class="col-sm-2 col-form-label" id="lblEnterOtp">Enter received OTP </label>
+                            <div class="col-sm-2">
+                                <input type="text" maxlength="6" id="txtEnterOtp" onkeypress="return isNumber(event)" />
+                            </div>
+                            <div class="col-sm-2" id="divErrorMsg">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-right py-3" id="divAuthBtn">
+                        @*<input class="btn btn-outline-primary my-2 my-sm-0" type="button" id="btnAuthenticate" value="Authenticate" />*@
+                        <input class="btn btn-outline-success my-2 my-sm-0" type="button" id="btnAuth" value="Register" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="loader" id="divLoader" style="display:none">
+        <div class="center">
+            <img src="~/imgs/DataLoading.gif" alt="Loader..." />
+        </div>
+    </div>
+    <!-- Body content Ends here -->
+    <!-- START HERE: Admission confirmation modal content -->
+    <div class="modal fade" id="admissionConfirmation" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="alert text-danger" role="alert">
+                        Authentication failed, Do you want to still Continue?
+                    </div>
+                    <div class="text-right">
+                        <button type="button" class="btn btn-outline-secondary btn-sm" data-dismiss="modal">NO</button>
+                        <a href="admission.html" class="btn btn-outline-success btn-sm ml-1">YES</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- END HERE: Admission confirmation modal content -->
+        <script type="text/javascript">
+            $(function () {
+                $('.admission-btn').click(function () {
+                    $('#admissionConfirmation').modal();
+                });
+                $('.secondary-menu li a').tooltip();
+            });
+        </script>
+
+

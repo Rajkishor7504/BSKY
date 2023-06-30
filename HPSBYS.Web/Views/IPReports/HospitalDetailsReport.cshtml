@@ -1,0 +1,594 @@
+﻿@{
+    ViewBag.Title = "HospitalDetailsReport";
+    Layout = "~/Views/Shared/_CommonLayout.cshtml";
+}
+
+@*<h2>HospitalDetailsReport</h2>*@
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="clearfix"></div>
+
+                    <!-- Family Verification info -->
+                    <div class="form-box-bg mb-4">
+
+                        <ul class="nav nav-tabs custom-tab mb-4">
+                            @*<li class="nav-item">
+                                    <a class="nav-link" href="@Url.Action(" ViewBlockPackage","BlockPackage")">Add</a>
+                                </li>*@
+                            <li class="nav-item">
+                                <a class="nav-link active" href="@Url.Action("HospitalDetailsReport", "IPReports")">View</a>
+                            </li>
+                        </ul>
+                        <div class="col-md-12 p-0">
+                            <div class="form-row">
+                                <div class="col-lg-2">
+                                    <div class="mb-4">
+
+                                        <label class="pkg-label mb-1">Admission From Date :</label>
+                                        <input type="text" id="fromdate" class="form-control datepicker" />
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-2">
+                                    <div class="mb-4">
+                                        <label class="pkg-label mb-1">Admission To Date :</label>
+                                        <input type="text" id="todate" class="form-control datepicker" />
+                                    </div>
+                                </div>
+                                <div class="col-lg-2">
+                                    <div class="mb-4">
+                                        <label class="pkg-label mb-1">Gender :</label>
+                                        <select id="ddPatientGender" class="form-control form-group">
+                                            <option value="A">All</option>
+                                            <option value="M">Male</option>
+                                            <option value="F">Female</option>
+                                            <option value="O">Others</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-2">
+                                    <div class="mb-4">
+                                        <label class="pkg-label mb-1">Type :</label>
+                                        <select id="ddAdmissionDateType" class="form-control form-group">
+                                            <option value="A">Admission Date</option>
+                                            <option value="B">Blocking Date</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-2 d-flex justify-content-start align-items-center">
+                                    <input class="btn btn-outline-success" type="button" value="Search" id="btnSearch">
+                                </div>
+                            </div>
+                        </div>
+
+                        @*<div class="table-responsive mt-2">
+                                <table id="example2" class="table table-striped" style="width:100%">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">SL No</th>
+                                            <th scope="col">Hospital Name</th>
+                                            <th scope="col">Hospital Code</th>
+                                            <th scope="col">Admission</th>
+                                            <th scope="col">Blocking</th>
+                                            <th scope="col">Unblocking</th>
+                                            <th scope="col">Discharge</th>
+                                            <th scope="col">Pre-Auth</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>*@
+
+
+
+                        <!-- modal start -->
+                        <div class="modal fade wow fadeInUp animated" id="popModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-xl modal-dialog-scrollable" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <div class="row heading-pkg">
+                                            <h5 class="mb-0">@Session["HospitalName"]</h5>
+                                        </div>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="row">
+                                            <div class="col-6 heading-pkg">
+                                                <h5 id="popModalTitle" class="pkg-label mb-1"></h5>
+                                            </div>
+                                            @*<div class="col-6">
+                                                    <button id="btnExcel" type="button" class="btn btn-outline-success btn-sm float-right" data-toggle="tooltip" title="Export To Excel">
+                                                        <i class="fa fa-file-excel-o"></i>
+                                                    </button>
+                                                </div>*@
+                                        </div>
+                                        <p></p>
+                                        <div class="row">
+                                            <div class="col-12">
+                                                @*<table id="grdReportDetails" class="table table-striped" style="width:100%;">
+                                                        <thead>
+                                                            <tr>
+                                                                <th scope="col">SL No</th>
+                                                                <th scope="col">Member Name</th>
+                                                                <th scope="col">Admission</th>
+                                                                <th scope="col">Blocking</th>
+                                                                <th scope="col">Unblocking</th>
+                                                                <th scope="col">Discharge</th>
+                                                                <th scope="col">Pre-Auth</th>
+                                                            </tr>
+                                                        </thead>
+                                                    </table>*@
+
+                                                <table id="exlReportDetails"></table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- modal end -->
+                    </div>
+
+                    <!-- Admission Report -->
+                    <div class="form-box-bg mb-4">
+                        <div class="row">
+                            <div class="col-xl-12 col-lg-12 mb-3 heading-pkg border-bottom ">
+                                <div class="d-flex">
+                                    <div class="flex-fill">
+
+                                        <h5 id="Hospitalname"> @Session["HospitalName"] ( <span class="text-success h5 mb-3 mt-3"> @Session["HospitalCode"] </span>) </h5>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xl-12 col-md-12 col-sm-12">
+                                <div class="tab-admin">
+                                    <ul class="nav nav-tabs" role="tablist">
+                                        <li class="nav-item">
+                                            <a class="nav-link active" data-toggle="tab" href="#tabs-1" role="tab"> Admission <span id="admissioncountid" class="badge badge-light">0</span></a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" data-toggle="tab" href="#tabs-2" role="tab"> Blocking  <span id="blockcountid" class="badge badge-light"> 0 </span>  </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" data-toggle="tab" href="#tabs-3" role="tab"> Un-blocking <span id="unblockcountid" class="badge badge-light"> 0 </span>  </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" data-toggle="tab" href="#tabs-4" role="tab"> Discharge <span id="dischargecountid" class="badge badge-light"> 0 </span>  </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" data-toggle="tab" href="#tabs-5" role="tab"> Pre-Auth Pending <span id="preauthcountid" class="badge badge-light"> 0 </span>  </a>
+                                        </li>
+                                    </ul>
+
+                                    <div class="tab-content">
+
+                                        <div class="tab-pane active" id="tabs-1" role="tabpanel">
+                                            <!-- Admission Report -->
+                                            <div class="col-xl-12 col-lg-12 mt-3 heading-pkg ">
+                                                <div class="d-flex">
+                                                    <div class="flex-fill">
+                                                        <h5> Admission Report </h5>
+                                                    </div>
+                                                    <div>
+                                                        <button id="btnExcel" type="button" class="btn btn-outline-success btn-sm float-right" data-toggle="tooltip" title="Export To Excel">
+                                                            <i class="fa fa-file-excel-o"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="table-responsive">
+                                                <table id="grdReportDetails" class="table table-striped preauth-tbl" cellspacing="0" width="100%">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Sl No</th>
+                                                            <th>
+                                                                <div class="prehed-bold"> Member Details </div>
+                                                                <div class="prehed-small"> ID | Name </div>
+                                                            </th>
+
+                                                            <th>Gender</th>
+                                                            <th>Admission Date</th>
+                                                            <th>Case No</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>1</td>
+                                                            <td>
+                                                                <b class="text-success"> 59776523 </b>
+                                                                <div class="pre-bold"> Bibhu Jena </div>
+                                                            </td>
+
+                                                            <td>Male</td>
+                                                            <td> 16-May-23 </td>
+                                                            <td> CASE/27237006/16052023/005 </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>2</td>
+                                                            <td>
+                                                                <b class="text-success"> 59776523 </b>
+                                                                <div class="pre-bold"> Bibhu Jena </div>
+                                                            </td>
+
+                                                            <td>Male</td>
+                                                            <td> 16-May-23 </td>
+                                                            <td> CASE/27237006/16052023/005 </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>3</td>
+                                                            <td>
+                                                                <b class="text-success"> 59776523 </b>
+                                                                <div class="pre-bold"> Bibhu Jena </div>
+                                                            </td>
+
+                                                            <td>Male</td>
+                                                            <td> 16-May-23 </td>
+                                                            <td> CASE/27237006/16052023/005 </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>4</td>
+                                                            <td>
+                                                                <b class="text-success"> 59776523 </b>
+                                                                <div class="pre-bold"> Bibhu Jena </div>
+                                                            </td>
+
+                                                            <td>Male</td>
+                                                            <td> 16-May-23 </td>
+                                                            <td> CASE/27237006/16052023/005 </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <!-- Admission Report -->
+                                        </div>
+                                        <div class="tab-pane" id="tabs-2" role="tabpanel">
+
+                                            <div class="col-xl-12 col-lg-12 mt-3 heading-pkg ">
+                                                <div class="d-flex">
+                                                    <div class="flex-fill">
+                                                        <h5> Blocking Report </h5>
+                                                    </div>
+                                                    <div>
+                                                        <button id="btnExcel2" type="button" class="btn btn-outline-success btn-sm float-right" data-toggle="tooltip" title="Export To Excel">
+                                                            <i class="fa fa-file-excel-o"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Blocking Report -->
+                                            <div class="table-responsive">
+                                                <table id="grdReportDetails2" class="table table-striped preauth-tbl" cellspacing="0" width="100%">
+                                                    <thead>
+                                                        <tr>
+                                                            <th style="width:5% !important;">Sl No</th>
+                                                            <th style="width:10% !important;">URN</th>
+                                                            <th style="width:15% !important;">
+                                                                <div class="prehed-bold"> Member Details </div>
+                                                                <div class="prehed-small"> Name | Gender </div>
+                                                            </th>
+                                                            <th style="width:10% !important;">
+                                                                Package Details
+                                                                <div class="prehed-small"> Name | Code </div>
+                                                            </th>
+                                                            <th style="width:10% !important;"> Blocking Date </th>
+                                                            <th style="width:10% !important;"> Admission Date </th>
+                                                            <th style="width:15% !important;">Case No</th>
+                                                            <th style="width:10% !important;">Amount</th>
+                                                            <th style="width:10% !important;">Pre-auth Status</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>1</td>
+                                                            <td>02120610257</td>
+                                                            <td>
+                                                                <b class="text-success"> 59776523 </b>
+                                                                <div class="pre-bold"> Bibhu Jena </div>
+                                                                <div class="prehed-small"> Male </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="pre-bold"> Burns Management </div>
+                                                                <div> MC011A </div>
+                                                            </td>
+                                                            <td> 16-May-23 </td>
+                                                            <td> 16-May-23 </td>
+                                                            <td> CASE/27237006/16052023/005 </td>
+                                                            <td>
+                                                                <div class="pre-bold"> &#8377; 1,25,000 </div>
+                                                            </td>
+                                                            <td> <span class="badge badge-success badge-font"> Yes </span> </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>2</td>
+                                                            <td>02120610257</td>
+                                                            <td>
+                                                                <b class="text-success"> 59776523 </b>
+                                                                <div class="pre-bold"> Bibhu Jena </div>
+                                                                <div class="prehed-small"> Male </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="pre-bold"> Burns Management </div>
+                                                                <div> MC011A </div>
+                                                            </td>
+                                                            <td> 16-May-23 </td>
+                                                            <td> 16-May-23 </td>
+                                                            <td> CASE/27237006/16052023/005 </td>
+                                                            <td>
+                                                                <div class="pre-bold"> &#8377; 1,25,000 </div>
+                                                            </td>
+                                                            <td> <span class="badge badge-danger badge-font"> No </span> </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <!-- Blocking Report -->
+                                        </div>
+                                        <div class="tab-pane" id="tabs-3" role="tabpanel">
+                                            <div class="col-xl-12 col-lg-12 mt-3 heading-pkg ">
+                                                <div class="d-flex">
+                                                    <div class="flex-fill">
+                                                        <h5> Un-Blocking Report </h5>
+                                                    </div>
+                                                    <div>
+                                                        <button id="btnExcel3" type="button" class="btn btn-outline-success btn-sm float-right" data-toggle="tooltip" title="Export To Excel">
+                                                            <i class="fa fa-file-excel-o"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Un-Blocking Report -->
+                                            <div class="table-responsive">
+                                                <table id="grdReportDetails3" class="table table-striped preauth-tbl" cellspacing="0" width="100%">
+                                                    <thead>
+                                                        <tr>
+                                                            <th style="width:5% !important;">Sl No</th>
+                                                            <th style="width:10% !important;">URN</th>
+                                                            <th style="width:15% !important;">
+                                                                <div class="prehed-bold"> Member Details </div>
+                                                                <div class="prehed-small"> Name | Gender </div>
+                                                            </th>
+                                                            <th style="width:10% !important;">
+                                                                Package Details
+                                                                <div class="prehed-small"> Name | Code </div>
+                                                            </th>
+                                                            <th style="width:10% !important;"> Un-Blocking Date </th>
+                                                            <th style="width:10% !important;"> Admission Date </th>
+                                                            <th style="width:15% !important;">Case No</th>
+                                                            <th style="width:10% !important;">Amount</th>
+                                                            <th style="width:10% !important;">Pre-auth Status</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>1</td>
+                                                            <td>02120610257</td>
+                                                            <td>
+                                                                <b class="text-success"> 59776523 </b>
+                                                                <div class="pre-bold"> Bibhu Jena </div>
+                                                                <div class="prehed-small"> Male </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="pre-bold"> Burns Management </div>
+                                                                <div> MC011A </div>
+                                                            </td>
+                                                            <td> 16-May-23 </td>
+                                                            <td> 16-May-23 </td>
+                                                            <td> CASE/27237006/16052023/005 </td>
+                                                            <td>
+                                                                <div class="pre-bold"> &#8377; 1,25,000 </div>
+                                                            </td>
+                                                            <td> <span class="badge badge-success badge-font"> Yes </span> </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>2</td>
+                                                            <td>02120610257</td>
+                                                            <td>
+                                                                <b class="text-success"> 59776523 </b>
+                                                                <div class="pre-bold"> Bibhu Jena </div>
+                                                                <div class="prehed-small"> Male </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="pre-bold"> Burns Management </div>
+                                                                <div> MC011A </div>
+                                                            </td>
+                                                            <td> 16-May-23 </td>
+                                                            <td> 16-May-23 </td>
+                                                            <td> CASE/27237006/16052023/005 </td>
+                                                            <td>
+                                                                <div class="pre-bold"> &#8377; 1,25,000 </div>
+                                                            </td>
+                                                            <td> <span class="badge badge-danger badge-font"> No </span> </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <!-- Un-Blocking Report -->
+                                        <div class="tab-pane" id="tabs-4" role="tabpanel">
+
+                                            <div class="col-xl-12 col-lg-12 mt-3 heading-pkg ">
+                                                <div class="d-flex">
+                                                    <div class="flex-fill">
+                                                        <h5> Discharge Report </h5>
+                                                    </div>
+                                                    <div>
+                                                        <button id="btnExcel4" type="button" class="btn btn-outline-success btn-sm float-right" data-toggle="tooltip" title="Export To Excel">
+                                                            <i class="fa fa-file-excel-o"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Discharge Report -->
+                                            <div class="table-responsive">
+                                                <table id="grdReportDetails4" class="table table-striped preauth-tbl" cellspacing="0" width="100%">
+                                                    <thead>
+                                                        <tr>
+                                                            <th style="width:5% !important;">Sl No</th>
+                                                            <th style="width:10% !important;">URN</th>
+                                                            <th style="width:15% !important;">
+                                                                <div class="prehed-bold"> Member Details </div>
+                                                                <div class="prehed-small"> Name | Gender </div>
+                                                            </th>
+                                                            <th style="width:15% !important;">
+                                                                Package Details
+                                                                <div class="prehed-small"> Name | Code </div>
+                                                            </th>
+                                                            <th style="width:10% !important;"> Discharge Date </th>
+                                                            <th style="width:10% !important;"> Admission Date </th>
+                                                            <th style="width:15% !important;">Case No</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>1</td>
+                                                            <td>02120610257</td>
+                                                            <td>
+                                                                <b class="text-success"> 59776523 </b>
+                                                                <div class="pre-bold"> Bibhu Jena </div>
+                                                                <div class="prehed-small"> Male </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="pre-bold"> Burns Management </div>
+                                                                <div> MC011A </div>
+                                                            </td>
+                                                            <td> 16-May-23 </td>
+                                                            <td> 16-May-23 </td>
+                                                            <td> CASE/27237006/16052023/005 </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>2</td>
+                                                            <td>02120610257</td>
+                                                            <td>
+                                                                <b class="text-success"> 59776523 </b>
+                                                                <div class="pre-bold"> Bibhu Jena </div>
+                                                                <div class="prehed-small"> Male </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="pre-bold"> Burns Management </div>
+                                                                <div> MC011A </div>
+                                                            </td>
+                                                            <td> 16-May-23 </td>
+                                                            <td> 16-May-23 </td>
+                                                            <td> CASE/27237006/16052023/005 </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <!-- Discharge Report -->
+                                        </div>
+                                        <div class="tab-pane" id="tabs-5" role="tabpanel">
+
+                                            <div class="col-xl-12 col-lg-12 mt-3 heading-pkg ">
+                                                <div class="d-flex">
+                                                    <div class="flex-fill">
+                                                        <h5> Pre-Auth Report </h5>
+                                                    </div>
+                                                    <div>
+                                                        <button id="btnExcel5" type="button" class="btn btn-outline-success btn-sm float-right" data-toggle="tooltip" title="Export To Excel">
+                                                            <i class="fa fa-file-excel-o"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Pre-auth Report -->
+                                            <div class="table-responsive">
+                                                <table id="grdReportDetails5" class="table table-striped preauth-tbl" cellspacing="0" width="100%">
+                                                    <thead>
+                                                        <tr>
+                                                            <th style="width:5% !important;">Sl No</th>
+                                                            <th style="width:10% !important;">URN</th>
+                                                            <th style="width:15% !important;">
+                                                                <div class="prehed-bold"> Member Details </div>
+                                                                <div class="prehed-small"> Name | Gender </div>
+                                                            </th>
+                                                            <th style="width:15% !important;">
+                                                                Package Details
+                                                                <div class="prehed-small"> Name | Code </div>
+                                                            </th>
+                                                            <th style="width:10% !important;"> Request Date </th>
+                                                            <th style="width:10% !important;"> Admission Date </th>
+                                                            <th style="width:15% !important;">Case No</th>
+                                                            <th style="width:10% !important;">Amount</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>1</td>
+                                                            <td>02120610257</td>
+                                                            <td>
+                                                                <b class="text-success"> 59776523 </b>
+                                                                <div class="pre-bold"> Bibhu Jena </div>
+                                                                <div class="prehed-small"> Male </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="pre-bold"> Burns Management </div>
+                                                                <div> MC011A </div>
+                                                            </td>
+                                                            <td> 16-May-23 </td>
+                                                            <td> 16-May-23 </td>
+                                                            <td> CASE/27237006/16052023/005 </td>
+                                                            <td>
+                                                                <div class="pre-bold"> &#8377; 1,25,000 </div>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>2</td>
+                                                            <td>02120610257</td>
+                                                            <td>
+                                                                <b class="text-success"> 59776523 </b>
+                                                                <div class="pre-bold"> Bibhu Jena </div>
+                                                                <div class="prehed-small"> Male </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="pre-bold"> Burns Management </div>
+                                                                <div> MC011A </div>
+                                                            </td>
+                                                            <td> 16-May-23 </td>
+                                                            <td> 16-May-23 </td>
+                                                            <td> CASE/27237006/16052023/005 </td>
+                                                            <td>
+                                                                <div class="pre-bold"> &#8377; 1,25,000 </div>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <!-- Pre-auth Report -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="~/js/dtButtons.min.js"></script>
+<script src="~/js/jszip.min.js"></script>
+<script src="~/js/buttonsHtml5.min.js"></script>
+<script src="~/js/table2excel.min.js"></script>
+
+@*<script src="~/js/dtButtons.min.js"></script>
+    <script src="~/js/jszip.min.js"></script>
+    <script src="~/js/buttonsHtml5.min.js"></script>
+    <script src="~/js/table2excel.min.js"></script>*@
+
+<script>
+    document.mynamespace = {};
+    document.mynamespace.hospitalcode = '@HttpContext.Current.Session["HospitalCode"]';
+    var hospitalcode = document.mynamespace.hospitalcode;
+</script>
+@Scripts.Render("~/bundles/hospitaldetailsreport")
+

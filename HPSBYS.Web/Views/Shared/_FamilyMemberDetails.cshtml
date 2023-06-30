@@ -1,0 +1,480 @@
+﻿
+
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 d-flex px-0">
+    <div class="chkbox-bg">
+        <input type="radio" name="texteditor" id="iris" checked>
+        <label for="iris"> IRIS </label>
+    </div>
+    <div class="chkbox-bg">
+        <input type="radio" name="texteditor" id="pos">
+        <label for="pos"> POS </label>
+    </div>
+    <div class="chkbox-bg">
+        <input type="radio" name="texteditor" id="otp">
+        <label for="otp"> OTP</label>
+    </div>
+</div>
+<div class="table-responsive">
+    <table id="grdFamilyDetails" data-toggle="table" class="table table-bordered">
+    </table>
+</div>
+
+<!--OTP Modal -->
+<div class="modal fade" id="OTPModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog otpmodal" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel"> OTP Verification </h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-12" align="center">
+                        <div class="mb-4">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="col-form-label  mb-1"> OTP <b><span style="color:red">*</span></b></div>
+                                    <input type="text" class="form-control  mb-3" id="txtopt" placeholder="Enter OTP">
+                                    <input type="hidden" mb-3" id="Uid" />
+                                    <input type="button" class="btn btn-outline-success" value="Verify" onclick="VerifyOTP();">
+                                    <input type="button" class="btn btn-outline-danger" value="Cancel" data-dismiss="modal" aria-label="Close">
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="clearfix"></div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--IRIS Modal -->
+<div class="modal fade" id="IrisModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Authenticate</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-box-bg">
+                    <div class="row justify-content-center  customRadio customCheckbox">
+                        <div class="col-md-4">
+
+                            <div class="chkbox-bg active">
+                                <input type="radio" name="textEditor" id="prdouc" checked="">
+                                <label for="prdouc"> Prodouction </label>
+                            </div>
+
+                        </div>
+                        <div class="col-md-4">
+                            <div class="chkbox-bg">
+                                <input type="radio" name="textEditor" id="staging">
+                                <label for="staging"> Staging Server </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6 mt-4">
+                            <div class="mb-4">
+                                <div class="row">
+                                    <div class="col-md-5">
+                                        <div class="col-form-label">RD Service Status <b><span style="color:red">*</span></b></div>
+                                    </div>
+                                    <div class="col-md-7">
+                                        <div class="col-form-label">
+                                            <input type="text" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-5">
+                                        <div class="col-form-label">Device Info Path <b><span style="color:red">*</span></b></div>
+                                    </div>
+                                    <div class="col-md-7">
+                                        <div class="col-form-label">
+                                            <input type="text" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-5">
+                                        <div class="col-form-label"> Capture Path <b><span style="color:red">*</span></b></div>
+                                    </div>
+                                    <div class="col-md-7">
+                                        <div class="col-form-label">
+                                            <input type="text" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-5">
+                                        <div class="col-form-label">RD Service Info <b><span style="color:red">*</span></b></div>
+                                    </div>
+                                    <div class="col-md-7">
+                                        <div class="col-form-label">
+                                            <input type="text" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg mb-4">
+                                <div class="mb-4 border-bottom heading-pkg">
+                                    <h5> Capture Pid Data </h5>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-5">
+                                        <div class="col-form-label">Error Code <b><span style="color:red">*</span></b></div>
+                                    </div>
+                                    <div class="col-md-7">
+                                        <div class="col-form-label">
+                                            <input type="number" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-5">
+                                        <div class="col-form-label">Quality Service <b><span style="color:red">*</span></b></div>
+                                    </div>
+                                    <div class="col-md-7">
+                                        <div class="col-form-label">
+                                            <input type="text" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-5">
+                                        <div class="col-form-label"> Error Info <b><span style="color:red">*</span></b></div>
+                                    </div>
+                                    <div class="col-md-7">
+                                        <div class="col-form-label">
+                                            <input type="text" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 mt-4">
+                            <div class="mb-4">
+                                <div class="row">
+                                    <div class="col-md-5">
+                                        <div class="col-form-label"> dpid <b><span style="color:red">*</span></b></div>
+                                    </div>
+                                    <div class="col-md-7">
+                                        <div class="col-form-label">
+                                            <input type="text" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-5">
+                                        <div class="col-form-label"> dpid <b><span style="color:red">*</span></b></div>
+                                    </div>
+                                    <div class="col-md-7">
+                                        <div class="col-form-label">
+                                            <input type="text" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-5">
+                                        <div class="col-form-label"> do <b><span style="color:red">*</span></b></div>
+                                    </div>
+                                    <div class="col-md-7">
+                                        <div class="col-form-label">
+                                            <input type="text" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-5">
+                                        <div class="col-form-label"> mi <b><span style="color:red">*</span></b></div>
+                                    </div>
+                                    <div class="col-md-7">
+                                        <div class="col-form-label">
+                                            <input type="text" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-5">
+                                        <div class="col-form-label"> mc <b><span style="color:red">*</span></b></div>
+                                    </div>
+                                    <div class="col-md-7">
+                                        <div class="col-form-label">
+                                            <input type="text" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-5">
+                                        <div class="col-form-label"> dpid <b><span style="color:red">*</span></b></div>
+                                    </div>
+                                    <div class="col-md-7">
+                                        <div class="col-form-label">
+                                            <input type="text" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mt-2 mb-2 customCheckbox">
+                                    <input type="checkbox" id="RAW">
+                                    <label for="RAW">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text Lorem Ipsum is simply dummy text </label>
+
+                                </div>
+
+
+                                <input type="button" class="btn btn-outline-success" value="Captured">
+                                <input type="button" class="btn btn-outline-success" value="Authentication">
+                                <input type="button" class="btn btn-outline-primary" value="Reset">
+                                <input type="button" class="btn btn-outline-danger" value="Close">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="mb-4 border-bottom heading-pkg">
+                            <h5> Auth Request </h5>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="col-form-label">Aadhar UID <b><span style="color:red">*</span></b></div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="col-form-label">
+                                    <input type="text" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="col-form-label"> Response Result <b><span style="color:red">*</span></b></div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="col-form-label">
+                                    <input type="text" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="col-form-label"> Error code <b><span style="color:red">*</span></b></div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="col-form-label">
+                                    <input type="number" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="col-form-label"> Error Info <b><span style="color:red">*</span></b></div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="col-form-label">
+                                    <input type="text" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    if (localStorage.getItem('DischargePackage') != null) {
+        var PackageInfo = JSON.parse(localStorage.getItem('DischargePackage'));
+    }
+
+    // Display Family Details
+    var params = {
+        URN: PackageInfo[0].urn
+    };
+    $.ajax({
+        url: ServiceURL + "/api/URN/GetFamilyMemeberList",
+        type: "GET",
+        data: params,
+        dataType: "json",
+        contentType: "application/json; charset=utf-8",
+        success: function (response) {
+            console.log("FamilyDetails : -", response);
+            $("#grdFamilyDetails").DataTable({
+                processing: true,
+                bLengthChange: true,
+                lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                bFilter: true,
+                bSort: true,
+                bPaginate: false,
+                searching: false,
+                bInfo: false,
+                data: response,
+                columns: [
+                    { data: 'id', type: "text", title: "Sl#", align: "center", render: function (data, type, row, meta) { return meta.row + meta.settings._iDisplayStart + 1; } },
+                    { data: "memberID", type: "text", title: "Member Id", align: "center" },
+                    { data: "memberName", type: "text", title: "Name", align: "center" },
+                    { data: "memberGender", type: "text", title: "Gender", align: "center" },
+                    { data: "memberAge", type: "text", title: "Age", align: "center" },
+                    {
+                        data: "aadharnumber", type: "text", title: " Aadhar Card No ", align: "center", render: function (data, type, row, meta) {
+                            if (type === 'display') {
+                                var BaseUrl = response.memberDistrictCode + '/' + response.memberBlockCode + '/' + response.memberPanchayatCode + '/RationCard/' + response.adharcard;
+                                console.log("baseUrl : ", BaseUrl);
+                                data = '<a target="_blank" href="../Download.ashx?msg=""' + encodeURIComponent(BaseUrl) + '">' + data + '</a>';
+                            }
+                            return data;
+                        }
+                    },
+                    {
+                        data: "rationCardNumber", type: "text", title: " Ration Card No ", align: "center", render: function (data, type, row, meta) {
+                            if (type === 'display') {
+                                var BaseUrl = response.memberDistrictCode + '/' + response.memberBlockCode + '/' + response.memberPanchayatCode + '/RationCard/' + response.adharcard;
+                                console.log("baseUrl : ", BaseUrl);
+                                data = '<a target="_blank" href="../Download.ashx?msg=""' + encodeURIComponent(BaseUrl) + '">' + data + '</a>';
+                            }
+                            return data;
+                        }
+                    },
+                ],
+                columnDefs: [
+                    {
+                        targets: 7,
+                        data: null,
+                        title: "Verify Patient",
+                        orderable: false,
+                        defaultContent: "<button type='button' onclick='VerificationMember(this)' class='btn btn-success focusedBtn btn-sm my-2 my-sm-0'> Verification</button>"
+                    }]
+            });
+        },
+        failure: function (response) {
+            alert(response.d);
+        },
+        error: function (response) {
+            alert(response.d);
+        }
+    });
+
+    function VerificationMember(ele) {
+        var dataRow = $('#grdFamilyDetails').DataTable().row($(ele).closest('tr')).data();
+        console.log('dataRow', dataRow);
+
+        if ($("#iris").is(":checked")) {
+            $('#IrisModal').modal('show');
+        }
+        if ($("#pos").is(":checked")) {
+            POSVerification();
+        }
+        if ($("#otp").is(":checked")) {
+            SendOTP(dataRow.aadharnumber);
+            $('#OTPModal').modal('show');
+            $("#Uid").val(dataRow.aadharnumber);
+        }
+        $('#VerifiedMemberId').val(dataRow.memberID);
+        $('#VerifiedMemberName').val(dataRow.memberName);
+    };
+
+    function SendOTP(aadharnumber) {
+        alert("Send OTP");
+        if (aadharnumber != "") {
+            $.ajax({
+                url: ServiceURL + "/api/Common/SendOTP?AadhaarNo=" + aadharnumber,
+                type: "POST",
+                processData: false,
+                contentType: false,
+                success: function (result) {
+                    if (result == "SUCCESS") {
+                        alert("OTP Generated & Sent to Registred Mobile No. & e-mail ID");
+
+                        //$('#lblEnterOtp').show();
+                        //$('#txtEnterOtp').show();
+                        //$('#txtEnterOtp').val('');
+                        //$('#btnAuthenticate').show();
+                        //$('#txtEnterOtp').show();
+                    }
+                    else if (result == "ERROR") {
+                        alert("Invalid Aadhaar Number or Aadhaar Server Not responding.");
+                        //swal("Good job!", "You clicked the button!", "success");
+                        //$('#lblEnterOtp').hide();
+                        //$('#txtEnterOtp').hide();
+                        //$('#btnAuthenticate').hide();
+                    }
+                    else {
+
+                    }
+                },
+                error: function (error) {
+                    $('#divLoader').hide();
+                    console.log(error.statusText);
+                }
+            });
+        }
+    };
+
+    function VerifyOTP() {
+        var otpValue = $('#txtopt').val();
+        var Uid = $("#Uid").val();
+        alert(Uid);
+        if (otpValue != "") {
+            var model = JSON.stringify({
+                uid: Uid,
+                otpValue: otpValue,
+                consent: "",
+                subAuaCode: "",
+                txn: "",
+                isBio: "",
+                isOTP: "",
+                bioType: "",
+                rdInfo: "",
+                rdData: "",
+                otpValue: ""
+            });
+            $.ajax({
+                url: ServiceURL + "/api/Common/OTPVerification",
+                type: "POST",
+                data: model,
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (result) {
+                    if (result == "SUCCESS") {
+                        alert("OTP verified successfully");
+                    }
+                    else if (result == "ERROR") {
+                        alert("OTP Not verified.");
+                    }
+                    else {
+
+                    }
+                },
+                error: function (error) {
+                    $('#divLoader').hide();
+                    console.log(error.statusText);
+                }
+            });
+        }
+    };
+
+    function POSVerification() {
+        //alert("Pos");
+        swal("Good job!", "You clicked the button!", "success");
+        $.ajax({
+            url: ServiceURL + "/api/Common/POSVerificationStatus",
+            type: "GET",
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            success: function (data) {
+                swal("Good job!", "You clicked the button!", "success");
+                console.log("pos", data);
+            },
+            error: function (error) {
+                console.log(error.statusText);
+            }
+        });
+    }
+</script>

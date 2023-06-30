@@ -1,0 +1,246 @@
+﻿
+@{
+    ViewBag.Title = "ViewExtensionOfStay";
+    Layout = "~/Views/Shared/_CommonLayout.cshtml";
+}
+<style type="text/css">
+    .jsgrid-grid-header,
+    .jsgrid-grid-body {
+        overflow: auto;
+    }
+</style>
+<script type="text/javascript">
+     $(document).keydown(function (event) {
+        event = (event || window.event);
+         if ((event.keyCode == 49) && (event.shiftKey === true)) {
+             window.location.href = '@Url.Action("ViewBlockPackage", "BlockPackage")';
+        }
+         else if ((event.keyCode == 50) && (event.shiftKey === true)) {
+            window.location.href = '@Url.Action("ViewMultipleBlockPackage", "BlockPackage")';
+        }
+        else if ((event.keyCode == 51) && (event.shiftKey === true)) {
+                window.location.href = '@Url.Action("PreAuthorizationDetails", "PreAuthorization")';
+         }
+          else if ((event.keyCode == 52) && (event.shiftKey === true)) {
+            window.location.href = '@Url.Action("ViewExtensionOfStay", "ExtensionOfStay")';
+        }
+    });
+    $(document).ready(function () {
+        $('#path').html('Extension Of Stay');
+        var arrMembInfo = [];
+        var SchemeParams = {
+            Schemecode: '0'
+        };
+        $.ajax({
+            url: ServiceURL + "/api/Common/GetSchemeList",
+            type: "GET",
+            data: SchemeParams,
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            success: function (data) {
+                // console.log(data);
+                $('#schemeName').empty().append('<option selected="selected" value="0">--select--</option>');
+                $.each(data, function () {
+                    $('#schemeName').append($("<option></option>").val(this['schemeCode']).text(this['schemeName']));
+                });
+                $('#schemeName').val('7').focus();
+            },
+            error: function (error) {
+                console.log(error.responseText);
+            }
+        });
+        BindGrid();
+        $('#ddlRows').change(function () {
+            if ($("option:selected", $("#ddlRows")).val() == '1') {
+                $("#jsGrid").jsGrid({ pageSize: 10 });
+            }
+            else if ($("option:selected", $("#ddlRows")).val() == '2') {
+                $("#jsGrid").jsGrid({ pageSize: 20 });
+            }
+            else if ($("option:selected", $("#ddlRows")).val() == '3') {
+                $("#jsGrid").jsGrid({ pageSize: 50 });
+            }
+            else if ($("option:selected", $("#ddlRows")).val() == '4') {
+                $("#jsGrid").jsGrid({ pageSize: 100 });
+            }
+            else if ($("option:selected", $("#ddlRows")).val() == '5') {
+                $("#jsGrid").jsGrid({ pageSize: 200 });
+            }
+            else if ($("option:selected", $("#ddlRows")).val() == '6') {
+                $("#jsGrid").jsGrid({ pageSize: 500 });
+            }
+        });
+        $('#btnSearch').click(function () {
+            if (Validate() == true) {
+                BindGrid();
+            }
+        });
+
+    });
+    function BindGrid() {
+        var arrBlockPackage = [];
+         $('#jsGrid').jsGrid({
+            width: "100%",
+            sorting: true,
+            paging: true,
+             pageSize: 10,
+             pagerFormat: "Pages: {first} {prev} {pages} {next} {last} &nbsp;&nbsp; {pageIndex} of {pageCount} &nbsp;&nbsp; Total rows: {itemCount}",
+            //filtering: true,
+            autoload: true,
+            controller: {
+                loadData: function (filter) {
+                    var d = $.Deferred();
+                    var RegParams = {
+                        Scheme: $('#schemeName').val(),
+                        URN: $('#urnNo').val(),
+                        HospitalCode: '@Session["HospitalCode"]'
+                    };
+                    return $.ajax({
+                        url: ServiceURL + "/api/Registration/GetPackageExtension",
+                        type: "GET",
+                        data: RegParams,
+                        dataType: "json",
+                        contentType: "application/json; charset=utf-8",
+                        error: function (error) {
+                            console.log(error.statusText);
+                        },
+                    }).done(function (result) {
+                         //console.log(result);
+                        if (result.length > 0) {
+                            $('#divRowCount').show();
+                            d.resolve($.map(result, function (item, itemIndex) {
+                                return $.extend(item, { "Index": itemIndex + 1 });
+                            }
+                            ));
+                        }
+                        else {
+                            $('#divRowCount').hide();
+                        }
+                        });
+                    return d.promise();
+                }
+            },
+             fields: [
+                    { name: "Index", type: "number", title: "#Sl", align: "center",width:20 },
+                 { name: "transactionId", title: "TransactionId", type: "number", visible: false },
+                 { name: "schemeCode", title: "schemeCode", type: "text", visible: false },
+                 //{ name: "headMemberID", title: "headMemberID", type: "text", visible: false },
+                 { name: "headMemberName", title: "headMemberName", type: "text", visible: false },
+                 { name: "urn", type: "text", title: "URN No.", align: "center" },
+                 { name: "patientName", type: "text", title: "Patient Name", align: "center" },
+                 { name: "packageName", type: "text", title: "Package Name", align: "center"},
+                 { name: "dateofadmission", type: "text", title: "Block Package Date", align: "center" },
+                 { name: "blockingInvoiceNo", title: "invoiceNo", type: "text", align: "center" },
+                 { name: "gender", type: "number", title: "Gender", align: "center" },
+                 //{ name: "patientContactNumber", type: "number",title: "Contact Number", align: "center" },
+                 {
+                     type: "control", editButton: false, deleteButton: false, align: "center", width: 83 , /*visible: false,*/
+                        itemTemplate: function (value,item) {
+                            return $("<button>").attr({ type: "button", class: "btn btn-outline-success focusedBtn btn-sm my-2 my-sm-0" }).text("Request for Extension Of Stay")
+                                .on("click", function () {
+                                    arrBlockPackage.push({
+                                        schemeCode: item.schemeCode,
+                                        urn: item.urn,
+                                        cardNo: item.cardNo,
+                                        PatientNm: item.patientName,
+                                        Packagenm: item.packageName,
+                                        invoiceNo: item.blockingInvoiceNo,
+                                        BlockPackageDate: item.dateofadmission,
+                                        Gender: item.headMemberID,
+                                        TransactionId: item.transactionId
+                                    })
+                                    localStorage.setItem('ExtensionOfStayInfo', JSON.stringify(arrBlockPackage));
+                                  window.location.href = '@Url.Action("AddExtensionOfStayDetails", "ExtensionOfStay")';
+                                });
+                        },
+                        headerTemplate: function () {
+                            return $("<div>").prop("title", "Action").text("Action");
+                        }
+                    }
+                ]
+                });
+    }
+    function Validate() {
+        if ($("#schemeName").val() == 0) {
+            alert("Please Select ShemeName!");
+            $("#schemeName").focus();
+            return false;
+        }
+        else if ($("#urnNo").val() == 0) {
+            alert("Please Select URN Number!");
+            $("#urnNo").focus();
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+</script>
+<script type="text/javascript">
+
+</script>
+<!-- Dashboard Body content part starts -->
+<div class="container-fluid">
+    <ul class="nav nav-tabs custom-tab pl-4">
+        <li class="nav-item">
+            <a class="nav-link" href="@Url.Action("ViewBlockPackage", "BlockPackage")">New Registration</a>
+        </li>
+        @*<li class="nav-item">
+            <a class="nav-link" href="@Url.Action("ViewMultipleBlockPackage", "BlockPackage")">Blocked Package</a>
+        </li>*@       
+        <li class="nav-item">
+            <a class="nav-link" href="@Url.Action("PreAuthorizationDetails", "PreAuthorization")">PreApproval Request</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link active" href="@Url.Action("ViewExtensionOfStay", "ExtensionOfStay")">Extension Of Stay</a>
+        </li>
+    </ul>
+    <div class="row">
+        <div class="col-12 pb-3">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col">
+                            <form class="filter-wrapper">
+                                <div class="form-group row">
+                                    <label for="schemeName" class="col-sm-2 col-form-label">Scheme Name</label>
+                                    <div class="col-sm-3">
+                                        <select class="form-control" id="schemeName"></select>
+                                    </div>
+                                    <label for="cardNo" class="col-sm-2 col-form-label">URN Number</label>
+                                    <div class="col-sm-3">
+                                        <input type="text" class="form-control" autofocus id="urnNo" placeholder="Enter here" />
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <input type="button" id="btnSearch" value="Search" class="btn btn-outline-success my-2 my-sm-0" />
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="row" id="divRowCount">
+                        <label for="Rows">&nbsp;&nbsp;&nbsp;Row count</label>
+                        <div class="col-sm-1">
+                            <select id="ddlRows" autofocus>
+                                <option value="1">10</option>
+                                <option value="2">20</option>
+                                <option value="3">50</option>
+                                <option value="4">100</option>
+                                <option value="5">200</option>
+                                <option value="6">500</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-10"></div>
+                    </div>
+                    <div class="table table-striped table-bordered" id="jsGrid">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        $('.secondary-menu li a').tooltip();
+    });
+</script>

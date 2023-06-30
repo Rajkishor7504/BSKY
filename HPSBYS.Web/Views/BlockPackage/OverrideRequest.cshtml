@@ -1,0 +1,297 @@
+﻿@{
+    ViewBag.Title = "OverrideRequest";
+    Layout = "~/Views/Shared/_CommonLayout.cshtml";
+}
+@Scripts.Render("~/bundles/overriderequest")
+
+
+<link href="~/css/jquery.dataTables.min.css" rel="stylesheet" />
+
+<!-- Dashboard Body content part starts -->
+
+<div class="container">
+
+    <div class="row">
+
+        <div class="col-12 pb-3">
+
+            <div class="card">
+
+                <div class="card-body">
+
+                    <div class="clearfix"></div>
+
+                    <!-- patient info -->
+
+                    <div class="form-box-bg mb-4">
+
+                        <ul class="nav nav-tabs custom-tab mb-4">
+                            <li class="nav-item">
+                                <a class="nav-link active" href="@Url.Action("OverrideRequest","BlockPackage")">Add</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link " href="@Url.Action("OverrideView","BlockPackage")">View</a>
+                            </li>
+
+                        </ul>
+
+                        <div class="pkg_grey">
+
+                            <div class="form-row">
+
+                                <div class="col-lg-10 col-md-12 col-sm-8 col-xs-12 form-row form-designsc">
+
+                                    <label for="packageHeader" class="col-lg-2 col-md-4 col-sm-4 col-xs-12 col-form-label">NFSA/SFSS NO<b><span style="color:red">*</span></b></label>
+
+                                    <div class="col-lg-3 col-md-4 col-sm-4 col-xs-12 mb-2 px-0">
+
+                                        <input id="txtUrnNo" type="text" class="form-control" autofocus placeholder="Enter here" maxlength="17" onkeypress="return inputLimiter(event,'Numbers')" />
+
+                                        <input id="hdnUrnNo" type="hidden" />
+
+                                    </div>
+
+                                    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 px-0">
+
+                                        <input class="btn btn-outline-success my-2 my-sm-0" type="button" value="Search" id="btnSearch">
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                        <input type="hidden" id="hospitalcode" value="@Session["HospitalCode"]" />
+                        <input type="hidden" id="hospitalcategoryId" value="@Session["HospitalCategoryId"]" />
+                        <div id="DvOverrideRequest">
+
+                            <div class="row mb-1 heading-pkg border-bottom ">
+
+                                <h5>Members List</h5>
+
+                            </div>
+
+                            <div class="clearfix"></div>
+
+                            <div class="col-md-12 col-sm-12 col-xs-12 px-0">
+
+                                <div class="table-responsive">
+
+                                    <table class="table table-striped jsgrid-table" id="grdOverrideRequest">
+
+                                        <thead>
+
+                                            <tr class="jsgrid-header-row">
+
+                                                <th scope="col" class="jsgrid-header-cell">Sl No.</th>
+                                                <th scope="col" class="jsgrid-header-cell">URN</th>
+                                                <th scope="col" class="jsgrid-header-cell">Name</th>
+                                                <th scope="col" class="jsgrid-header-cell">Id</th>
+
+
+                                                <th scope="col" class="jsgrid-header-cell">Aadhaar Card No</th>
+                                                <th scope="col" class="jsgrid-header-cell">Gender</th>
+
+                                                <th scope="col" class="jsgrid-header-cell">Age</th>
+
+
+
+                                                <th scope="col" class="jsgrid-header-cell">Action</th>
+
+                                            </tr>
+
+                                        </thead>
+
+                                        <tbody>
+                                        </tbody>
+
+                                    </table>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="clearfix"></div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+    <!-- OverRide Request Modal -->
+    <div id="MyPopupBlock" class="modal fade" role="dialog">
+
+        <div class="modal-dialog modal-lg">
+
+            <!-- Modal content-->
+
+            <div class="modal-content">
+
+                <form id="OverrideRequestForm">
+
+                    <div class="modal-header">
+
+                        <div class="row">
+
+                            <div class="col-lg-12">
+
+                                <h4 class="modal-title"> Override Request </h4>
+
+                            </div>
+
+                        </div>
+
+                        <button type="button" class="close" data-dismiss="modal"> &times; </button>
+
+                    </div>
+
+                    <div class="modal-body">
+
+                        <div class="row">
+
+                            <div class="col-md-4 mb-2">
+
+                                <label class="pkg-label font-weight-normal">Member Id :</label>
+                                <div class="pkghead-txt" id="lblPatientMemberId"></div>
+
+                            </div>
+
+
+                            <div class="col-md-4 mb-2">
+
+                                <label class="pkg-label font-weight-normal"> Name :</label>
+                                <div class="pkghead-txt" id="lblPatientName"></div>
+
+                            </div>
+
+
+                            <div class="col-md-4 mb-2">
+
+                                <label class="pkg-label font-weight-normal"> Gender :</label>
+                                <div class="pkghead-txt" id="lblPatientGender"></div>
+
+                            </div>
+
+
+                            <div class="col-md-4 mb-2">
+
+                                <label class="pkg-label font-weight-normal"> Age :</label>
+                                <div class="pkghead-txt" id="lblPatientAge"></div>
+
+                            </div>
+
+
+                            <div class="col-md-4 mb-2">
+
+                                <label class="pkg-label font-weight-normal"> Aadhaar No. :</label>
+                                <div class="pkghead-txt" id="lblPatientAadharNo"></div>
+
+                            </div>
+
+                            <div class="col-md-4 mb-2">
+
+                                <label class="pkg-label font-weight-normal"> URN :</label>
+                                <div class="pkghead-txt" id="lblPatientUrnNo"></div>
+
+                            </div>
+
+                            <div class="col-md-4 mb-2">
+
+                                <label class="pkg-label font-weight-normal">Purpose of Override Code<b><span style="color:red">*</span></b></label>
+                                @*<label>
+                                        <input type="checkbox" class="packagedetails" id="chkboxblock" value="0303" />
+                                        Discharge Package
+                                    </label>*@
+                                <div class="py-2">
+                                    <div class="custom-control custom-radio custom-control-inline">
+                                        <input type="radio" class="custom-control-input packagedetails" id="rdblockpackage" value="0301">
+                                        <label class="custom-control-label" for="rdblockpackage">Block Package</label>
+                                    </div>
+                                    <div class="custom-control custom-radio custom-control-inline">
+                                        <input type="radio" class="custom-control-input packagedetails" id="rdunblockpackage" value="0302">
+                                        <label class="custom-control-label" for="rdunblockpackage">UnBlock Package</label>
+                                    </div>
+                                    <div class="custom-control custom-radio custom-control-inline">
+                                        <input type="radio" class="custom-control-input packagedetails" id="rddischarge" value="0303">
+                                        <label class="custom-control-label" for="rddischarge">Discharge Package</label>
+                                    </div>
+                                </div>
+
+                            </div>
+
+
+                            <div class="col-md-8">
+
+                                <label class="pkg-label font-weight-normal"> No. Of Days <b><span style="color:red">*</span></b></label>
+
+                                <div class="pkghead-txt">
+                                    <input id="txtNoofdays" maxlength="2" min="1" max="30" type="number" autocomplete="off" oninput="validity.valid||(value='');" onkeypress='return event.charCode >= 48 && event.charCode <= 57' />
+                                </div>
+
+                            </div>
+
+
+                            <div class="col-md-4">
+                                <label class="pkg-label font-weight-normal"> Upload File </label>
+                                <div class="pkghead-txt">
+                                    <input type="file" class="form-control pr-5" id="uploadfile">
+                                    <span id="RemoveoverrideDoc" onclick="RemoveoverrideDoc(this)" class="btn btn-outline-danger btn-sm btn-crus"> <i class="fa fa-times"></i></span>
+                                </div>
+                                <div>
+                                    <small><span style="color:red">File to be uploaded in  pdf , jpeg , jpg and size should not exceed 5 MB </span></small>
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-8">
+
+                                <label class="pkg-label font-weight-normal"> Description<b><span style="color:red">*</span></b></label>
+                                <div class="pkghead-txt">
+                                    <textarea id="txtDescription12" class="form-control" oninput="this.value = this.value.toUpperCase()" placeholder="Description" style="width:100%"></textarea>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer">
+
+                        <div class="row">
+
+                            <div class="col-md-12">
+
+                                <button type="button" id="btnSubmit" class="btn btn-sm btn-success" onclick="submitOverrideRequestForm()"> Submit </button>
+
+                                <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal"> Close </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="~/js/jquery.dataTables.min.js"></script>
+
+<script>
+    document.mynamespace = {};
+    document.mynamespace.hospitalcode = '@HttpContext.Current.Session["HospitalCode"]';
+    document.mynamespace.hospitalcategoryId = '@HttpContext.Current.Session["HospitalCategoryId"]';
+</script>
+  

@@ -1,0 +1,1390 @@
+﻿
+@{
+    ViewBag.Title = "AddDownWard";
+    Layout = "~/Views/Shared/_CommonLayout.cshtml";
+}
+
+@Scripts.Render("~/bundles/discharge")
+<script type="text/javascript">
+$(document).ready(function () {
+    arrDischargePackage = [];
+    arrPrevPackage = [];
+    arrAddOnPackage = [];
+    $('#CurBlkHeader').hide();
+    $('#PrevBlkHeader').hide();
+    $('#AddOnBlkHeader').hide();
+    //$('#lblPHC').hide();
+    //$('#rbPHC').hide();
+    //$('#lblHSC').hide();
+    //$('#rbHSC').hide();
+    $('#divDisBlk').hide();
+    $('#divSubCen').hide();
+    $('#path').html('<a href="@Url.Action("ViewDischarge", "Discharge")">Discharge List</a> / Downward Referal');
+    //$('.datepicker').datepicker({
+    //    format: 'dd M yyyy',
+    //    endDate: 'today',
+    //    autoclose: true
+    //}); //code for datepicker
+    //$(".datepicker").datepicker("setDate", (new Date().toDateString()));
+    $('#mSummery').val('No');
+    $('#btnDischarge').show();
+    $('#divLoader').hide();
+    //$('#dischargeDate').attr('readonly', true);
+    //$('.datepicker').datepicker('remove');
+    var DistParams = {
+                  Action: 'A'
+    };
+    $.ajax({
+        url: ServiceURL + "/api/Common/GetAllDist",
+        type: "GET",
+        data: DistParams,
+        dataType: "json",
+        contentType: "application/json; charset=utf-8",
+        success: function (data) {
+            // console.log(data);
+            $('#ddlDistrict').empty().append('<option selected="selected" value="0">--select--</option>');
+            $.each(data, function () {
+                $('#ddlDistrict').append($("<option></option>").val(this['districtCode']).text(this['districtName']));
+            });
+        },
+        error: function (error) {
+            console.log(error.statusText);
+        }
+    });
+    var params = {
+        HospitalCode: '@Session["HospitalCode"]'
+    };
+    //$.ajax({
+    //    url: ServiceURL + "/api/Hospital/GetHospitalInformation",
+    //    type: "GET",
+    //    data: params,
+    //    dataType: "json",
+    //    contentType: "application/json; charset=utf-8",
+    //    success: function (data) {
+    //        $("#HdState").html(data.hospitalState);
+    //        $("#HdDistrict").html(data.hospitalDistrict);
+    //        $("#HdCode").html(data.hospitalCode);
+    //        $("#HdName").html(data.hospitalname);
+    //        // console.log(data);
+    //    },
+    //    error: function (error) {
+    //        console.log(error.statusText);
+    //    }
+    //});
+    if (localStorage.getItem('DischargeInfo') != null) {
+        var DischargeInfo = JSON.parse(localStorage.getItem('DischargeInfo'));
+        var RegParams = {
+            Action: 'A',
+            InvoiceNo: DischargeInfo[0].blockingInvoiceNo
+        };
+        $.ajax({
+           url: ServiceURL + "/api/Common/getDownwardReferalByBlockingInvoiceNo",
+           type: "GET",
+           data: RegParams,
+           dataType: "json",
+           contentType: "application/json; charset=utf-8",
+           success: function (data) {
+               if (data.length > 0) {
+                   if (data[0].isReferalRequired == 'Y') {
+                        $("#refReqYes").prop("checked", true);
+                        $('#divSubCen').show();
+                        $('#divDisBlk').show();
+                        $('#ddlDistrict').val(data[0].districtCode);
+                       bindBlock(data[0].blockCode,data[0].phcCode,data[0].subCenterCode);
+                   }
+                   else {
+                       $("#refReqNo").prop("checked", true);
+                   }
+                $('#btnDischarge').val('Update');
+               }
+           },
+           error: function (error) {
+               console.log(error.statusText);
+           },
+       });
+        var RegParams = {
+            Action: 'B',
+            InvoiceNo: DischargeInfo[0].blockingInvoiceNo
+        };
+        $.ajax({
+           url: ServiceURL + "/api/Registration/GetPreviousAddOnPackageDetailsByInvoiceNo",
+           type: "GET",
+           data: RegParams,
+           dataType: "json",
+           contentType: "application/json; charset=utf-8",
+           success: function (data) {
+               if (data.length > 0) {
+                   for (var i = 0; i < data.length; i++) {
+                       arrAddOnPackage.push({
+                          invoiceNo:DischargeInfo[0].blockingInvoiceNo,
+                          procedureName:data[i].procedureName,
+                          procedureCode:data[i].procedureCode,
+                          categoryName:data[i].categoryName,
+                          categoryCode:data[i].categoryCode,
+                          packageName:data[i].packageName,
+                          packageCode:data[i].packageCode,
+                          blockingDate:data[i].blockingDate,
+                          blockingAmount: data[i].blockingAmount,
+                          actualAmount:data[i].blockingAmount
+
+                       });
+                   }
+               }
+           },
+           error: function (error) {
+               console.log(error.statusText);
+           },
+       });
+        var DischargeParam = {
+            HospitalCode: '@Session["HospitalCode"]',
+            Action: 'B',
+            URN: DischargeInfo[0].urn,
+            BlockingInVoiceNo: DischargeInfo[0].blockingInvoiceNo
+        };
+        $.ajax({
+            url: ServiceURL + "/api/Registration/GetDischargeDetail",
+            type: "GET",
+            data: DischargeParam,
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            success: function (data) {
+                if (data.length > 0) {
+                    //console.log(data)
+                    $('#SumDisAmnt').html(data[0].sumAmountBlocked)
+                    for (var i = 0; i < data.length; i++) {
+                        if (data[i].packageChangeStatus == 0) {
+                            arrDischargePackage.push({
+                                invoiceNo: data[i].invoiceNo,
+                                dateofadmission: data[i].dateofadmission,
+                                procedureCode: data[i].procedureCode,
+                                procedureName: data[i].procedureName,
+                                packageCode: data[i].packageCode,
+                                packageName: data[i].packageName,
+                                amoutBlocked: data[i].amoutBlocked,
+                                isMedSergical: data[i].isMedSergical,
+                                packageMode: data[i].packageMode,
+                                noofDays: data[i].noofDays,
+                                urn: data[i].urn,
+                                CappedAmount: data[i].cappedAmount,
+                                ISExtensionofstay: data[i].isExtensionofstay,
+                                dtmNextRequestdate: data[i].dtmNextRequestdate,
+                                category: data[i].category,
+                                categoryCode: data[i].categoryCode,
+                                TransactionID: data[i].transactionID,
+                                WardId: data[i].wardId
+                            });
+                        }
+                        else {
+                            arrPrevPackage.push({
+                                invoiceNo: data[i].invoiceNo,
+                                dateofadmission: data[i].dateofadmission,
+                                procedureCode: data[i].procedureCode,
+                                procedureName: data[i].procedureName,
+                                packageCode: data[i].packageCode,
+                                packageName: data[i].packageName,
+                                amoutBlocked: data[i].amoutBlocked,
+                                isMedSergical: data[i].isMedSergical,
+                                packageMode: data[i].packageMode,
+                                noofDays: data[i].noofDays,
+                                urn: data[i].urn,
+                                CappedAmount: data[i].cappedAmount,
+                                ISExtensionofstay: data[i].isExtensionofstay,
+                                dtmNextRequestdate: data[i].dtmNextRequestdate,
+                                category: data[i].category,
+                                categoryCode: data[i].categoryCode,
+                                TransactionID: data[i].transactionID,
+                                WardId: data[i].wardId,
+                                TempDischargeDate: data[i].temporaryDischargeDate,
+                                TemporaryDiscargeAmount: data[i].temporaryDiscargeAmount,
+                            });
+                        }
+                    }
+                    $('#UrnNo').html(data[0].urn);
+                    $('#HeadOfFamily').html(data[0].headMemberName);
+                    $('#State').html(data[0].memberStateName);
+                    $('#StateCode').html(data[0].memberStateCode);
+                    $('#District').html(data[0].memberDistrictName);
+                    $('#DistrictCode').html(data[0].memberDistrictCode);
+                    $('#PatientNm').html(data[0].memberName);
+                    $('#divSchCode').html(data[0].schemeCode);
+                    $('#SchName').html(data[0].schemeName);
+                    $('#familyID').html(data[0].familyID);
+                    var date1_ms = new Date(data[data.length-1].dateofadmission).getTime();
+                    var date2_ms = new Date().getTime();
+                    var difference_ms = date2_ms - date1_ms;
+                    difference_ms = difference_ms / 1000;
+                    difference_ms = difference_ms / 60;
+                    difference_ms = difference_ms / 60;
+                    var days = Math.floor(difference_ms / 24);
+                    $('.datepicker').datepicker({
+                        format: 'dd-M-yy',
+                        startDate: '-' + days + 'd',
+                        endDate: 'today',
+                        autoclose: true
+                    }); //code for datepicker
+                    $(".datepicker").datepicker("setDate", (new Date().toDateString()));
+                    if (data[0].urn != "") {
+                        var BalanceParams = {
+                            Action: 'R',
+                            URN: data[0].urn,
+                            FamilyId: $('#familyID').text()
+                        };
+                        $.ajax({
+                            url: ServiceURL + "/api/Common/GetAvailBalance",
+                            type: "GET",
+                            data: BalanceParams,
+                            dataType: "json",
+                            contentType: "application/json; charset=utf-8",
+                            success: function (result) {
+                                if (result != null) {
+                                    $('#AvlCover').html(result.availableBalance);
+                                    $('#TraBlkAmnt').html(result.amountBlocked);
+
+                                }
+                                else {
+                                    $('#AvlCover').html('NA');
+                                    $('#TraBlkAmnt').html('0');
+                                }
+
+                                //if (result.length > 0) {
+                                //    // console.log(data);
+                                //    //$('#IPNumber').html(data[0].policynumber)
+                                //    //$('#StartDt').html(data[0].policyStartDate)
+                                //    //$('#EndDt').html(data[0].policyEnddate)
+                                //}
+                            },
+                            error: function (error) {
+                                console.log(error.responseText);
+                            }
+                        });
+                    }
+                    if (data[0].memberDistrictCode != "") {
+                        var PolicyParams = {
+                            URN: $('#UrnNo').text()
+                            //MemberDistrictCode: data[0].memberDistrictCode,
+                            //SchemeCode: $('#divSchCode').text()
+                        };
+                        $.ajax({
+
+                            url: ServiceURL + "/api/Common/GetPolicy",
+                            type: "GET",
+                            data: PolicyParams,
+                            dataType: "json",
+                            contentType: "application/json; charset=utf-8",
+                            success: function (data) {
+                                if (data.length > 0) {
+                                    alert(data[0].policynumber);
+                                    //console.log(data);
+                                    $('#IPNumber').html(data[0].policynumber)
+                                    $('#StartDt').html(data[0].policyStartDate)
+                                    $('#EndDt').html(data[0].policyEnddate)
+                                }
+                            },
+                            error: function (error) {
+                                console.log(error.responseText);
+                            }
+                        });
+                    }
+                }
+            },
+            error: function (error) {
+                console.log(error.responseText);
+            }
+        });
+        $('#BlkInvNo').text(DischargeInfo[0].blockingInvoiceNo);
+    }
+    function bindBlock(BlockCode,VPHCCode,SubCenterCode) {
+        var BlockParams = {
+              Action: 'B',
+              DistCode: $('#ddlDistrict').val()
+    };
+    $.ajax({
+        url: ServiceURL + "/api/Common/GetAllBlockByDistCode",
+        type: "GET",
+        data: BlockParams,
+        dataType: "json",
+        contentType: "application/json; charset=utf-8",
+        success: function (data) {
+            // console.log(data);
+            $('#ddlPhc').empty();
+            $('#ddlSubCntr').empty();
+            $('#ddlHlthBlk').empty().append('<option selected="selected" value="0">--select--</option>');
+            $.each(data, function () {
+                $('#ddlHlthBlk').append($("<option></option>").val(this['blockCode']).text(this['blockName']));
+            });
+            if (BlockCode!=null) {
+                $('#ddlHlthBlk').val(BlockCode);
+                 bindPHC(VPHCCode,SubCenterCode);
+            }
+        },
+        error: function (error) {
+            console.log(error.statusText);
+        }
+    });
+    }
+    $('#ddlDistrict').change(function () {
+        bindBlock();
+    });
+    function bindPHC(PHCCode,SubCenterCode) {
+        var PHCParams = {
+              Action: 'C',
+              DistCode: $('#ddlDistrict').val(),
+              BlockCode: $('#ddlHlthBlk').val()
+    };
+    $.ajax({
+        url: ServiceURL + "/api/Common/GetAllPHCByDistCodeAndBlockCode",
+        type: "GET",
+        data: PHCParams,
+        dataType: "json",
+        contentType: "application/json; charset=utf-8",
+        success: function (data) {
+            // console.log(data);
+            $('#ddlSubCntr').empty();
+            $('#ddlPhc').empty().append('<option selected="selected" value="0">--select--</option>');
+            $.each(data, function () {
+                $('#ddlPhc').append($("<option></option>").val(this['phcCode']).text(this['phcName']));
+            });
+            if (PHCCode != null) {
+                $('#ddlPhc').val(PHCCode);
+                bindSubCenter(SubCenterCode);
+            }
+        },
+        error: function (error) {
+            console.log(error.statusText);
+        }
+    });
+    }
+    $('#ddlHlthBlk').change(function () {
+        bindPHC();
+    });
+    function bindSubCenter(SubCenterCode) {
+         var PHCParams = {
+              Action: 'D',
+              DistCode: $('#ddlDistrict').val(),
+              BlockCode: $('#ddlHlthBlk').val(),
+              PHCCode: $('#ddlPhc').val()
+    };
+    $.ajax({
+        url: ServiceURL + "/api/Common/GetAllSubCentreByDistBlockAndPHCCode",
+        type: "GET",
+        data: PHCParams,
+        dataType: "json",
+        contentType: "application/json; charset=utf-8",
+        success: function (data) {
+            // console.log(data);
+            $('#ddlSubCntr').empty().append('<option selected="selected" value="0">--select--</option>');
+            $.each(data, function () {
+                $('#ddlSubCntr').append($("<option></option>").val(this['subCentreCode']).text(this['subCentreName']));
+            });
+            if (SubCenterCode != null) {
+                $('#ddlSubCntr').val(SubCenterCode);
+            }
+        },
+        error: function (error) {
+            console.log(error.statusText);
+        }
+    });
+    }
+    $('#ddlPhc').change(function () {
+        bindSubCenter();
+    });
+    $('#btnViewPackage').click(function () {
+      if (arrDischargePackage.length > 0) {
+                 $('#CurBlkHeader').show();
+
+                arrDischargePackageWithActueal = [];
+                if (arrDischargePackage.length == 1 && arrDischargePackage[0].isMedSergical == 'M') {
+                    var DtAdmission = new Date(arrDischargePackage[0].dateofadmission);
+                    var DtDischarge = new Date($('#dischargeDate').val());
+                    var ActDays = 0;
+                    var ActAmnt = 0;
+                    if (DtDischarge - DtAdmission === 0) {
+                        ActDays = 1;
+                        ActAmnt = arrDischargePackage[0].amoutBlocked * ActDays;
+                    }
+                    else {
+                        if (arrDischargePackage[0].packageMode == '1') {
+                            var Diff = new Date(DtDischarge - DtAdmission);
+                            ActDays = Diff / 1000 / 60 / 60 / 24;
+                            ActAmnt = arrDischargePackage[0].amoutBlocked * ActDays;
+                        }
+                        else if (arrDischargePackage[0].packageMode == '2') {
+                            var Diff = new Date(DtDischarge - DtAdmission);
+                            ActDays = Diff / 1000 / 60 / 60 / 24;
+                            ActAmnt = '--';
+                        }
+                        else {
+                            var Diff = new Date(DtDischarge - DtAdmission);
+                            ActDays = Diff / 1000 / 60 / 60 / 24;
+                            ActAmnt = arrDischargePackage[0].amoutBlocked;
+                        }
+                    }
+
+                    //arrDischargePackage[0].push({ ActDays: ActDays, ActAmnt: ActAmnt });
+                    arrDischargePackageWithActueal.push({
+                        invoiceNo: arrDischargePackage[0].invoiceNo,
+                        dateofadmission: arrDischargePackage[0].dateofadmission,
+                        procedureCode: arrDischargePackage[0].procedureCode,
+                        procedureName: arrDischargePackage[0].procedureName,
+                        packageCode: arrDischargePackage[0].packageCode,
+                        packageName: arrDischargePackage[0].packageName,
+                        amoutBlocked: arrDischargePackage[0].amoutBlocked,
+                        noofDays: arrDischargePackage[0].noofDays,
+                        ActDays: ActDays,
+                        ActAmnt: ActAmnt,
+                        isMedSergical: arrDischargePackage[0].isMedSergical,
+                        packageMode: arrDischargePackage[0].packageMode,
+                        urn: arrDischargePackage[0].urn,
+                        CappedAmount: arrDischargePackage[0].CappedAmount,
+                        ISExtensionofstay: arrDischargePackage[0].ISExtensionofstay,
+                        dtmNextRequestdate: arrDischargePackage[0].dtmNextRequestdate,
+                        category: arrDischargePackage[0].category,
+                        categoryCode: arrDischargePackage[0].categoryCode,
+                        transactionID: arrDischargePackage[0].TransactionID,
+                        wardId: arrDischargePackage[0].WardId
+                    });
+                }
+                else {
+                    var ActDays;
+                    var DOA;
+                    for (var i = 0; i < arrDischargePackage.length; i++) {
+                        if (arrDischargePackage[i].dateofadmission == null || arrDischargePackage[i].dateofadmission == '') {
+                            ActDays = '--';
+                            DOA = '--';
+                        }
+                        else {
+                            DOA = arrDischargePackage[i].dateofadmission;
+                            var DtAdmission = new Date(arrDischargePackage[i].dateofadmission);
+                            var DtDischarge = new Date($('#dischargeDate').val());
+
+                            if (DtDischarge - DtAdmission === 0) {
+                                ActDays = 1;
+                            }
+                            else {
+                                var Diff = new Date(DtDischarge - DtAdmission);
+                                ActDays = Diff / 1000 / 60 / 60 / 24;
+                            }
+                        }
+                        arrDischargePackageWithActueal.push({
+                            invoiceNo: arrDischargePackage[i].invoiceNo,
+                            dateofadmission: DOA,
+                            procedureCode: arrDischargePackage[i].procedureCode,
+                            procedureName: arrDischargePackage[i].procedureName,
+                            packageCode: arrDischargePackage[i].packageCode,
+                            packageName: arrDischargePackage[i].packageName,
+                            amoutBlocked: arrDischargePackage[i].amoutBlocked,
+                            noofDays: arrDischargePackage[i].noofDays,
+                            ActDays: ActDays,
+                            ActAmnt: arrDischargePackage[i].amoutBlocked,
+                            isMedSergical: arrDischargePackage[i].isMedSergical,
+                            packageMode: arrDischargePackage[i].packageMode,
+                            urn: arrDischargePackage[0].urn,
+                            CappedAmount: arrDischargePackage[i].CappedAmount,
+                            ISExtensionofstay: arrDischargePackage[i].ISExtensionofstay,
+                            dtmNextRequestdate: arrDischargePackage[i].dtmNextRequestdate,
+                            category: arrDischargePackage[i].category,
+                            categoryCode: arrDischargePackage[i].categoryCode,
+                            transactionID: arrDischargePackage[i].TransactionID,
+                            wardId: arrDischargePackage[i].WardId
+                        });
+                    }
+                }
+                $('#jsGrid').jsGrid({
+                    height: "auto",
+                    width: "100%",
+                    sorting: true,
+                    paging: true,
+                    pageSize: 10,
+                    autoload: true,
+
+                    controller: {
+                        loadData: function () {
+                            var d = $.Deferred();
+                            //d.resolve(arrDischargePackageWithActueal);
+                            //return d.promise();
+                            d.resolve($.map(arrDischargePackageWithActueal, function (item, itemIndex) {
+                                return $.extend(item, { "Index": itemIndex + 1 });
+                            }
+                            ));
+                            return d.promise();
+                        },
+
+                        deleteItem: function (deletingClient) {
+                            //debugger;
+                            var clientIndex = $.inArray(deletingClient, arrDischargePackageWithActueal);
+                            arrDischargePackageWithActueal.splice(clientIndex, 1);
+                        }
+                    },
+                    fields: [{ name: "Index", type: "text", width: 50, title: "#Sl", align: "center" },
+                    { name: "invoiceNo", type: "text", title: "Blocking Invoice No.", align: "center" },
+                    { name: "dateofadmission", title: "Blocked Date", type: "text", align: "center" },
+                    { name: "procedureCode", title: "procedureCode", type: "number", align: "center", visible: false },
+                    { name: "urn", title: "urn", type: "number", align: "center", visible: false },
+                    { name: "procedureName", title: "Procedure", type: "number", align: "center" },
+                    { name: "category", title: "Category", type: "text", align: "center" },
+                    { name: "categoryCode", title: "Category Code", type: "text", align: "center", visible: false },
+                    { name: "packageCode", title: "packageCode", type: "number", align: "center", visible: false },
+                    { name: "isMedSergical", title: "isMedSergical", type: "number", align: "center", visible: false },
+                    { name: "packageMode", title: "packageMode", type: "number", align: "center", visible: false },
+                    { name: "packageName", title: "Package", type: "text", align: "center" },
+                    { name: "amoutBlocked", title: "Amount Blocked", type: "text", align: "center" },
+                    { name: "noofDays", title: "Days", type: "text", align: "center" },
+                    { name: "ActDays", title: "Actual Days", type: "text", align: "center" },
+                    { name: "ActAmnt", title: "Actual Amount", type: "text", align: "center" },
+                    { name: "CappedAmount", title: "CappedAmount", type: "text", align: "center", visible: false },
+                    { name: "ISExtensionofstay", title: "ISExtensionofstay", type: "text", align: "center", visible: false },
+                    { name: "dtmNextRequestdate", title: "dtmNextRequestdate", type: "text", align: "center", visible: false },
+                    {
+                        type: "control", title: "Remove", visible: false, editButton: false, headerTemplate: function () {
+                            return $("<div>").prop("title", "Remove").text("Remove");
+                        }
+                    },
+
+                    {
+                          type: "control", editButton: true, deleteButton: false,width: 90, align: "center",
+                        itemTemplate: function (value, item) {
+                           // console.log(item.wardId);
+                              if (item.wardId != 0 && item.wardId != null && item.wardId != '') {
+                                  return $("<button>").attr({ type: "button", class: "btn btn-outline-primary focusedBtn btn-sm my-2 my-sm-0" }).text("View Ward Details")
+                                      .on("click", function () {
+                                          var arrWardTransactionInfo = [];
+                                          arrWardTransactionInfo.push({
+                                              TranId: item.transactionID
+                                          });
+                                          localStorage.setItem('WardTransactionInfo', JSON.stringify(arrWardTransactionInfo));
+                                          window.open('../BlockPackage/ViewPreviousWardDetails?TranId='+item.transactionID +'&Date='+$('#hfDiscDt').text(),'_blank', 'location=yes,height=570,width=1250,scrollbars=yes,status=yes');
+                                      });
+                              }
+                              else {
+                                  return false;
+                              }
+                          },
+                          headerTemplate: function () {
+                              return $("<div>").prop("title", "Action").text("View Details");
+                          }
+
+                    }
+
+                    ]
+                });
+              //  $('#btnDischarge').show();
+                $('#hfDiscDt').text($('#dischargeDate').val());
+
+            if (arrPrevPackage.length > 0) {
+                $('#PrevBlkHeader').show();
+                arrPrevDischargePackageWithActueal = [];
+                if (arrPrevPackage.length == 1 && arrPrevPackage[0].isMedSergical == 'M') {
+                    var DtAdmission = new Date(arrPrevPackage[0].dateofadmission);
+                    var DtDischarge = new Date(arrPrevPackage[0].TempDischargeDate);
+                    var ActDays = 0;
+                    var ActAmnt = 0;
+                    if (DtDischarge - DtAdmission === 0) {
+                        ActDays = 1;
+                        ActAmnt = arrPrevPackage[0].TemporaryDiscargeAmount;
+                    }
+                    else {
+                        if (arrPrevPackage[0].packageMode == '1') {
+                            var Diff = new Date(DtDischarge - DtAdmission);
+                            ActDays = Diff / 1000 / 60 / 60 / 24;
+                            ActAmnt = arrPrevPackage[0].amoutBlocked * ActDays;
+                        }
+                        else if (arrPrevPackage[0].packageMode == '2') {
+                            var Diff = new Date(DtDischarge - DtAdmission);
+                            ActDays = Diff / 1000 / 60 / 60 / 24;
+                            ActAmnt = '--';
+                        }
+                        else {
+                            var Diff = new Date(DtDischarge - DtAdmission);
+                            ActDays = Diff / 1000 / 60 / 60 / 24;
+                            ActAmnt = arrPrevPackage[0].amoutBlocked;
+                             }
+
+                    }
+
+                    //arrDischargePackage[0].push({ ActDays: ActDays, ActAmnt: ActAmnt });
+                    arrPrevDischargePackageWithActueal.push({
+                        invoiceNo: arrPrevPackage[0].invoiceNo,
+                        dateofadmission: arrPrevPackage[0].dateofadmission,
+                        procedureCode: arrPrevPackage[0].procedureCode,
+                        procedureName: arrPrevPackage[0].procedureName,
+                        packageCode: arrPrevPackage[0].packageCode,
+                        packageName: arrPrevPackage[0].packageName,
+                        amoutBlocked: arrPrevPackage[0].amoutBlocked,
+                        noofDays: arrPrevPackage[0].noofDays,
+                        ActDays: ActDays,
+                        ActAmnt: ActAmnt,
+                        isMedSergical: arrPrevPackage[0].isMedSergical,
+                        packageMode: arrPrevPackage[0].packageMode,
+                        urn: arrPrevPackage[0].urn,
+                        CappedAmount: arrPrevPackage[0].CappedAmount,
+                        ISExtensionofstay: arrPrevPackage[0].ISExtensionofstay,
+                        dtmNextRequestdate: arrPrevPackage[0].dtmNextRequestdate,
+                        category: arrPrevPackage[0].category,
+                        categoryCode: arrPrevPackage[0].categoryCode,
+                        transactionID: arrPrevPackage[0].TransactionID,
+                        wardId: arrPrevPackage[0].WardId,
+                        temporaryDischargeDate:arrPrevPackage[0].TempDischargeDate
+                    });
+                }
+                else {
+                    var ActDays=0;
+                    var DOA;
+                    var ActAmnt = 0;
+                    for (var i = 0; i < arrPrevPackage.length; i++) {
+                        if (arrPrevPackage[i].dateofadmission == null || arrPrevPackage[i].dateofadmission == '') {
+                            ActDays = '--';
+                            DOA = '--';
+                        }
+                        else {
+                            DOA = arrPrevPackage[i].dateofadmission;
+                            var DtAdmission = new Date(arrPrevPackage[i].dateofadmission);
+                            var DtDischarge = new Date(arrPrevPackage[i].TempDischargeDate);
+
+                            if (DtDischarge - DtAdmission === 0) {
+                                ActDays = 1;
+                                ActAmnt = arrPrevPackage[i].TemporaryDiscargeAmount;
+                            }
+                            else {
+                                var Diff = new Date(DtDischarge - DtAdmission);
+                                ActDays = Diff / 1000 / 60 / 60 / 24;
+                                ActAmnt = arrPrevPackage[i].TemporaryDiscargeAmount;
+                            }
+                             if (arrPrevPackage[i].packageMode=='2') {
+                                ActAmnt = '--';
+                             }
+                        }
+                        arrPrevDischargePackageWithActueal.push({
+                            invoiceNo: arrPrevPackage[i].invoiceNo,
+                            dateofadmission: DOA,
+                            procedureCode: arrPrevPackage[i].procedureCode,
+                            procedureName: arrPrevPackage[i].procedureName,
+                            packageCode: arrPrevPackage[i].packageCode,
+                            packageName: arrPrevPackage[i].packageName,
+                            amoutBlocked: arrPrevPackage[i].amoutBlocked,
+                            noofDays: arrPrevPackage[i].noofDays,
+                            ActDays: ActDays,
+                            ActAmnt: ActAmnt,
+                            isMedSergical: arrPrevPackage[i].isMedSergical,
+                            packageMode: arrPrevPackage[i].packageMode,
+                            urn: arrPrevPackage[0].urn,
+                            CappedAmount: arrPrevPackage[i].CappedAmount,
+                            ISExtensionofstay: arrPrevPackage[i].ISExtensionofstay,
+                            dtmNextRequestdate: arrPrevPackage[i].dtmNextRequestdate,
+                            category: arrPrevPackage[i].category,
+                            categoryCode: arrPrevPackage[i].categoryCode,
+                            transactionID: arrPrevPackage[i].TransactionID,
+                            wardId: arrPrevPackage[i].WardId,
+                            temporaryDischargeDate:arrPrevPackage[i].TempDischargeDate
+                        });
+                    }
+                }
+                $('#jsGridPrev').jsGrid({
+                    height: "auto",
+                    width: "100%",
+                    sorting: true,
+                    paging: true,
+                    pageSize: 10,
+                    autoload: true,
+
+                    controller: {
+                        loadData: function () {
+                            var d = $.Deferred();
+                            //d.resolve(arrDischargePackageWithActueal);
+                            //return d.promise();
+                            d.resolve($.map(arrPrevDischargePackageWithActueal, function (item, itemIndex) {
+                                return $.extend(item, { "Index": itemIndex + 1 });
+                            }
+                            ));
+                            return d.promise();
+                        },
+
+                        deleteItem: function (deletingClient) {
+                            //debugger;
+                            var clientIndex = $.inArray(deletingClient, arrPrevDischargePackageWithActueal);
+                            arrPrevDischargePackageWithActueal.splice(clientIndex, 1);
+                        }
+                    },
+                    fields: [{ name: "Index", type: "text", width: 50, title: "#Sl", align: "center" },
+                    { name: "invoiceNo", type: "text", title: "Blocking Invoice No.", align: "center" },
+                    { name: "dateofadmission", title: "Blocked Date", type: "text", align: "center" },
+                    { name: "procedureCode", title: "procedureCode", type: "number", align: "center", visible: false },
+                    { name: "urn", title: "urn", type: "number", align: "center", visible: false },
+                    { name: "procedureName", title: "Procedure", type: "number", align: "center" },
+                    { name: "category", title: "Category", type: "text", align: "center" },
+                    { name: "categoryCode", title: "Category Code", type: "text", align: "center", visible: false },
+                    { name: "packageCode", title: "packageCode", type: "number", align: "center", visible: false },
+                    { name: "isMedSergical", title: "isMedSergical", type: "number", align: "center", visible: false },
+                    { name: "packageMode", title: "packageMode", type: "number", align: "center", visible: false },
+                    { name: "packageName", title: "Package", type: "text", align: "center" },
+                    { name: "temporaryDischargeDate", title: "DischargeDate", type: "text", align: "center"},
+                    { name: "amoutBlocked", title: "Amount Blocked", type: "text", align: "center" },
+                    { name: "noofDays", title: "Days", type: "text", align: "center" },
+                    { name: "ActDays", title: "Actual Days", type: "text", align: "center" },
+                    { name: "ActAmnt", title: "Actual Amount", type: "text", align: "center" },
+                    { name: "CappedAmount", title: "CappedAmount", type: "text", align: "center", visible: false },
+                    { name: "ISExtensionofstay", title: "ISExtensionofstay", type: "text", align: "center", visible: false },
+                    { name: "dtmNextRequestdate", title: "dtmNextRequestdate", type: "text", align: "center", visible: false },
+
+                    {
+                        type: "control", title: "Remove", visible: false, editButton: false, headerTemplate: function () {
+                            return $("<div>").prop("title", "Remove").text("Remove");
+                        }
+                    },
+
+                    {
+                          type: "control", editButton: true, deleteButton: false,width: 90, align: "center",
+                        itemTemplate: function (value, item) {
+                           // console.log(item.wardId);
+                              if (item.wardId != 0 && item.wardId != null && item.wardId != '') {
+                                  return $("<button>").attr({ type: "button", class: "btn btn-outline-primary focusedBtn btn-sm my-2 my-sm-0" }).text("View Ward Details")
+                                      .on("click", function () {
+                                          var arrWardTransactionInfo = [];
+                                          arrWardTransactionInfo.push({
+                                              TranId: item.transactionID
+                                          });
+                                          localStorage.setItem('WardTransactionInfo', JSON.stringify(arrWardTransactionInfo));
+                                          window.open('../BlockPackage/ViewPreviousWardDetails?TranId='+item.transactionID +'&Date='+item.temporaryDischargeDate,'_blank', 'location=yes,height=570,width=1250,scrollbars=yes,status=yes');
+                                      });
+                              }
+                              else {
+                                  return false;
+                              }
+                          },
+                          headerTemplate: function () {
+                              return $("<div>").prop("title", "Action").text("View Details");
+                          }
+
+                    }
+
+                    ]
+                });
+                $('#btnDischarge').show();
+                $('#hfDiscDt').text($('#dischargeDate').val());
+            }
+            if (arrAddOnPackage.length > 0) {
+                $('#AddOnBlkHeader').show();
+                $('#jsGridAddOn').jsGrid({
+                    height: "auto",
+                    width: "100%",
+                    sorting: true,
+                    paging: true,
+                    pageSize: 10,
+                    autoload: true,
+
+                    controller: {
+                        loadData: function () {
+                            var d = $.Deferred();
+                            //d.resolve(arrDischargePackageWithActueal);
+                            //return d.promise();
+                            d.resolve($.map(arrAddOnPackage, function (item, itemIndex) {
+                                return $.extend(item, { "Index": itemIndex + 1 });
+                            }
+                            ));
+                            return d.promise();
+                        }
+                    },
+                      fields: [
+                           { name: "Index", width: 50, type: "number", title: "#Sl", align: "center", filtering: false },
+                           { name: "invoiceNo", type: "text", title: "Blocking Invoice No.", align: "center" },
+                           { name: "blockingDate", type: "text", title: "Blocking Date", align: "center"},
+                           { name: "procedureName", type: "text", title: "Procedure", align: "center" },
+                           { name: "procedureCode", type: "text", title: "Procedure Code", align: "center",visible: false },
+                           { name: "categoryName", type: "text", title: "Category", align: "center" },
+                           { name: "categoryCode", type: "text", title: "Category Code", align: "center", visible: false },
+                           { name: "packageName", type: "text", title: "Package Name", align: "center" },
+                           { name: "packageCode", type: "text", title: "Package Code", align: "center", visible: false },
+                           { name: "blockingAmount", type: "text", title: "Blocking Amount(Rs.)", align: "center" },
+                           { name: "actualAmount", type: "text", title: "Actual Amount(Rs.)", align: "center" }
+                      ]
+                });
+            }
+        }
+    });
+    var ml = 200;
+    $('#Desc').text("(Maximum " + ml + " characters are allowed.)");
+    $('#description').keydown(function () {
+        var text = $(this).val();
+        var textLength = text.length;
+        if (textLength > ml) {
+            $(this).val(text.substring(0, (ml)));
+            var charactersLeft = ml - textLength + 1;
+        }
+        else {
+            var charactersLeft = ml - textLength;
+        }
+        $('#Desc').text("(Maximum " + (charactersLeft) + " characters are allowed.)");
+    });
+    $('#MSummery').text("(Maximum " + ml + " characters are allowed.)");
+    $('#mSummery').keydown(function () {
+        var text = $(this).val();
+        var textLength = text.length;
+        if (textLength > ml) {
+            $(this).val(text.substring(0, (ml)));
+            var charactersLeft = ml - textLength + 1;
+        }
+        else {
+            var charactersLeft = ml - textLength;
+        }
+        $('#MSummery').text("(Maximum " + (charactersLeft) + " characters are allowed.)");
+    });
+    $('#mortality').change(function () {
+        if ($('#mortality').val() == '1') {
+            $('#MotSummery').css('visibility', 'visible');
+            $('#mSummery').val('');
+            $('#lblMotSum').css('visibility', 'visible');
+            $('#MSummery').css('visibility', 'visible');
+        }
+        else {
+            $('#MotSummery').css('visibility', 'hidden');
+            $('#mSummery').val('No');
+            $('#lblMotSum').css('visibility', 'hidden');
+            $('#MSummery').css('visibility', 'hidden');
+        }
+    });
+    $('#btnDischarge').click(function () {
+        var def = $.Deferred();
+        if ($('#refReqYes').prop("checked")) {
+            if (validateDownward()) {
+                if (confirm("Are you sure to Save/Update?")) {
+                    $('#divLoader').show();
+                    var gridDischarge = $("#jsGrid").jsGrid("option", "data");
+                    if (gridDischarge.length > 0) {
+                        var IsReferal;
+                        if ($('#refReqYes').prop("checked")) {
+                            IsReferal = 'Y';
+                        }
+                        else {
+                            IsReferal = 'N';
+                        }
+                        var DischargeParams = new FormData();
+                        DischargeParams.append("__RequestVerificationToken", gettoken());
+                        DischargeParams.append("BlockingInvoiceNo", DischargeInfo[0].blockingInvoiceNo);
+                        DischargeParams.append("URN", $('#UrnNo').text());
+                        DischargeParams.append("IsReferalRequired", IsReferal);
+                        DischargeParams.append("DistrictCode", $('#ddlDistrict').val());
+                        DischargeParams.append("BlockCode", $("#ddlHlthBlk").val());
+                        DischargeParams.append("PHCCode", $("#ddlPhc").val());
+                        DischargeParams.append("SubCenterCode", $("#ddlSubCntr").val());
+
+                        if ($('#btnDischarge').val() == 'Save') {
+                            $.ajax({
+                                url: '@Url.Action("AddDownWardReferal", "Discharge")',
+                                type: "POST",
+                                data: DischargeParams,
+                                processData: false,
+                                contentType: false,
+                                success: function (data) {
+                                    $('#divLoader').hide();
+                                    if (data == "success") {
+                                        alert('DownWard Save Successfully !!');
+                                        window.location.href = "@Url.Action("ViewDischarge", "Discharge")";
+                                        d.resolve();
+                                    }
+                                    else if (data == "exist") {
+                                        if (confirm("Already Downward Referal Submited. do you want to edit?")) {
+                                            $('#btnDischarge').val('Update');
+                                        }
+                                        else {
+                                            window.location.href = "@Url.Action("ViewDischarge", "Discharge")";
+                                            d.resolve();
+                                        }
+                                    }
+                                },
+                                error: function (error) {
+                                    $('#divLoader').hide();
+                                    console.log(error.statusText);
+                                    d.resolve();
+                                }
+                            });
+                        }
+                        else {
+                             $.ajax({
+                                 url: '@Url.Action("UpdateDownWardReferal", "Discharge")',
+                                 type: "POST",
+                                 data: DischargeParams,
+                                 processData: false,
+                                 contentType: false,
+                                 success: function (data) {
+                                     $('#divLoader').hide();
+                                     if (data == "update") {
+                                         alert('Downward Update Successfully !!');
+                                         window.location.href = "@Url.Action("ViewDischarge", "Discharge")";
+                                         d.resolve();
+                                     }
+
+                                 },
+                                 error: function (error) {
+                                     $('#divLoader').hide();
+                                     console.log(error.statusText);
+                                     d.resolve();
+                                 }
+                            });
+                        }
+
+                    }
+                }
+            }
+        }
+        else if ($('#refReqNo').prop("checked")) {
+           if (validateDownward()) {
+                if (confirm("Are you sure to Save/Update?")) {
+                    $('#divLoader').show();
+                    var gridDischarge = $("#jsGrid").jsGrid("option", "data");
+                    if (gridDischarge.length > 0) {
+                        var IsReferal;
+                        if ($('#refReqYes').prop("checked")) {
+                            IsReferal = 'Y';
+                        }
+                        else {
+                            IsReferal = 'N';
+                        }
+                        var DischargeParams = new FormData();
+                        DischargeParams.append("__RequestVerificationToken", gettoken());
+                        DischargeParams.append("BlockingInvoiceNo", $('#BlkInvNo').text());
+                        DischargeParams.append("URN", $('#UrnNo').text());
+                        DischargeParams.append("IsReferalRequired", IsReferal);
+                        DischargeParams.append("DistrictCode", $('#ddlDistrict').val());
+                        DischargeParams.append("BlockCode", $("#ddlHlthBlk").val());
+                        DischargeParams.append("PHCCode", $("#ddlPhc").val());
+                        DischargeParams.append("SubCenterCode", $("#ddlSubCntr").val());
+                        if ($('#btnDischarge').val() == 'Save') {
+                            $.ajax({
+                                url: '@Url.Action("AddDownWardReferal", "Discharge")',
+                                type: "POST",
+                                data: DischargeParams,
+                                processData: false,
+                                contentType: false,
+                                success: function (data) {
+                                    $('#divLoader').hide();
+                                    if (data == "success") {
+                                        alert('DownWard Save Successfully !!');
+                                        window.location.href = "@Url.Action("ViewDischarge", "Discharge")";
+                                        d.resolve();
+
+                                    }
+                                    else if (data == "exist") {
+                                        if (confirm("Already Downward Referal Submited. do you want to edit?")) {
+                                            $('#btnDischarge').val('Update');
+                                        }
+                                        else {
+                                            window.location.href = "@Url.Action("ViewDischarge", "Discharge")";
+                                            d.resolve();
+                                        }
+                                    }
+                                },
+                                error: function (error) {
+                                    $('#divLoader').hide();
+                                    console.log(error.statusText);
+                                    d.resolve();
+                                }
+                            });
+                        }
+                        else {
+                             $.ajax({
+                                 url: '@Url.Action("UpdateDownWardReferal", "Discharge")',
+                                 type: "POST",
+                                 data: DischargeParams,
+                                 processData: false,
+                                 contentType: false,
+                                 success: function (data) {
+                                     $('#divLoader').hide();
+                                     if (data == "update") {
+                                         alert('Downward Update Successfully !!');
+                                         window.location.href = "@Url.Action("ViewDischarge", "Discharge")";
+                                         d.resolve();
+                                     }
+
+                                 },
+                                 error: function (error) {
+                                     $('#divLoader').hide();
+                                     console.log(error.statusText);
+                                     d.resolve();
+                                 }
+                            });
+                        }
+                    }
+                }
+           }
+        }
+        else {
+            alert('Please select Referal Required!');
+        }
+        return def.promise();
+    });
+    $('#TreComCertificate').on('change', function (e) {
+        if (!ValidateFile('TreComCertificate', 'Valid Document')) {
+            return false;
+        };
+        if (!CheckFileType('TreComCertificate', '1')) {
+            return false;
+        };
+    });
+    function AddDischarge() {
+        var d = $.Deferred();
+        var gridDischarge = $("#jsGrid").jsGrid("option", "data");
+        var MortalitySum = '';
+        if (gridDischarge.length > 0) {
+            var DischargeStatus = 'Discharge';
+            for (var i = 0; i < gridDischarge.length; i++) {
+                if (gridDischarge[i].ActDays == '--' || gridDischarge[i].ActDays == '--') {
+                    DischargeStatus = 'NotDischarge'
+                    alert('Cannot Discharge the patient Please Check The PreApproval Status !!');
+                    $('#divLoader').hide();
+                    window.location.href = "@Url.Action("ViewDischarge", "Discharge")";
+                    break;
+                }
+            }
+            if (DischargeStatus == 'Discharge') {
+                if ($("option:selected", $("#mortality")).text() == 'No') {
+                    MortalitySum = 'No';
+                }
+                else {
+                    MortalitySum = $('#mSummery').val();
+                }
+                var fileUpload = $("#TreComCertificate").get(0);
+                var files = fileUpload.files;
+                if (files.length > 0) {
+                    var DischargeParams = new FormData();
+                    DischargeParams.append("__RequestVerificationToken", gettoken());
+                    DischargeParams.append("file", files[0]);
+                    DischargeParams.append("ACTIONCODE", 'R');
+                    DischargeParams.append("BlockingInvoiceNo", gridDischarge[0].invoiceNo);
+                    DischargeParams.append("DischargeDesc", $('#description').val());
+                    DischargeParams.append("DischargeUserDate", $('#dischargeDate').val());
+                    DischargeParams.append("DATEOFDISCHARGE", $('#dischargeDate').val());
+                    DischargeParams.append("Mortality", $("option:selected", $("#mortality")).text());
+                    DischargeParams.append("MortalitySummary", MortalitySum.toString());
+                    DischargeParams.append("ProcedureCode", gridDischarge[0].procedureCode);
+                    DischargeParams.append("ProcedureName", gridDischarge[0].procedureName);
+                    DischargeParams.append("PackageCode", gridDischarge[0].packageCode);
+                    DischargeParams.append("PackageName", gridDischarge[0].packageName);
+                    DischargeParams.append("PackageCost", gridDischarge[0].amoutBlocked);
+                    DischargeParams.append("NoofDays", gridDischarge[0].noofDays);
+                    DischargeParams.append("AmoutBlocked", gridDischarge[0].ActAmnt);
+                    DischargeParams.append("NoofDaysActual", gridDischarge[0].ActDays.toString());
+                    DischargeParams.append("PackageMode", gridDischarge[0].packageMode);
+                    DischargeParams.append("IsMedSergical", gridDischarge[0].isMedSergical);
+                    DischargeParams.append("URN", gridDischarge[0].urn);
+
+                    DischargeParams.append("category", gridDischarge[0].category);
+                    DischargeParams.append("categoryCode", gridDischarge[0].categoryCode);
+
+                    $.ajax({
+                        url: '@Url.Action("AddDischarge", "Discharge")',
+                        type: "POST",
+                        data: DischargeParams,
+                        processData: false,
+                        contentType: false,
+                        success: function (data) {
+                            $('#divLoader').hide();
+                            if (data == "sucess") {
+                                alert('Patient Discharged Successfully !!');
+                                window.location.href = "@Url.Action("ViewDischarge", "Discharge")";
+                                d.resolve();
+
+                            }
+                        },
+                        error: function (error) {
+                            $('#divLoader').hide();
+                            console.log(error.statusText);
+                            d.resolve();
+                        }
+                    });
+                }
+            }
+        }
+        return d.promise();
+    }
+    $('#refReqYes').click(function () {
+        //$('#lblPHC').show();
+        //$('#rbPHC').show();
+        //$('#lblHSC').show();
+        //$('#rbHSC').show();
+        $('#divSubCen').show();
+        $('#divDisBlk').show();
+        //$('#btnDischarge').hide();
+    });
+     $('#refReqNo').click(function () {
+         //$('#lblPHC').hide();
+         //$('#rbPHC').hide();
+         //$('#lblHSC').hide();
+         //$('#rbHSC').hide();
+         $('#divDisBlk').hide();
+         $('#divSubCen').hide();
+     });
+    $('#rbPHC').click(function () {
+         $('#divDisBlk').show();
+
+    });
+     $('#rbHSC').click(function () {
+         $('#divDisBlk').show();
+
+    });
+});
+</script>
+<!-- Dashboard Body content part starts -->
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12 pb-3">
+
+            <div class="card">
+
+                <div class="data-info">
+                    <div class="form-box-bg mb-4">
+                        <div class="row">
+                            <div class="col-sm-2">
+                                <h2>Hospital Details</h2>
+                                <div class="row">
+                                    <div class="col-sm-3" hidden="hidden">
+                                        <p>State</p>
+                                        <h3 id="HdState"></h3>
+                                    </div>
+                                    <div class="col-sm-3" hidden="hidden">
+                                        <p>District</p>
+                                        <h3 id="HdDistrict"></h3>
+                                    </div>
+                                    <div class="col-sm-3" hidden="hidden">
+                                        <p>Hospital Code</p>
+                                        <h3 id="HdCode"></h3>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <p>Name</p>
+                                        <h3 id="HdName"></h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <h2>Member Info</h2>
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <p>URN Number</p>
+                                        <h3 id="UrnNo"></h3>
+                                    </div>
+                                    <div class="col-sm-3" hidden="hidden">
+                                        <p>Head of Family</p>
+                                        <h3 id="HeadOfFamily"></h3>
+                                        <div id="familyID" hidden></div>
+                                    </div>
+                                    <div class="col-sm-3" hidden="hidden">
+                                        <p>State</p>
+                                        <h3 id="State"></h3>
+                                        <h3 id="StateCode" style="visibility:hidden"></h3>
+                                    </div>
+                                    <div class="col-sm-3" hidden="hidden">
+                                        <p>District</p>
+                                        <h3 id="District"></h3>
+                                        <h3 id="DistrictCode" style="visibility:hidden"></h3>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <p>Patient Name</p>
+                                        <h3 id="PatientNm"></h3>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <p>Blocking Invoice No</p>
+                                        <h3 id="BlkInvNo"></h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <h2>Insurance Policy Details</h2>
+                                <div class="row pb-3">
+                                    <div class="col-sm-3" hidden="hidden">
+                                        <p>Scheme Name</p>
+                                        <h3 id="SchName"></h3>
+                                        <div id="divSchCode" hidden></div>
+                                    </div>
+                                    <div class="col-sm-3" hidden="hidden">
+                                        <p>Policy Number</p>
+                                        <h3 id="IPNumber"></h3>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <p>Start Date</p>
+                                        <h3 id="StartDt"></h3>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <p>End Date</p>
+                                        <h3 id="EndDt"></h3>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <p>Transaction Blocked Amount</p>
+                                        <h3 id="TraBlkAmnt"></h3>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <p>Available Cover</p>
+                                        <h3 id="AvlCover"></h3>
+                                        <h3 id="SumDisAmnt" hidden></h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @*<hr>
+                            <div class="row">
+                               <div class="col">
+                                   <h2>Insurance Policy Details</h2>
+                                   <div class="row pb-3">
+                                       <div class="col-sm-3">
+                                           <p>Scheme Name</p>
+                                           <h3 id="SchName"></h3>
+                                           <div id="divSchCode" hidden></div>
+                                       </div>
+                                       <div class="col-sm-3">
+                                           <p>Policy Number</p>
+                                           <h3 id="IPNumber"></h3>
+                                       </div>
+                                       <div class="col-sm-3">
+                                           <p>Start Date</p>
+                                           <h3 id="StartDt"></h3>
+                                       </div>
+                                       <div class="col-sm-3">
+                                           <p>End Date</p>
+                                           <h3 id="EndDt"></h3>
+                                       </div>
+
+                                   </div>
+                               </div>
+                                       <div class="col">
+                                   <h2>&nbsp;</h2>
+                                   <div class="row pb-3">
+                                       <div class="col-sm-4">
+                                           <p>Transaction Blocked Amount</p>
+                                           <h3 id="TraBlkAmnt"></h3>
+                                       </div>
+                                       <div class="col-sm-2">
+                                           <p>Available Cover</p>
+                                           <h3 id="AvlCover"></h3>
+                                           <h3 id="SumDisAmnt" hidden></h3>
+                                       </div>
+                                   </div>
+                               </div>
+
+                                   </div>*@
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="custom-tab-content">
+                        <div class="form-box-bg mb-4">
+                            <div>
+                                <form>
+                                    <div class="form-group row">
+                                        <label for="patientName" class="col-sm-2 col-form-label">Referal Required<b><span style="color:red">*</span></b></label>
+                                        <div class="col-sm-2">
+                                            Yes <input type="radio" id="refReqYes" name="Referal" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                            No <input type="radio" id="refReqNo" name="Referal" />
+                                        </div>
+                                        @*<label id="lblPHC" for="dischargeDate" class="col-xs-1 col-form-label">PHC <b><span style="color:red">*</span></b></label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                            <div class="col-xs-1" id="rbPHC">
+                                                <input type="radio" id="rbPHC" name="PHCHSC" />
+                                            </div>
+                                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                            <label id="lblHSC" for="dischargeDate" class="col-xs-1 col-form-label">HSC <b><span style="color:red">*</span></b></label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                            <div class="col-xs-1" id="rbHSC">
+                                                <input type="radio" id="rbHSC" name="PHCHSC" />
+                                            </div>*@
+                                    </div>
+                                    <div class="form-group row" id="divDisBlk">
+                                        <label for="district" class="col-sm-2 col-form-label">District <b><span style="color:red">*</span></b></label>
+                                        <div class="col-sm-2">
+                                            <select id="ddlDistrict" class="form-control"></select>
+                                        </div>
+
+                                        <label for="healthblock" class="col-sm-2 col-form-label">Health Block <b><span style="color:red">*</span></b></label>
+                                        <div class="col-sm-2">
+                                            <select name="" id="ddlHlthBlk" class="form-control"></select>
+                                        </div>
+
+                                        <label for="healthblock" class="col-sm-2 col-form-label">Name Of PHC <b><span style="color:red">*</span></b></label>
+                                        <div class="col-sm-2">
+                                            <select name="" id="ddlPhc" class="form-control"> </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row" id="divSubCen">
+
+                                        <label for="healthblock" class="col-sm-2 col-form-label">Name Of SubCenter <b><span style="color:red">*</span></b></label>
+                                        <div class="col-sm-2">
+                                            <select name="" id="ddlSubCntr" class="form-control"></select>
+                                        </div>
+                                    </div>
+                                    <label for="dischargeDate" hidden="hidden" class="col-sm-2 col-form-label">Discharge Date <b><span style="color:red">*</span></b></label>
+                                    <div class="col-sm-2" hidden="hidden">
+                                        <div class="input-group mb-3">
+                                            <input type="text" id="dischargeDate" class="form-control datepicker" placeholder="dd mmm yyyy" aria-label="Username" aria-describedby="basic-addon1" autofocus>
+                                            <div id="hfDiscDt" hidden></div>
+                                            <div class="input-group-prepend">
+                                                <label for="dischargeDate" class="input-group-text"><i class="fa fa-calendar"></i></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                            </div>
+                        </div>
+                        @*<div class="form-group row">
+                                <label for="description" class="col-sm-2 col-form-label"></label>
+                                <div class="col-sm-2">
+                                    <span id="Desc" class="max_char" style="color: Red; position: initial !important;">
+
+                                    </span>
+                                </div>
+                                <label for="mortality" class="col-sm-2 col-form-label"></label>
+                                <div class="col-sm-2">
+
+                                </div>
+                                <label for="mSummery" class="col-sm-2 col-form-label"></label>
+                                <div class="col-sm-2">
+                                    <span id="MSummery" class="max_char" style="color: Red; position: initial !important;visibility:hidden">
+
+                                    </span>
+                                </div>
+                            </div>*@
+
+                        <div class="text-right py-3">
+                            <input class="btn btn-outline-primary my-2 my-sm-0" type="button" id="btnViewPackage" value="View Package" />
+                        </div>
+                        <div>
+                            <h5 style="color:darkorange" id="CurBlkHeader" class="noPrint">Current Active Package Details</h5>
+                            <div class="table table-striped" id="jsGrid">
+                            </div>
+                            <h5 style="color:darkorange" id="PrevBlkHeader" class="noPrint">Previous Blocked Package Details</h5>
+                            <div class="table table-striped" id="jsGridPrev">
+                            </div>
+                            <h5 style="color:darkorange" id="AddOnBlkHeader" class="noPrint">AddOn Blocked Package Details</h5>
+                            <div class="table table-striped" id="jsGridAddOn">
+                            </div>
+                        </div>
+                        <div class="text-right py-3">
+                            <input type="button" class="btn btn-outline-danger my-2 my-sm-0" value="Back" onclick="window.location.href = '@Url.Action("ViewDischarge", "Discharge")';" />
+                            <input class="btn btn-outline-success my-2 my-sm-0" type="button" id="btnDischarge" value="Save" />
+                        </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<div class="loader" id="divLoader">
+    <div class="center">
+        <img src="~/imgs/DataLoading.gif" alt="Loader..." />
+    </div>
+</div>
+<!-- Body content Ends here -->
+<script type="text/javascript">
+    $(function () {
+        //$('.datepicker').datepicker({
+        //    format: 'dd M yyyy',
+        //    endDate: 'today',
+        //    autoclose: true
+        //}); //code for datepicker
+        $('.secondary-menu li a').tooltip();
+    });
+</script>
+
+
+<script>
+    // breadcrumb active & menu active
+    $(document).ready(function () {
+        loadNavigation('AddDownWard', 'Mldischarge', 'pl', 'Discharge', 'Add Down Ward', '');
+    });
+</script>
+
+

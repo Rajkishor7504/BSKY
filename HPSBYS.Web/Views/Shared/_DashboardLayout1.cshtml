@@ -1,0 +1,287 @@
+﻿@using System.Configuration
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>BSKY:: Dashboard</title>
+    <link rel="icon" type="image/png" href="~/imgs/favicon.png" />
+    <link rel="stylesheet" href="~/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/style.css" />
+    <link rel="stylesheet" href="~/css/icon.css" />
+    <link rel="stylesheet" href="~/css/animate.min.css" />
+    <link rel="stylesheet" href="~/css/jquery-ui.css" />
+    <script src="~/js/jquery.min.js" type="text/javascript"></script>
+    <script src="~/js/popper.min.js" type="text/javascript"></script>
+    <script src="~/js/bootstrap.min.js" type="text/javascript"></script>
+    <script src="~/js/sweetalert.min.js"></script>
+    <script src="~/js/jquery-ui.js" type="text/javascript"></script>
+    <script src="~/js/moment.min.js"></script>
+    <script src="~/js/moment-parseformat.js"></script>
+    <script type="text/javascript">
+         ServiceURL = "@ConfigurationManager.AppSettings["ServiceURL"]"
+         ShortcutKeyURL = "@ConfigurationManager.AppSettings["ShortcutKeyURL"]"
+    </script>
+    <script type="text/javascript">
+         function gettoken() {
+         var token = '@Html.AntiForgeryToken()';
+         token = $(token).val();
+         return token;
+         }
+    </script>
+    <script type="text/javascript">
+         $(document).ready(function () {
+           if ('@Session["UserName"]'== 'MIS_020demotest') {
+               $('#logTools').show();
+               $('#Tools').hide();
+           }
+           else {
+               $('#logTools').hide();
+               $('#Tools').show();
+           }
+         });
+         function logintocms() {
+            var date = new Date();
+            var dateStr =
+                ("00" + date.getDate()).slice(-2) + "-" +
+                ("00" + (date.getMonth() + 1)).slice(-2) + "-" +
+                date.getFullYear() + " " +
+                ("00" + date.getHours()).slice(-2) + ":" +
+                ("00" + date.getMinutes()).slice(-2) + ":" +
+                ("00" + date.getSeconds()).slice(-2);
+
+            var dateform = OnEncryptPwd(dateStr);
+            var param = {
+                username: '@Session["HospitalCode"]',
+               // password: 'NA',
+                dateoftoken: dateform
+            }
+            $.ajax({
+                //url: "http://172.27.32.208:8080/api/login/GetSSOLoginInformation",//local url
+                //url: "http://192.168.10.76/bsky_service_testI/api/login/GetSSOLoginInformation",//testing url
+                url: "https://bskyportal.odisha.gov.in/bsky_service/api/login/GetSSOLoginInformation",// Live URL
+                type: "POST",
+                data: JSON.stringify(param),
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json',
+                async: false,
+
+                success: function (data) {
+                    console.log(data);
+                    if (data != null) {
+                        console.log(data.data);
+                        var myvalue = JSON.stringify(data.data);
+                        var encryptmyvalue = OnEncryptPwd(myvalue);
+                        var myurl = "https://bskyportal.odisha.gov.in/#/landing?data=" + encryptmyvalue;// Live URL
+                        //var myurl = "http://192.168.10.76/bsky_service_testI/#/landing?data=" + encryptmyvalue;//Testing URL
+                        //window.location.href = "http://172.27.32.208:4200/#/landing?data=" + encryptmyvalue;
+                        window.open(myurl, "_blank");
+                    }
+                    else {
+                        return sweetAlert('UnAuthorize');
+                    }
+                },
+            });
+        }
+        function OnEncryptPwd(normalPass) {
+            if (normalPass) {
+
+                var encPassword = this.makeid() + btoa(normalPass) + this.makeid();
+                return encPassword;
+            }
+            else {
+                return normalPass
+            }
+        }
+
+        function makeid() {
+            var text = "";
+            var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+            for (var i = 0; i < 5; i++)
+                text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+            return text;
+        }
+
+        function getdropdownlist() {
+            var NoticeParams = {
+                Action: 'A'
+            };
+            $.ajax({
+                url: ServiceURL + "/api/Common/getNotices",
+                type: "GET",
+                data: NoticeParams,
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                beforeSend: function () {
+                    $("#loader").show();
+                },
+                success: function (data) {
+                    $("#style-3").html('');
+                    console.log('data', data);
+                    if (data.length > 0) {
+                        for (i = 0; i < data.length; i++) {
+                            var htm = '';
+                            htm = '<li><p>' + data[i].notices + '</p><div class="pk_dt"><i class="fa fa-calendar"></i><span id="sp1"> ' + data[i].startDate + '</span></div></li>';
+                            $("#style-3").append(htm);
+
+                        }
+                       // $('#dropdownButton').show();
+
+                    }
+                    else {
+                        swal({
+                            text: "No Record Found", type: "error", confirmButtonColor: "#36A865", confirmButtonText: "OK",
+                            closeOnConfirm: false
+                        }).then(function () {
+                            $('#dropdownButton').hide();
+                        });
+                    }
+                },
+
+                complete: function () {
+                    console.log('after');
+                    $("#loader").hide();
+                }
+
+
+            });
+        };
+
+    </script>
+    <script src="~/js/ShortcutKey.js"></script>
+</head>
+
+<body class="dashboard_pattern" oncontextmenu="return false;">
+    @*oncontextmenu="return false;"*@
+    <!-- loader section -->
+    <div id="loader" class="spinner-bg">
+        <div class="spin-inner">
+            <img src="~/imgs/bsky_loader.gif" alt="">
+        </div>
+    </div>
+    <!-- loader section -->
+    <!-- Code for header part -->
+
+    <section class="navbar-bg">
+        <nav class="navbar navdash-top sticky-top navbar-expand-lg">
+            <div class="container">
+                <a class="navbar-brand" title="Home"> <img src="~/imgs/index-logo.png" alt=""></a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav mr-auto w-100 justify-content-end">
+                        @* <li class="nav-item active">
+            <a class="nav-link  dropdown-item" onclick="logintocms();" href="#"> Login To CMS</a>
+        </li>*@
+                        @if (Convert.ToInt32(Session["groupid"]) != 1)
+                        {
+                            <li class="nav-item active">
+                                <a class="nav-link  dropdown-item" href="@Url.Action("BlockPreApproval", "BlockPackage")"> Pre-auth</a>
+                            </li>
+                            <li class="nav-item active">
+                                <a class="nav-link  dropdown-item" href="@Url.Action("OverrideRequest", "BlockPackage")"> Override</a>
+                            </li>
+                            <li class="nav-item active">
+                                <a class="nav-link  dropdown-item" href="@Url.Action("PatientReferalForm", "Discharge")"> Referral </a>
+                            </li>
+                        }
+
+                            <li class="nav-item dropdown menu_drop">
+                                <a class="nav-link dropdown-item  dropdown-toggle menu-radius" data-toggle="dropdown"> Reports </a>
+                                <div class="dropdown-menu">
+                                    <a class="nav-link" href="@Url.Action("HospitalDetailsReport", "IPReports")"> <i class="fa fa-angle-double-right"></i> Admission</a>
+                                    @if (Convert.ToInt32(Session["groupid"]) != 1)
+                                    {
+                                    <a class="nav-link" href="@Url.Action("HospitalReferralReport", "IPReports")"><i class="fa fa-angle-double-right"></i> Referral</a>
+                                    }
+                                    <a class="nav-link" href="@Url.Action("KnowYourStatus", "IPReports")"><i class="fa fa-angle-double-right"></i> Know Your Status</a>
+                                    <a class="nav-link" href="@Url.Action("HospitalPreAuthReport", "IPReports")"><i class="fa fa-angle-double-right"></i> PreAuth</a>
+                                    <a class="nav-link" href="@Url.Action("HospitalMortalityReport", "IPReports")"><i class="fa fa-angle-double-right"></i> Mortality</a>
+                                    <a class="nav-link" href="@Url.Action("AuthenticationDetails", "IPReports")"><i class="fa fa-angle-double-right"></i> Authentication Details</a>
+                                    <a class="nav-link" href="@Url.Action("HospitalPackageReport", "IPReports")"><i class="fa fa-angle-double-right"></i> Package Details</a>
+                                    <a class="nav-link" href="@Url.Action("PatientMobileVerificationReport", "IPReports")"><i class="fa fa-angle-double-right"></i> Mobile Verification</a>
+                                </div>
+                            </li>
+
+
+                        </ul>
+                    <div class="header-menu">
+                        <ul class="navbar-pos navbar-collapse nav">
+                            @if (Convert.ToInt32(Session["groupid"]) != 1)
+                            {
+                            <li class="nav-item dropdown logedUser">
+                                <button class="btn btn-link dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <div class="fi-font mt-1"> @*<span  class="bell-note"> 2</span>*@ <span onclick="getdropdownlist();" class="fi-rr-bell"></span> </div>
+                                </button>
+                                <div id="dropdownButton" class="dropdown-menu text-center wow fadeInDown    animated p-0" aria-labelledby="dropdownMenuButton">
+                                    <div class="scrollbar-note" id="style-1">
+                                        <div class="force-overflow"></div>
+                                        <h4>Notification</h4>
+                                        <ul id="style-3" class="notification">
+                                        </ul>
+                                    </div>
+                                </div>
+                            </li>
+                            }
+
+                            <li class="nav-item dropdown logedUser">
+                                <button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <div class="fi-font"> <span class="fi-rr-user"></span> </div>
+                                </button>
+                                <div class="dropdown-menu text-center wow flipInX  animated" aria-labelledby="dropdownMenuButton">
+                                    <h3>@Session["HospitalName"]</h3>
+                                    @if (Convert.ToInt32(Session["groupid"]) != 1)
+                                    {
+                                    <p class="mb-3">@Session["HospitalDistName"]</p>
+                                    }
+                                    else
+                                    {
+                                    <b class="text-success">Biju Swasthya Kalyan Yojna</b>
+                                    }
+                                    @*<a class="btn btn-outline-success btn-sm btn-block" href="@Url.Action("ChangePassword", "Dashboard")">Change Password</a>*@
+                                    <!-- <a class="btn btn-outline-danger btn-sm btn-block" href="@Url.Action("Logout", "Dashboard")">Logout</a> -->
+                                </div>
+                            </li>
+                            <li class="nav-item dropdown logedUser">
+                                <a class="btn_logout" href="@Url.Action("Logout", "Dashboard")" title="Log Out">Logout  </a>
+                            </li>
+
+                            <li class="nav-item dropdown logedUser">
+                                <a class="btn_logout" onclick="logintocms();" href="#" title="Login CMS"> Login CMS </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <div class="collapse" id="navbarToggleExternalContent"></div>
+    </section>
+    <!-- Header code Ends here -->
+    @RenderBody()
+    <footer>
+        <p> &copy;Copyright 2023 All Rights Reserved.  </p>
+    </footer>
+    <script>
+        // Disable right-click with f12 click
+        document.addEventListener('contextmenu', (e) => e.preventDefault());
+        function ctrlShiftKey(e, keyCode) {
+            return e.ctrlKey && e.shiftKey && e.keyCode === keyCode.charCodeAt(0);
+        }
+        document.onkeydown = (e) => {
+            // Disable F12, Ctrl + Shift + I, Ctrl + Shift + J, Ctrl + U
+            if (
+                event.keyCode === 123 ||
+                ctrlShiftKey(e, 'I') ||
+                ctrlShiftKey(e, 'J') ||
+                ctrlShiftKey(e, 'C') ||
+                (e.ctrlKey && e.keyCode === 'U'.charCodeAt(0))
+            )
+                return false;
+        };
+    </script>
+</body>
+</html>

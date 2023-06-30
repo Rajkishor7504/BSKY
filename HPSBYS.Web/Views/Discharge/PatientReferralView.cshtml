@@ -1,0 +1,315 @@
+﻿
+@{
+    ViewBag.Title = "PatientReferralView";
+    Layout = "~/Views/Shared/_CommonLayout.cshtml";
+}
+
+<!-- Dashboard Body content part starts -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="clearfix"></div>
+                    <!-- patient info -->
+                    <div class="form-box-bg mb-4">
+                        <ul class="nav nav-tabs custom-tab mb-4">
+                            <li class="nav-item">
+                                <a class="nav-link" href="@Url.Action("PatientReferalForm","Discharge")">Add</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link active" href="@Url.Action("PatientReferralView","Discharge")">View</a>
+                            </li>
+                        </ul>
+                        <div class="col-md-12 col-sm-12 col-xs-12 px-0">
+
+                            <div class="form-row">
+                                <div class="col-lg-2">
+                                    <div class="mb-4">
+                                        <label class="pkg-label"> From Date :</label>
+                                        <input type="text" id="txtFromDate" class="form-control dateFormat" />
+                                    </div>
+                                </div>
+                                <div class="col-lg-2">
+                                    <div class="mb-4">
+                                        <label class="pkg-label"> To Date :</label>
+                                        <input type="text" id="txtToDate" class="form-control dateFormat" />
+                                    </div>
+                                </div>
+                                <div class="col-lg-2 d-flex justify-content-start align-items-center">
+                                    <input class="btn btn-outline-success" type="button" value="Search" id="btnSearch">
+                                </div>
+                            </div>
+
+                            <div id="DvPatientReferralView">
+                                <div class="clearfix"></div>
+                                <div class="col-md-12 col-sm-12 col-xs-12 px-0">
+                                    @*<div class="table-responsive">
+                                        <table id="grdPatientReferralView" data-toggle="table" class="table table-striped"></table>
+                                    </div>*@
+                                </div>
+                            </div>
+
+
+                            <!-- Patient referal View -->
+
+                            <div class="table-responsive">
+                                <table id="grdPatientReferralView" class="table table-striped border preauth-tbl" cellspacing="0" width="100%">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:5% !important;">Sl No</th>
+                                            <th style="width:15% !important;">URN</th>
+                                            <th style="width:20% !important;">
+                                                <div class="prehed-bold"> Member Details </div>
+                                                <div class="prehed-small"> ID | Name </div>
+                                            </th>
+
+                                            <th style="width:10% !important;"> From Hospital </th>
+
+                                            <th style="width:10% !important;"> To Hospital </th>
+
+                                            <th style="width:10% !important;"> Referral date </th>
+
+                                            <th style="width:15% !important;">
+                                                <div class="prehed-bold"> Referal Code </div>
+                                                <div class="prehed-small"> Status </div>
+                                            </th>
+
+
+                                            <th style="width:10% !important;"> Action </th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>1</td>
+                                            <td>02120610257</td>
+                                            <td>
+                                                <b class="text-success"> 59776523 </b>
+                                                <div class="pre-bold"> BIBHU JENA </div>
+                                            </td>
+
+                                            <td>  02-June-23  </td>
+
+                                            <td>  16-May-23  </td>
+
+                                            <td>  10-Aug-23  </td>
+
+                                            <td>
+
+                                                <div class="mb-1">  B11807  </div>
+                                                <div class="badge badge-warning badge-font mb-1"> Pending </div>
+
+
+                                            </td>
+
+                                            <td>
+                                                <button type="button" tooltip="View Details" toggle="modal" class="btn btn-outline-success focusedBtn btn-sm my-2 mr-2 my-sm-0"> <i class="fa fa-eye"></i></button>
+                                            </td>
+
+                                        </tr>
+
+                                        <tr>
+                                            <td>2</td>
+                                            <td>02120610257</td>
+                                            <td>
+                                                <b class="text-success"> 59776523 </b>
+                                                <div class="pre-bold"> RUNU GOUDA </div>
+                                            </td>
+
+                                            <td>  02-June-23  </td>
+
+                                            <td>  16-May-23  </td>
+
+                                            <td>  10-Aug-23  </td>
+                                            <td>
+
+                                                <div class="mb-1">  B11807  </div>
+                                                <div class="badge badge-success badge-font mb-1"> Approved </div>
+
+
+                                            </td>
+
+                                            <td>
+                                                <button type="button" tooltip="View Details" toggle="modal" class="btn btn-outline-success focusedBtn btn-sm my-2 mr-2 my-sm-0"> <i class="fa fa-eye"></i></button>
+                                            </td>
+
+                                        </tr>
+
+
+
+                                    </tbody>
+                                </table>
+                            </div>
+
+
+
+
+
+
+
+                        </div>
+
+                        <!-- Patient referal View -->
+
+
+                    </div>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="viewref" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel"> Patient View Referal Details </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+
+            <div class="modal-body">
+                <div class="col-xxl-12 col-xl-12 col-lg-12 card mb-3 border">
+
+                    <div class="row">
+
+                        <div class="col-xxl-6  col-xl-6  col-lg-6  col-md-5 col-sm-5 col-xs-12 border-right">
+
+                            <div class="col-lg-12 col-md-12 px-0">
+                                <div class="mb-1 heading-pkg border-bottom px-0">
+                                    <h5 class="m-1">Refer From </h5>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-xxl-6  col-xl-6  col-lg-6  col-md-6 col-sm-6 col-xs-12">
+                                    <div class="pkg-label"> Name of Hospital : </div>
+                                    <div class="color-hed p-0"> <label class="col-form-label p-0 mb-2" id="fromhospitalname"> </label> </div>
+                                </div>
+
+                                <div class="col-xxl-6  col-xl-6  col-lg-6  col-md-6 col-sm-6 col-xs-12">
+                                    <div class="pkg-label"> Name of Dr : </div>
+                                    <div class="color-hed p-0"> <label class="col-form-label p-0 mb-2" id="fromdrname"> </label> </div>
+                                </div>
+
+                                <div class="col-xxl-6  col-xl-6  col-lg-6  col-md-6 col-sm-6 col-xs-12">
+                                    <div class="pkg-label"> Department :  </div>
+                                    <div class="color-hed p-0"> <label class="col-form-label p-0 mb-2" id="fromdeptname"> </label> </div>
+                                </div>
+
+
+
+                                <div class="col-xxl-6  col-xl-6  col-lg-6  col-md-6 col-sm-6 col-xs-12">
+                                    <div class="pkg-label"> Date : </div>
+                                    <div class="color-hed p-0"> <label class="col-form-label p-0 mb-2" id="fromreferraldate"> </label> </div>
+                                </div>
+
+                                <div class="col-xxl-12  col-xl-12  col-lg-12  col-md-12 col-sm-12 col-xs-12">
+                                    <div class="pkg-label"> Reason for Referring : </div>
+                                    <div class="color-hed p-0">  <label class="col-form-label p-0 mb-2" id="reasonforrefer"> </label> </div>
+                                </div>
+
+                            </div>
+
+
+                        </div>
+
+
+                        <div class="col-xxl-6  col-xl-6  col-lg-6  col-md-5 col-sm-5 col-xs-12">
+
+                            <div class="col-lg-12 col-md-12 px-0">
+                                <div class="mb-1 heading-pkg border-bottom px-0">
+                                    <h5 class="m-1">Refer To </h5>
+                                </div>
+                            </div>
+                            <div class="row">
+
+                                <div class="col-xxl-6  col-xl-6  col-lg-6  col-md-6 col-sm-6 col-xs-12">
+                                    <div class="pkg-label"> State : </div>
+                                    <div class="color-hed p-0"><label class="col-form-label p-0  mb-2" id="tostate"> </label> </div>
+                                </div>
+
+
+                                <div class="col-xxl-6  col-xl-6  col-lg-6  col-md-6 col-sm-6 col-xs-12">
+                                    <div class="pkg-label"> District : </div>
+                                    <div class="color-hed p-0"> <label class="col-form-label p-0  mb-2" id="todistrict"> </label> </div>
+                                </div>
+
+
+                                <div class="col-xxl-6  col-xl-6  col-lg-6  col-md-6 col-sm-6 col-xs-12">
+                                    <div class="pkg-label"> Hospital : </div>
+                                    <div class="color-hed p-0"><label class="col-form-label p-0  mb-2" id="tohospital"> </label> </div>
+                                </div>
+
+                                <div class="col-xxl-6  col-xl-6  col-lg-6  col-md-6 col-sm-6 col-xs-12">
+                                    <div class="pkg-label"> Date : </div>
+                                    <div class="color-hed p-0"> <label class="col-form-label p-0  mb-2" id="toreferraldate"></label></div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xxl-12 col-xl-12  col-lg-12  col-md-12 col-sm-12 col-xs-12">
+                            <div class="border-top">
+                                <div class="row">
+                                    <div class="col-xxl-6  col-xl-6  col-lg-6  col-md-6 col-sm-6 col-xs-12 border-right p-0">
+                                        <div class="col-xxl-12 col-xl-12  col-lg-12  col-md-12 col-sm-12 col-xs-12">
+                                            <div class="pkg-label"> Provisional/Final Diagnosis : </div>
+                                            <div class="color-hed p-0"> <label class="col-form-label p-0  mb-2" id="diagnosis"> </label> </div>
+                                        </div>
+
+                                        <div class="col-xxl-12 col-xl-12  col-lg-12  col-md-12 col-sm-12 col-xs-12">
+                                            <div class="pkg-label"> Brief History & Details of Patient : </div>
+                                            <div class="color-hed p-0"> <label class="col-form-label p-0  mb-2" id="briefhistory"> </label> </div>
+                                        </div>
+
+                                        <div class="col-xxl-12 col-xl-12  col-lg-12  col-md-12 col-sm-12 col-xs-12">
+                                            <div class="pkg-label"> Treatment Given : </div>
+                                            <div class="color-hed p-0"> <label class="col-form-label p-0  mb-2" id="treatmentgiven"> </label> </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xxl-6  col-xl-6  col-lg-6  col-md-6 col-sm-6 col-xs-12 p-0">
+                                        <div class="col-xxl-12 col-xl-12  col-lg-12  col-md-12 col-sm-12 col-xs-12">
+                                            <div class="pkg-label"> Treatment Advised : </div>
+                                            <div class="color-hed p-0"><label class="col-form-label p-0 mb-2" id="treatmentadvised"> </label> </div>
+                                        </div>
+                                        <div class="col-xxl-12 col-xl-12  col-lg-12  col-md-12 col-sm-12 col-xs-12">
+                                            <div class="pkg-label"> Investigation Document(s) : </div>
+                                            <div class="color-hed mb-2 mt-1">
+                                                <button id="investigationdoc" onclick="DownloadDoc(this);">
+                                                    <i class="fa fa-download"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="col-xxl-12 col-xl-12  col-lg-12  col-md-12 col-sm-12 col-xs-12">
+                                            <div class="pkg-label"> Referral Document(s) : </div>
+                                            <div class="color-hed mb-2 mt-1">
+                                                <button id="referraldoc" onclick="DownloadDoc(this);">
+                                                    <i class="fa fa-download"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<script>
+
+     document.mynamespace = {};
+    document.mynamespace.hospitalcode = '@HttpContext.Current.Session["HospitalCode"]';
+    document.mynamespace.UserId = '@HttpContext.Current.Session["UserId"]';
+</script>
+@Scripts.Render("~/bundles/patientreferralview")

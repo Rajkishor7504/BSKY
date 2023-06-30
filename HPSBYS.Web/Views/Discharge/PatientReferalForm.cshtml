@@ -1,0 +1,292 @@
+﻿@{
+    ViewBag.Title = "PatientReferralFrom";
+    Layout = "~/Views/Shared/_CommonLayout.cshtml";
+}
+
+<!-- Dashboard Body content part starts -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 pb-3">
+            <div class="card">
+                <div class="card-body">
+                    <div class="form-box-bg mb-4">
+                        <ul class="nav nav-tabs custom-tab mb-4">
+                            <li class="nav-item">
+                                <a class="nav-link active" href="@Url.Action("PatientReferalForm","Discharge")">Add</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="@Url.Action("PatientReferralView","Discharge")">View</a>
+                            </li>
+                        </ul>
+                        <div class="row pl-3 mb-3 heading-pkg border-bottom">
+                            <h5>Patient Referral Form</h5>
+                        </div>
+                        <div class="row border-bottom mb-3">
+                            <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12 border-right">
+                                <div class="row">
+                                    <div class="col-lg-5 col-md-5 col-sm-6 col-xs-12">
+                                        <label class="col-form-label">NFSA/SFSS Card or BSKY Card No <b><span style="color:red">*</span></b> </label>
+                                    </div>
+                                    <div class="col-lg-7 col-md-7 col-sm-6 col-xs-12 input-group">
+                                        @*<span class="text-danger"></span>*@
+                                        <input type="text" id="txtPatientUrn" class="form-control form-group inputRequired" maxlength="17" onkeypress="return inputLimiter(event,'Numbers')" placeholder="Enter NFSA/SFSS Card or BSKY Card No">
+                                        <div class="input-group-append formDirect">
+                                            <button id="btnSearchUrn" class="form-control form-group btn btn-outline-success" data-toggle="tooltip" title="Search URN"><i class="fa fa-search"></i></button>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-5 col-md-5 col-sm-6 col-xs-12">
+                                        <label class="col-form-label">Patient Name <b><span style="color:red">*</span></b> </label>
+                                    </div>
+                                    <div class="col-lg-7 col-md-7 col-sm-6 col-xs-12">
+                                        <span class="text-danger"></span>
+                                        <select id="ddPatientName" class="form-control form-group dropdownRequired">
+                                            <option value="0">-Select-</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-5 col-md-5 col-sm-6 col-xs-12">
+                                        <label class="col-form-label">Age <b><span style="color:red">*</span></b> </label>
+                                    </div>
+                                    <div class="col-lg-7 col-md-7 col-sm-6 col-xs-12">
+                                        <span class="text-danger"></span>
+                                        <input type="text" id="txtPatientAge" class="form-control form-group inputRequired" maxlength="3" onkeypress="return inputLimiter(event,'Numbers')" placeholder="Enter Age">
+                                    </div>
+                                    <div class="col-lg-5 col-md-5 col-sm-6 col-xs-12">
+                                        <label class="col-form-label">Gender <b><span style="color:red">*</span></b> </label>
+                                    </div>
+                                    <div class="col-lg-7 col-md-7 col-sm-6 col-xs-12">
+                                        <span class="text-danger"></span>
+                                        <select id="ddPatientGender" class="form-control form-group dropdownRequired">
+                                            <option value="0">-Select-</option>
+                                            <option value="M">Male</option>
+                                            <option value="F">Female</option>
+                                            <option value="O">Others</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-5 col-md-5 col-sm-6 col-xs-12">
+                                        <label class="col-form-label">Regd. No <b><span style="color:red">*</span></b> </label>
+                                    </div>
+                                    <div class="col-lg-7 col-md-7 col-sm-6 col-xs-12">
+                                        <span class="text-danger"></span>
+                                        <input type="text" id="txtRegdNo" class="form-control form-group inputRequired" placeholder="Enter Regd. No">
+                                    </div>
+                                    <div class="col-lg-5 col-md-5 col-sm-6 col-xs-12">
+                                        <label class="col-form-label">Date <b><span style="color:red">*</span></b> </label>
+                                    </div>
+                                    <div class="col-lg-7 col-md-7 col-sm-6 col-xs-12">
+                                        <span class="text-danger"></span>
+                                        <input type="text" id="txtPatientFormDate" autocomplete="off" readonly class="form-control form-group dateFormat inputRequired bg-white">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                                <div class="row">
+                                    <div class="col-lg-12 col-md-12">
+                                        <div class="mb-1 heading-pkg border-bottom px-0">
+                                            <h5>Vitals at the time of Referring</h5>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <div class="form-row">
+                                            <div class="col-md-4">
+                                                <label class="col-form-label">Parameter</label>
+                                                <select class="form-control" id="ddVitals"></select>
+                                                <span id="errddVitals" class="text-danger"></span>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="col-form-label">Value</div>
+                                                <input type="text" id="txtVitalsValue" class="form-control" maxlength="7" onkeypress="return inputLimiter(event,'NameCharactersAndNumbers')">
+                                                <span id="errVitalsValue" class="text-danger"></span>
+                                            </div>
+                                            <div class="col-md-2 addmore-sc">
+                                                <button id="btnAddVitals" class="btn btn-outline-success"> Add More &nbsp;<i class="fa fa-plus"></i></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <div class="form-row">
+                                            <div class="col-md-12">
+                                                <div class="table-responsive border mt-4 mb-3">
+                                                    <table class="table table-striped" id="tblVitals">
+                                                        <thead>
+                                                            <tr class="jsgrid-header-row">
+                                                                <th scope="col" class="jsgrid-header-cell" width="100">SL No</th>
+                                                                <th scope="col" class="jsgrid-header-cell">Parameter</th>
+                                                                <th scope="col" class="jsgrid-header-cell">Value</th>
+                                                                <th scope="col" class="jsgrid-header-cell">Action</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row border-bottom mb-3">
+                            <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12 border-right">
+                                <div class="col-lg-12 col-md-12 px-0">
+                                    <div class="mb-3 heading-pkg border-bottom px-0">
+                                        <h5>Refer From </h5>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-5 col-md-5 col-sm-6 col-xs-12">
+                                        <label class="col-form-label">Name of Hospital <b><span style="color:red">*</span></b> </label>
+                                    </div>
+                                    <div class="col-lg-7 col-md-7 col-sm-6 col-xs-12">
+                                        <span class="text-danger"></span>
+                                        <input type="text" id="txtHospitalReferFrom" oninput="this.value = this.value.toUpperCase()" class="form-control form-group inputRequired" placeholder="Enter Name of Hospital" onkeypress="return inputLimiter(event,'NameCharactersymbolDoctor')">
+                                    </div>
+                                    <div class="col-lg-5 col-md-5 col-sm-6 col-xs-12">
+                                        <label class="col-form-label">Name of Dr <b><span style="color:red">*</span></b> </label>
+                                    </div>
+                                    <div class="col-lg-7 col-md-7 col-sm-6 col-xs-12">
+                                        <span class="text-danger"></span>
+                                        <input type="text" id="txtDoctorName" autocomplete="off" oninput="this.value = this.value.toUpperCase()" class="form-control form-group inputRequired" placeholder="Enter Name of Dr" onkeypress="return inputLimiter(event,'NameCharactersymbolDoctor')">
+                                    </div>
+                                    <div class="col-lg-5 col-md-5 col-sm-6 col-xs-12">
+                                        <label class="col-form-label">Department <b><span style="color:red">*</span></b> </label>
+                                    </div>
+                                    <div class="col-lg-7 col-md-7 col-sm-6 col-xs-12">
+                                        <span class="text-danger"></span>
+                                        <input type="text" id="ddDepartmentFrom" onkeypress="return inputLimiter(event,'NameCharactersymbolDoctor')" oninput="this.value = this.value.toUpperCase()" class="form-control form-group inputRequired" placeholder="Enter Name of Dept.">
+                                    </div>
+                                    <div class="col-lg-5 col-md-5 col-sm-6 col-xs-12">
+                                        <label class="col-form-label">Date <b><span style="color:red">*</span></b> </label>
+                                    </div>
+                                    <div class="col-lg-7 col-md-7 col-sm-6 col-xs-12">
+                                        <span class="text-danger"></span>
+                                        <input type="text" id="txtReferralFromDate" autocomplete="off" readonly class="form-control form-group dateFormat inputRequired bg-white">
+                                    </div>
+                                    <div class="col-lg-5 col-md-5 col-sm-6 col-xs-12">
+                                        <label class="col-form-label">Reason for Referring <b><span style="color:red">*</span></b> </label>
+                                    </div>
+                                    <div class="col-lg-7 col-md-7 col-sm-6 col-xs-12">
+                                        <span class="text-danger"></span>
+                                        <textarea id="txtReasonForRefer" class="form-control form-group inputRequired" onkeypress="return inputLimiter(event,'NameCharactersymbolDoctor')" rows="3" oninput="this.value = this.value.toUpperCase()"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                                <div class="col-lg-12 col-md-12 px-0">
+                                    <div class="mb-3 heading-pkg border-bottom px-0">
+                                        <h5>Refer To </h5>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-5 col-md-5 col-sm-6 col-xs-12 formDirect">
+                                        <label class="col-form-label">State <b><span style="color:red">*</span></b> </label>
+                                    </div>
+                                    <div class="col-lg-7 col-md-7 col-sm-6 col-xs-12 formDirect">
+                                        <span class="text-danger"></span>
+                                        <select id="ddState" class="form-control form-group dropdownRequired"> <option value="0">-Select-</option> </select>
+                                    </div>
+                                    <div class="col-lg-5 col-md-5 col-sm-6 col-xs-12 formDirect">
+                                        <label class="col-form-label">District <b><span style="color:red">*</span></b> </label>
+                                    </div>
+                                    <div class="col-lg-7 col-md-7 col-sm-6 col-xs-12 formDirect">
+                                        <span class="text-danger"></span>
+                                        <select id="ddDistrict" class="form-control form-group dropdownRequired"> <option value="0">-Select-</option> </select>
+                                    </div>
+                                    <div class="col-lg-5 col-md-5 col-sm-6 col-xs-12">
+                                        <label class="col-form-label">Hospital <b><span style="color:red">*</span></b> </label>
+                                    </div>
+                                    <div class="col-lg-7 col-md-7 col-sm-6 col-xs-12">
+                                        <span class="text-danger"></span>
+                                        <select id="ddHospitalReferTo" class="form-control form-group dropdownRequired formDirect"> <option value="0">-Select-</option> </select>
+                                        <input type="text" id="txtHospitalReferTo" class="form-control form-group inputRequired formRedirect" readonly>
+                                    </div>
+                                    <div class="col-lg-5 col-md-5 col-sm-6 col-xs-12">
+                                        <label class="col-form-label">Date <b><span style="color:red">*</span></b> </label>
+                                    </div>
+                                    <div class="col-lg-7 col-md-7 col-sm-6 col-xs-12">
+                                        <span class="text-danger"></span>
+                                        <input type="text" id="txtReferralToDate" autocomplete="off" readonly class="form-control form-group dateFormat inputRequired bg-white">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                                <div class="row">
+                                    <div class="col-lg-5 col-md-5 col-sm-6 col-xs-12">
+                                        <label class="col-form-label">Provisional/Final Diagnosis</label>
+                                    </div>
+                                    <div class="col-lg-7 col-md-7 col-sm-6 col-xs-12">
+                                        <textarea id="txtDiagnosis" class="form-control form-group" rows="2" placeholder="Enter Provisional/Final Diagnosis" oninput="this.value = this.value.toUpperCase()" onkeypress="return inputLimiter(event,'NameCharactersymbolDoctor')"></textarea>
+                                    </div>
+                                    <div class="col-lg-5 col-md-5 col-sm-6 col-xs-12">
+                                        <label class="col-form-label">Treatment Given</label>
+                                    </div>
+                                    <div class="col-lg-7 col-md-7 col-sm-6 col-xs-12">
+                                        <textarea id="txtTreatmentGiven" class="form-control form-group" rows="2" placeholder="Enter Treatment Given" oninput="this.value = this.value.toUpperCase()" onkeypress="return inputLimiter(event,'NameCharactersymbolDoctor')"></textarea>
+                                    </div>
+                                    <div class="col-lg-5 col-md-5 col-sm-6 col-xs-12">
+                                        <label class="col-form-label">Investigation Done (Reports Attached)</label>
+                                    </div>
+                                    <div class="col-lg-7 col-md-7 col-sm-6 col-xs-12">
+                                        <span class="text-danger"></span>
+                                        <input type="file" id="fileInvestigationReport" class="form-control pr-5">
+                                        <span id="RemoveInvestigationDoc" onclick="RemoveInvestigationDoc(this)" class="btn btn-outline-danger btn-sm btn-crus"> <i class="fa fa-times"></i></span>
+                                        <div class="mt-1">
+                                            <small><div class="text-danger">File to be uploaded in  pdf , jpeg , jpg and size should not exceed 5 MB </div></small>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                                <div class="row">
+                                    <div class="col-lg-5 col-md-5 col-sm-6 col-xs-12">
+                                        <label class="col-form-label">Brief History & Details of Patient</label>
+                                    </div>
+                                    <div class="col-lg-7 col-md-7 col-sm-6 col-xs-12">
+                                        <textarea id="txtPatientBriefHistory" class="form-control form-group" rows="2" placeholder="Enter Brief History & Details of Patient" oninput="this.value = this.value.toUpperCase()" onkeypress="return inputLimiter(event,'NameCharactersymbolDoctor')"></textarea>
+                                    </div>
+                                    <div class="col-lg-5 col-md-5 col-sm-6 col-xs-12">
+                                        <label class="col-form-label">Treatment Advised <b><span style="color:red">*</span></b> </label>
+                                    </div>
+                                    <div class="col-lg-7 col-md-7 col-sm-6 col-xs-12">
+                                        <span class="text-danger"></span>
+                                        <textarea id="txtTreatmentAdvised" class="form-control form-group inputRequired" rows="2" placeholder="Enter Treatment Advised" oninput="this.value = this.value.toUpperCase()" onkeypress="return inputLimiter(event,'NameCharactersymbolDoctor')"></textarea>
+                                    </div>
+                                    <div class="col-lg-5 col-md-5 col-sm-6 col-xs-12">
+                                        <label class="col-form-label">Referral Document(s)</label>
+                                    </div>
+                                    <div class="col-lg-7 col-md-7 col-sm-6 col-xs-12">
+                                        <span class="text-danger"></span>
+                                        <input type="file" id="referaluploaddocs" class="form-control pr-5">
+                                        <span id="RemoveReferalDoc" onclick="RemoveReferalDoc(this)" class="btn btn-outline-danger btn-sm btn-crus"> <i class="fa fa-times"></i></span>
+                                        <div class="mt-1">
+                                            <small>
+                                                <div class="text-danger">
+                                                    File to be uploaded in  pdf , jpeg , jpg and size should not exceed 5 MB
+                                                </div>
+                                            </small>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-left mb-4 mt-4 px-0">
+                            <input id="btnSubmit" onclick="confirmPatientReferralForm();" class="btn btn-success my-2 my-sm-0" type="button" value="Submit">
+                            <input class="btn btn-primary my-2 my-sm-0" type="reset" value="Clear" id="btnClear" onclick="ClearPage();">
+                            <input class="btn btn-danger my-2 my-sm-0" type="button" value="Close" id="btnClose" onclick="ClosePage();">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+     document.mynamespace = {};
+    document.mynamespace.hospitalcode = '@HttpContext.Current.Session["HospitalCode"]';
+    document.mynamespace.UserId = '@HttpContext.Current.Session["UserId"]';
+</script>
+@Scripts.Render("~/bundles/patientreferralform")

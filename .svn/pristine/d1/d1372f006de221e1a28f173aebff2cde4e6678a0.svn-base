@@ -1,0 +1,193 @@
+﻿
+@{
+    ViewBag.Title = "ViewPatientStatus";
+    Layout = "~/Views/Shared/_CommonLayout.cshtml";
+}
+<style type="text/css">
+    tr.highlight td.jsgrid-cell {
+        background-color: lightgoldenrodyellow;
+    }
+    .jsgrid-grid-header,
+    .jsgrid-grid-body {
+        overflow: auto;
+    }
+</style>
+<script>
+    $(document).ready(function () {
+        $('#path').html('Patient Status');
+        $('#divRowCount').hide();
+        $('#DivNote').hide();
+       // fillgrid();
+        $('#ddlRows').change(function () {
+            if ($("option:selected", $("#ddlRows")).val() == '1') {
+                $("#jsGrid").jsGrid({ pageSize: 10 });
+            }
+            else if ($("option:selected", $("#ddlRows")).val() == '2') {
+                $("#jsGrid").jsGrid({ pageSize: 20 });
+            }
+            else if ($("option:selected", $("#ddlRows")).val() == '3') {
+                $("#jsGrid").jsGrid({ pageSize: 50 });
+            }
+            else if ($("option:selected", $("#ddlRows")).val() == '4') {
+                $("#jsGrid").jsGrid({ pageSize: 100 });
+            }
+            else if ($("option:selected", $("#ddlRows")).val() == '5') {
+                $("#jsGrid").jsGrid({ pageSize: 200 });
+            }
+            else if ($("option:selected", $("#ddlRows")).val() == '6') {
+                $("#jsGrid").jsGrid({ pageSize: 500 });
+            }           
+        });
+        $('#btnSearch').click(function () {
+            if (validate()) {
+                fillgrid();
+            }
+        });
+    });
+    function fillgrid() {
+           $('#jsGrid').jsGrid({
+            width: "100%",
+            sorting: true,
+            paging: true,
+            autoload: true,
+            pageSize: 10,
+            pagerFormat: "Pages: {first} {prev} {pages} {next} {last} &nbsp;&nbsp; {pageIndex} of {pageCount} &nbsp;&nbsp; Total rows: {itemCount}",
+            pageButtonCount: 10,
+            rowClick: function (args) {
+                //console.log(args)
+                var $row = this.rowByItem(args.item),
+                    selectedRow = $("#jsGrid").find('table tr.highlight');
+                if (selectedRow.length) {
+                    selectedRow.toggleClass('highlight');
+                };
+                $row.toggleClass("highlight");
+            },
+            controller: {
+                loadData: function (filter) {
+                    var d = $.Deferred();
+                    var RegParams = {                      
+                        Action: 'A',
+                        URN: $('#urnNo').val()
+                    };
+                    return $.ajax({
+                        url: ServiceURL + "/api/Registration/GetPatientStatus",
+                        type: "GET",
+                        data: RegParams,
+                        dataType: "json",
+                        contentType: "application/json; charset=utf-8",
+                        error: function (error) {
+                            console.log(error.statusText);
+                        },
+                    }).done(function (result) {
+                        // console.log(result);
+                        if (result.length > 0) {
+                            $('#divRowCount').show();
+                            $('#DivNote').show();
+                              d.resolve($.map(result, function (item, itemIndex) {
+                                  return $.extend(item, { "Index": itemIndex + 1 });
+                              }
+                            ));
+                        }
+                        else {
+                            $('#divRowCount').hide();
+                        }
+                    });
+                    return d.promise();
+                }
+            },
+            fields: [
+                { name: "Index", width: 30, type: "number", title: "#Sl", align: "center"},
+                { name: "urn", type: "text", title: "URN No.", align: "center" },
+                { name: "patientName", type: "text", title: "Patient Name", align: "center" },
+                { name: "hospitalCode", type: "text", title: "Hospital Code", align: "center" }, 
+                { name: "hospitalName", type: "text", title: "Hospital Name", align: "center" },  
+                { name: "registrationUserDate", type: "text", title: "Admission Date", align: "center" }  
+            ]
+           });
+    }
+    function validate() {
+        if ($('#urnNo').val() == '') {
+            alert('Please Enter URN !!');
+            $('#urnNo').focus();
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+    function inputLimiter(e, allow) {
+        var AllowableCharacters = '';
+        if (allow == 'NameCharactersymbol') {
+            AllowableCharacters = ' ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz./&';
+        }
+        if (allow == 'NameCharacters') {
+            AllowableCharacters = ' ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-.\'';
+        }
+        if (allow == 'NameCharactersAndNumbers') {
+            AllowableCharacters = '1234567890 ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-,/.\'';
+        }
+        if (allow == 'Description') {
+            AllowableCharacters = '1234567890 ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-,./\&(){}[]#$:';
+        }
+        if (allow == 'Numbers') {
+            AllowableCharacters = '1234567890';
+        }
+        if (allow == 'Decimal') {
+            AllowableCharacters = '1234567890.';
+        }
+        var k;
+        k = document.all ? parseInt(e.keyCode) : parseInt(e.which);
+        if (k != 13 && k != 8 && k != 0) {
+            if ((e.ctrlKey == false) && (e.altKey == false)) {
+                return (AllowableCharacters.indexOf(String.fromCharCode(k)) != -1);
+            }
+            else {
+                return true;
+            }
+        }
+        else {
+            return true;
+        }
+    }
+</script>
+<div class="row">
+    <div class="col-12 pb-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col">
+                        <form class="filter-wrapper">
+                            <div class="form-group row">
+                                <label for="packageHeader" class="col-sm-1 col-form-label">URN</label>
+                                <div class="col-sm-2">
+                                    <input type="text" class="form-control" autofocus id="urnNo" placeholder="Enter here" maxlength="17" onkeypress="return inputLimiter(event,'Numbers')" />
+                                </div>                             
+                                <div class="col-sm-1">
+                                    <input class="btn btn-outline-success my-2 my-sm-0" type="button" value="Search" id="btnSearch">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div style="color:green" id="DivNote"><marquee onmouseover="this.stop();" onmouseout="this.start();"><b>Note : The Report Is Showing List Of Admitted Patient Whose Treatment Is Going On But Not Discharged.</b></marquee></div>
+                <div class="row" id="divRowCount">
+                    <label for="Rows">&nbsp;&nbsp;&nbsp;Row count</label>
+                    <div class="col-sm-1">
+                        <select id="ddlRows" autofocus>
+                            <option value="1">10</option>
+                            <option value="2">20</option>
+                            <option value="3">50</option>
+                            <option value="4">100</option>
+                            <option value="5">200</option>
+                            <option value="6">500</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-10"></div>
+                </div>
+                <div class="table table-striped table-bordered" id="jsGrid">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

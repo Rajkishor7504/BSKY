@@ -1,0 +1,13 @@
+2020-06-30 11:12:19.7494 DEBUG WebAPI Registered
+2020-06-30 14:33:24.4502 DEBUG WebAPI Registered
+2020-06-30 15:11:14.3648 DEBUG WebAPI Registered
+2020-06-30 15:14:45.9498 DEBUG WebAPI Registered
+2020-06-30 15:17:21.0574 DEBUG WebAPI Registered
+2020-06-30 16:46:38.3601 DEBUG WebAPI Registered
+2020-06-30 16:49:13.0508 ERROR System.NullReferenceException: Object reference not set to an instance of an object.
+   at HPSBYS.Data.Services.CommonExtension.ToDynamicParameters(Object[] parameters, String outParameter, DbType dbType) in D:\Ram\HPSBYS_1.2.0.0\HPSBYS.Data\Services\CommonExtension.cs:line 37
+   at HPSBYS.Data.Services.PatientDataServices.PreAuthPackageBlock(PreAuthApprovedPackageBlock obj) in D:\Ram\HPSBYS_1.2.0.0\HPSBYS.Data\Services\PatientDataServices.cs:line 303
+2020-06-30 16:50:36.8405 DEBUG WebAPI Registered
+2020-06-30 16:51:55.2318 ERROR System.NullReferenceException: Object reference not set to an instance of an object.
+   at HPSBYS.Data.Services.CommonExtension.ToDynamicParameters(Object[] parameters, String outParameter, DbType dbType) in D:\Ram\HPSBYS_1.2.0.0\HPSBYS.Data\Services\CommonExtension.cs:line 37
+   at HPSBYS.Data.Services.PatientDataServices.PreWardAuthPackageBlock(PreAuthApprovedPackageBlock obj) in D:\Ram\HPSBYS_1.2.0.0\HPSBYS.Data\Services\PatientDataServices.cs:line 325

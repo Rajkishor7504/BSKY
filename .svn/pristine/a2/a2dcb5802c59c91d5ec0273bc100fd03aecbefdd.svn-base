@@ -1,0 +1,3 @@
+2018-12-12 09:43:49.8624 INFO http://164.100.138.214:8080/aua2.5/auaservice/authenticateOtp
+2018-12-12 09:43:49.8803 INFO <?xml version="1.0" encoding="UTF-8" standalone="yes"?><Otp xmlns="http://www.uidai.gov.in/authentication/otp/1.0" uid="715448184377" ac="0000540000" sa="0000540000" ver="2.5" txn="ORI:OCAC:ILFS:20181212094349862" ts="2018-12-12T09:43:49.000+05:30" lk="MJ5m2MhDMB1pujFwcsL_bWm0JOiv6OLouMUXQFWN6Y1TrWKeHSmfPVQ" type="A"><Opts ch="00" /></Otp>
+2018-12-12 09:43:56.3470 INFO <?xml version="1.0" encoding="UTF-8" standalone="yes"?><OtpRes txn="ORI:OCAC:ILFS:20181212094349862" code="44b113b7b3114f5ba1b1682b3d98ab71" ts="2018-12-12T09:51:30.499+05:30" ret="y" xmlns="http://www.uidai.gov.in/authentication/otp/1.0"><Signature></Signature></OtpRes>
